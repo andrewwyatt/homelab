@@ -1,0 +1,14 @@
+<%= node['linux']['chef']['file_header'] %>
+
+[Unit]
+Description=Boot notification service
+After=syslog.target network.target NetworkManager-wait-online.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/bootnotice start
+ExecStop=/usr/sbin/bootnotice stop
+RemainAfterExit=true
+
+[Install]
+WantedBy=multi-user.target

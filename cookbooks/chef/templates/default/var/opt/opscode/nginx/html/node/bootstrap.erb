@@ -1,0 +1,450 @@
+#!/bin/bash
+
+###
+### Chef Client Bootstrap Utility
+###
+
+<%= node['chef']['file_header'] %>
+
+### Options:
+###
+### -f {FQDN}        - Specify the client FQDN (needed for kickstart)
+### -v {VERSION}     - Specify version to install
+### -s {SERVER}      - Specify target Chef server
+### -o {ORG}         - Specify target organization
+### -e {ENVIRONMENT} - Specify the target environment
+### -r {RUNLIST}     - Specify the default run list item for the server
+### -u {URL}         - Specify alternative URL
+### -p {PASSWORD}    - Specify the decryption password (will prompt if not provided)
+### -t {TIMEOUT}     - Specify the delay before proceeding, 0 to disable
+###
+
+PLATFORM=`uname -r | sed -s -e 's#^.*\.el##' -e 's#.x86_64##'`
+
+SERVER="<%= @server_name %>"
+VERSION="<%= @client_version %>"
+INSTALLFROMSOURCE=<%= @install_from_source %>
+REPOPATH="<%= @url %>${PLATFORM}/"
+ORG="<%= @org_name %>"
+ORGUSER="<%= @org_user %>"
+ORGCERT="<%= @org_cert %>"
+CHEFENVIRONMENT="<%= @chef_environment %>"
+RUNLIST="<%= @run_list %>"
+TIMEOUT=<%= @bootstrap_delay %>
+BOOTSTRAPROOT=<%= @bootstrap_root %>
+
+SLACK_ENABLED=<%= node['chef']['slack_enabled'] %>
+SLACK_USER=<%= node['chef']['bootstrap_name'] %>
+SLACK_CHANNEL=<%= node['chef']['slack_channel'] %>
+SLACK_EMOJI=<%= node['chef']['bootstrap_emoji'] %>
+SLACK_API_PATH=<%= node['chef']['api_path'] %>
+
+###############################################################################
+
+function cleanup() {
+  ### Once the client.pem exists there is no need for any other certs to be left around
+  ### as they are a security concern.
+  rm -f /etc/chef/${ORGCERT}.pem >/dev/null 2>&1
+  rm -f /etc/chef/${ORGUSER}.pem >/dev/null 2>&1
+  rm -f /root/${CLIENTROLE}.json >/dev/null 2>&1
+  rm -rf /root/.bootstrap >/dev/null 2>&1
+  rm -f /root/client.json >/dev/null 2>&1
+}
+
+function bootstrap_help() {
+  cat <<EOF
+Usage: bootstrap [OPTION(S)]...
+Just a simple tool to insert a node into a chef server for systems management
+reasons.  Must be run as root.
+
+Mandatory arguments
+  -c    Clean out the previous installation
+  -e    Use Chef environment                            ..${CHEFENVIRONMENT}
+  -f    Client FQDN
+  -h    Help..
+  -o    Organization                                    ..${ORG}
+  -p    Decryption Password (will prompt if empty)
+  -r    Run List                                        ..${RUNLIST}
+  -s    Chef server for injection                       ..${SERVER}
+  -t    Delay deployment for N seconds                  ..${TIMEOUT} seconds
+  -v    Client version to install                       ..${VERSION}
+  -u    URL for packages                                ..${REPOPATH}
+  -y    Install via YUM rather than URL (Falls back to URL)
+EOF
+  exit 1
+}
+
+function notify() {
+  if [ ${SLACK_ENABLED} ]
+  then
+    curl -X POST --data-urlencode "payload={\"channel\": \"${SLACK_CHANNEL}\", \"username\": \"${SLACK_USER}\", \"text\": \"$1\", \"icon_emoji\": \"${SLACK_EMOJI}\"}" "https://hooks.slack.com/services/${SLACK_API_PATH}" >/dev/null 2>&1
+  fi
+  echo $1
+}
+
+while getopts "f:s:v:o:e:u:r:p:t:ch" opt; do
+  case $opt in
+    f)
+      FQDN=${OPTARG}
+    ;;
+    s)
+      SERVER=${OPTARG}
+    ;;
+    v)
+      VERSION=${OPTARG}
+    ;;
+    o)
+      ORG=${OPTARG}
+    ;;
+    e)
+      CHEFENVIRONMENT=${OPTARG}
+    ;;
+    r)
+      RUNLIST=${OPTARG}
+    ;;
+    u)
+      REPOPATH="${OPTARG}"
+    ;;
+    p)
+      PASSWORD=${OPTARG}
+    ;;
+    t)
+      num='^[0-9]+$'
+      if ! [[ ${OPTARG} =~ $num ]]
+      then
+         echo "ERROR: Timeout value must be a number."
+         cleanup 2>/dev/null
+         exit 1
+       else
+         TIMEOUT=${OPTARG}
+       fi
+    ;;
+    c)
+      CLEAN=true
+    ;;
+    y)
+      INSTALLFROMSOURCE=false
+    ;;
+    h)
+      bootstrap_help
+    ;;
+  esac
+done
+
+if [ ! "${UID}" == 0 ]
+then
+   echo "This utility needs to be run as the root user."
+   cleanup 2>/dev/null
+   exit 1
+fi
+
+IPADDRESS=$(ip addr show | grep 'inet ' | awk '{print $2}' | grep -v "^127." | cut -d: -f2 | awk '{ print $1}'|cut -d/ -f1)
+
+if [ ${FQDN} ]
+then
+  hostname ${FQDN}
+else
+  FQDN=$(hostname -f)
+fi
+
+HOSTNAME=$(hostname -s)
+if [ ! $? = 0 ]
+then
+  notify "ERROR: This host doesn't know its own name, so how can I even?"
+fi
+
+PLATFORMRELEASE=$(rpm -qa | grep '\-release')
+PLATFORMVERSION=$(rpm -q --queryformat '%{VERSION}' ${PLATFORMRELEASE})
+
+echo "****"
+echo "****   Abandon hope all ye who enter here"
+echo "****   All your ${FQDN} are belong to ${SERVER}"
+echo "****   Deploying version ${VERSION}"
+echo "****"
+
+if [ ${TIMEOUT} -gt 0 ]
+then
+  echo "PRESS CONTROL-C NOW TO ABORT, PROCEEDING WITH DEPLOY IN ${TIMEOUT} SECONDS"
+  sleep ${TIMEOUT}
+fi
+
+notify "${FQDN} wants to join ${SERVER}?  Making it so."
+
+### Ensure /etc/hosts is proper or chef client bootstrap will fail
+cat <<EOF >/etc/hosts
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+${IPADDRESS}	${FQDN} ${HOSTNAME}
+EOF
+
+### Am I already in there?
+NODETEST=$(knife node show ${FQDN} -s https://${SERVER}/organizations/${ORG} -c /etc/chef/client.rb >/dev/null 2>&1)
+if [ $? = 0 ]
+then
+  notify "ERROR: ${FQDN} is already attached to ${SERVER} and must be removed first."
+  cleanup 2>/dev/null
+  exit 1
+fi
+
+if [ "$(rpm -qi chef >/dev/null 2>&1 && echo installed)" == "installed" ]
+then
+  if [ "${CLEAN}" == true ]
+  then
+    notify "Removing the Chef installation from ${FQDN}."
+    rpm -e chef
+    rm -rf /etc/chef
+    rm -rf /var/lib/chef
+  else
+    notify "ERROR: ${FQDN} already exists on ${SERVER}. Delete the node from Chef and use -c to prepare this node for bootstrap."
+    cleanup 2>/dev/null
+    exit 1
+  fi
+fi
+
+### Create and harden the /etc/chef directory
+if [ ! -d "/etc/chef" ]
+then
+  mkdir -p /etc/chef
+fi
+
+### Harden /etc/chef
+chown root:root /etc/chef
+chmod 0700 /etc/chef
+
+### Create and harden the /var/chef directory
+if [ ! -d "/var/chef" ]
+then
+  mkdir -p /var/chef
+fi
+
+### Harden /var/chef
+chown root:root /var/chef
+chmod 0700 /var/chef
+
+while true
+do
+  ### REMEMBER TO IMPROVE THIS
+  if [ ${INSTALLFROMSOURCE} == true ]
+  then
+    notify "Fetching the Chef client list from URL - ${REPOPATH}"
+    PACKAGE=$(curl -L ${REPOPATH} 2>/dev/null | grep "chef-[0-9].*.x86_64.rpm" | sed -s -e 's/^.*href="//' -e 's/".*$//' -e 's/<[^>]*>//g' | head -n 1 | awk '{printf $1}')
+    notify "Installing Chef Client ${VERSION} - ${PACKAGE}"
+    rpm -Uvh --oldpackage --replacepkgs "${REPOPATH}${PACKAGE}" >/dev/null 2>&1
+    if [ ! $? = 0 ]
+    then
+      notify "ERROR: Could not install Chef client via URL."
+      cleanup 2>/dev/null
+      exit 1
+    else
+     break
+    fi
+  else
+    notify "Fetching the Chef client from a local YUM repo."
+    yum -y install chef-${VERSION}
+    if [ ! $? = 0 ]
+    then
+      notify "ERROR: Could not install package via yum, trying via URL instead."
+      INSTALLFROMSOURCE = true
+    else
+     break
+    fi
+  fi
+done
+
+
+### Create and restrict access to the bootstrap directory
+if [ ! -d "/root/.bootstrap" ]
+then
+  mkdir /root/.bootstrap
+  chown root:root /root/.bootstrap
+  chmod 0700 /root/.bootstrap
+fi
+
+cd /root/.bootstrap
+
+### Get the password from the command line if it wasn't provided with -p
+if [ ! ${PASSWORD} ]
+then
+  echo -n "Please provide the decryption password: "
+  read -s PASSWORD
+  echo
+fi
+
+### Temporarily store the password on the filesystem so openssl can consume it.
+cat <<EOF | tr -d '\n\r' >/root/.bootstrap/.password
+${PASSWORD}
+EOF
+
+chown root:root /root/.bootstrap/.password
+chmod 0700 /root/.bootstrap/.password
+
+if [ ${SERVER} ]
+then
+  for item in ${SERVER}.crt ${ORGCERT}.pem ${ORGUSER}.pem encrypted_data_bag_secret
+  do
+    notify "Downloading ${item} from ${SERVER} and decrypting it"
+    ERRORMSG=$(curl -o /root/.bootstrap/${item}.enc -L -s -q https://${SERVER}${BOOTSTRAPROOT}${item}.enc --insecure | grep 404)
+    if [[ ${ERRORMSG} =~ 404 ]]
+    then
+      echo "ERROR: Encrypted file ${item} not found on my Chef server ${SERVER}"
+      cleanup 2>/dev/null
+      exit 1
+    fi
+    openssl aes-256-cbc -d -a -in /root/.bootstrap/${item}.enc -out /root/.bootstrap/${item} -pass file:/root/.bootstrap/.password
+    if [ ! $? = 0 ]
+    then
+      notify "Decryption of ${item} failed, can't continue"
+      cleanup 2>/dev/null
+      exit 1
+    fi
+  done
+else
+  echo "ERROR: Use -s {fqdn} to specify a Chef server."
+  cleanup 2>/dev/null
+  exit 1
+fi
+
+notify "Provisioning the data bag secret"
+if [ -e "encrypted_data_bag_secret" ]
+then
+  mv encrypted_data_bag_secret /etc/chef/encrypted_data_bag_secret
+else
+  notify "ERROR: The data bag encryption key does not exist in the payload, dying."
+  cleanup 2>/dev/null
+  exit 1
+fi
+
+notify "Provisioning the ${SERVER} certificates"
+mkdir /etc/chef/trusted_certs
+if [ -e "${SERVER}.crt" ]
+then
+  mv ${SERVER}.crt /etc/chef/trusted_certs
+else
+  notify "ERROR: The ${SERVER} certificate does not exist in the payload, dying."
+  cleanup 2>/dev/null
+  exit 1
+fi
+
+notify "Preparing to bootstrap ${FQDN} to ${SERVER}"
+if [ -e "${ORGUSER}.pem" ]
+then
+  mv ${ORGUSER}.pem /etc/chef
+else
+  notify "ERROR: The ${ORGUSER} certificate does not exist in the payload, dying."
+  cleanup 2>/dev/null
+  exit 1
+fi
+
+notify "Installing Chef server validation certificate"
+if [ -e "${ORGCERT}.pem" ]
+then
+  mv ${ORGCERT}.pem /etc/chef
+else
+  notify "ERROR: The validator certificate does not exist in the payload, dying."
+  cleanup 2>/dev/null
+  exit 1
+fi
+
+notify "Setting up the client.rb for bootstrap"
+### Configure the client.rb to communicate with the desired Chef server
+cat <<EOF >/etc/chef/client.rb
+current_dir = File.dirname(__FILE__)
+log_level                :info
+log_location             STDOUT
+node_name                "${FQDN}"
+chef_server_url          "https://${SERVER}/organizations/${ORG}"
+cache_type               'BasicFile'
+cache_options( :path => "#{ENV['HOME']}/.chef/checksums" )
+validation_client_name   "${ORGCERT}"
+EOF
+
+
+notify "Connecting ${FQDN} to the ${ORG} organization on ${SERVER}"
+chef-client -S https://${SERVER}/organizations/${ORG} -K /etc/chef/${ORGCERT}.pem -c /etc/chef/client.rb
+if [ $? = 0 ]
+then
+  notify "Connection of ${FQDN} to ${SERVER} successful."
+else
+  notify "ERROR: Something went wrong establishing a connection from ${FQDN} to ${SERVER}, please take a look."
+  cleanup 2>/dev/null
+  exit 1
+fi
+
+### Test that the environment we are bootstrapping exists
+notify "Probing the requested Chef environment ${CHEFENVIRONMENT} from ${FQDN}"
+ENVTEST=$(knife environment show ${CHEFENVIRONMENT} -s https://${SERVER}/organizations/${ORG} -c /etc/chef/client.rb -k /etc/chef/client.pem >/dev/null 2>&1)
+if [ ! $? = 0 ]
+then
+  notify "ERROR: The requested organization (${ORG}) or environment (${CHEFENVIRONMENT}) does not exist."
+  cleanup 2>/dev/null
+  exit 1
+fi
+
+if [ ${RUNLIST} ]
+then
+CLIENTROLE=`echo ${FQDN} | sed -e 's#\.#_#g'`
+
+### Create a role for the client node
+  cat <<EOF > /root/${CLIENTROLE}.json
+  {
+    "name": "${CLIENTROLE}",
+    "description": "Primary role for ${FQDN}",
+    "run_list": [
+      "${RUNLIST}"
+    ]
+  }
+EOF
+  notify "Creating or replacing the role for ${FQDN} (${CLIENTROLE}) with ${RUNLIST} as the default run list entry."
+  knife role from file /root/${CLIENTROLE}.json -s https://${SERVER}/organizations/${ORG} -c /etc/chef/client.rb -k /etc/chef/${ORGUSER}.pem -u ${ORGUSER} >/dev/null 2>&1
+  if [ $? = 0 ]
+  then
+    notify "Role ${CLIENTROLE} has been created successfully."
+  else
+    notify "Could not create ${CLIENTROLE} for ${FQDN} on ${SERVER}"
+    cleanup 2>/dev/null
+    exit 1
+  fi
+
+  ### Set up basic chef environment and runlist
+  cat <<EOF > /root/client.json
+  {
+    "chef_environment": "${CHEFENVIRONMENT}",
+    "run_list": [ "role[${CLIENTROLE}]" ]
+  }
+EOF
+else
+  ### Set up basic chef environment
+  cat <<EOF > /root/client.json
+  {
+    "chef_environment": "${CHEFENVIRONMENT}"
+  }
+EOF
+fi
+
+### Ensure that the node is set to a useful environment by default
+notify "Bootstrapping ${FQDN} to the ${CHEFENVIRONMENT} environment on ${SERVER}"
+knife node environment set ${FQDN} ${CHEFENVIRONMENT} -s https://${SERVER}/organizations/${ORG} -c /etc/chef/client.rb -k /etc/chef/client.pem
+if [ $? = 0 ]
+then
+  notify "Bootstrap of ${FQDN} to ${SERVER} successful."
+else
+  notify "ERROR: Something went horribly wrong with the bootstrap on ${FQDN}, you better check it out."
+  cleanup 2>/dev/null
+  exit 1
+fi
+
+if [ ${RUNLIST} ]
+then
+  ### Set the default run list
+  echo "Applying run list ${RUNLIST} to ${FQDN}"
+  chef-client -S https://${SERVER}/organizations/${ORG} -K /etc/chef/${ORGCERT}.pem -j /root/client.json
+  if [ $? = 0 ]
+  then
+    echo "Applying ${RUNLIST} to ${FQDN} successful."
+  else
+    echo "ERROR: Something went horribly wrong configuring ${RUNLIST} on ${FQDN}, you better check it out."
+    cleanup 2>/dev/null
+    exit 1
+  fi
+fi
+
+cleanup 2>/dev/null

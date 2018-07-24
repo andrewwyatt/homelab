@@ -1,0 +1,2 @@
+<%= node['provisioner']['file_header'] %>
+<%= @mirror_schedule %> root /opt/provisioner/bin/mirror_<%= @name %>.sh 2>&1 >/var/log/mirror-<%= @name %>-cron.log

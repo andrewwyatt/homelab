@@ -1,0 +1,12 @@
+name 'chef'
+maintainer 'Andrew Wyatt'
+maintainer_email 'andrew@fuduntu.org'
+license 'Apache-2.0'
+description 'Deploys and configures Chef servers'
+long_description 'Deploys and configures Chef servers'
+version '0.2.2'
+chef_version '>= 12.1' if respond_to?(:chef_version)
+depends 'enterprise_linux'
+supports 'redhat'
+source_url 'https://github.com/andrewwyatt/tilde-slash-lab'
+issues_url 'https://github.com/andrewwyatt/tilde-slash-lab/issues'

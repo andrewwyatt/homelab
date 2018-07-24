@@ -1,0 +1,48 @@
+#!/bin/bash
+
+<%= node['provisioner']['file_header'] %>
+
+SLACK_ENABLED=<%= node['provisioner']['slack_enabled'] %>
+SLACK_USER=<%= node['provisioner']['replicator_name'] %>
+SLACK_CHANNEL=<%= node['provisioner']['slack_channel'] %>
+SLACK_EMOJI=<%= node['provisioner']['replicator_emoji'] %>
+SLACK_API_PATH=<%= node['provisioner']['api_path'] %>
+
+function notify() {
+  if [ ${SLACK_ENABLED} ]
+  then
+    curl -X POST --data-urlencode "payload={\"channel\": \"${SLACK_CHANNEL}\", \"username\": \"${SLACK_USER}\", \"text\": \"$(hostname -f): $1\", \"icon_emoji\": \"${SLACK_EMOJI}\"}" "https://hooks.slack.com/services/${SLACK_API_PATH}" >/dev/null 2>&1
+  fi
+}
+
+if [ -f /var/lock/subsys/rsync_updates_<%= @name %> ]; then
+    echo "Mirroring is already running, or stuck.  Can not continue."
+    exit 0
+fi
+
+if [ ! -d <%= @mirror_path %> ]; then
+  mkdir -p <%= @mirror_path %>
+fi
+
+touch /var/lock/subsys/rsync_updates_<%= @name %>
+
+if [ ! -d <%= @mirror_path %> ]
+then
+  mkdir -p <%= @mirror_path %>
+fi
+
+echo "Mirroring <%= @name %> from <%= @url %>"
+
+while true
+do
+  rsync  -avSHP --delete <%= node['provisioner']['rsync_excludes'] %> <%= @url %> <%= @mirror_path %> 2>&1 >/var/log/mirror-<%= @name %>.log
+  if [ $? = 0 ]
+  then
+    break
+  fi
+  notify "Mirroring of <%= @name %> did not complete successfully, retrying."
+  echo "Mirroring of <%= @name %> did not complete successfully, retrying."
+  sleep <%= node['provisioner']['retry_delay'] %>
+done
+
+/bin/rm -f /var/lock/subsys/rsync_updates_<%= @name %>

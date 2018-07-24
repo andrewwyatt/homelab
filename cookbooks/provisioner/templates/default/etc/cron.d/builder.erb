@@ -1,0 +1,3 @@
+<%= node['provisioner']['file_header'] %>
+<%= node['provisioner']['watch_schedule'] %> root su - <%= node['provisioner']['user'] %> <%= node['provisioner']['path'] %>/bin/watch_uploads.sh
+<%= node['provisioner']['watch_schedule'] %> root su - <%= node['provisioner']['user'] %> <%= node['provisioner']['path'] %>/bin/watch_repos.sh

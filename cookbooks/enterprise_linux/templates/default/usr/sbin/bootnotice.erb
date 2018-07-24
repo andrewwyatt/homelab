@@ -1,0 +1,41 @@
+#!/bin/bash
+#
+# bootnotice	Sends a notice that the server is starting up or shutting down.
+#
+
+<%= node['linux']['chef']['file_header'] %>
+
+# Source function library.
+. /etc/init.d/functions
+
+### Slack Integration
+SLACK_ENABLED="<%= node['linux']['slack_enabled'] %>"
+SLACK_USER="<%= node['linux']['boot_notice_name'] %>"
+SLACK_CHANNEL="<%= node['linux']['slack_channel'] %>"
+SLACK_EMOJI="<%= node['linux']['boot_notice_emoji'] %>"
+SLACK_API_PATH="<%= node['linux']['api_path'] %>"
+
+function notify() {
+  if [ ${SLACK_ENABLED} ]
+  then
+    curl -X POST --data-urlencode "payload={\"channel\": \"${SLACK_CHANNEL}\", \"username\": \"${SLACK_USER}\", \"text\": \"$1\", \"icon_emoji\": \"${SLACK_EMOJI}\"}" "https://hooks.slack.com/services/${SLACK_API_PATH}" >/var/log/notice 2>&1
+  fi
+}
+
+case "$1" in
+   start)
+     if [ ! -e /var/lock/subsys/bootnotice ]
+     then
+       touch /var/lock/subsys/bootnotice
+       notify "FYI ... I am now online."
+     fi
+   ;;
+   stop)
+     if [ -e /var/lock/subsys/bootnotice ]
+     then
+       rm -f /var/lock/subsys/bootnotice
+       notify "FYI ... I am shutting down or rebooting"
+     fi
+   ;;
+esac
+exit 0

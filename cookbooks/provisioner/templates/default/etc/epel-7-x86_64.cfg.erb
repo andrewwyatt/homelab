@@ -1,0 +1,49 @@
+<%= node['provisioner']['file_header'] %>
+
+config_opts['root'] = 'epel-7-x86_64-<%= @repository %>'
+config_opts['target_arch'] = 'x86_64'
+config_opts['legal_host_arches'] = ('x86_64',)
+config_opts['chroot_setup_cmd'] = 'install @buildsys-build'
+config_opts['dist'] = 'el7'  # only useful for --resultdir variable subst
+config_opts['releasever'] = '7'
+
+config_opts['yum.conf'] = """
+[main]
+cachedir=/var/cache/yum
+debuglevel=2
+reposdir=/dev/null
+logfile=/var/log/yum.log
+retries=20
+obsoletes=1
+gpgcheck=0
+assumeyes=1
+syslog_ident=mock
+syslog_device=
+
+# repos
+<% node['linux']['yum']['package_mirrors']["#{@mirror}"].each do |id,data| -%>
+[<%= id %>]
+<% data.each do |key,value| -%>
+<%= key %>=<%= value %>
+<% end -%>
+<% end -%>
+
+[<%= @repository %>]
+name=<%= @repository %>
+baseurl=file://<%= node['provisioner']['baserepopath'] %>/<%= @repository %>/RPMS/
+enabled=1
+
+<% unless @repository == 'STABLE' %>
+[STABLE]
+name=STABLE
+baseurl=file://<%= node['provisioner']['baserepopath'] %>/STABLE/RPMS/
+enabled=1
+<% end %>
+
+[epel-debug]
+enabled=1
+name=epel-debug
+mirrorlist=http://mirrors.fedoraproject.org/mirrorlist?repo=epel-debug-7&arch=x86_64
+failovermethod=priority
+enabled=0
+"""

@@ -1,0 +1,10 @@
+<%= node['linux']['chef']['file_header'] %>
+
+umask <%= node['linux']['user']['umask'] %>
+
+HISTTIMEFORMAT='%F %T '
+readonly HISTTIMEFORMAT
+export HISTTIMEFORMAT
+HISTSIZE=5000
+readonly HISTSIZE
+export HISTSIZE

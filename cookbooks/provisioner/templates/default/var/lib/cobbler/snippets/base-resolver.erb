@@ -1,0 +1,10 @@
+<%= node['provisioner']['file_header'] %>
+
+cat <<EODNS >/etc/resolv.conf
+search <%= node['linux']['dns_search'] %>
+
+<% node['linux']['dns_resolvers'].each do |key,resolver| -%>
+nameserver <%= resolver %>
+<% end -%>
+options <%= node['linux']['dns_options'] %>
+EODNS

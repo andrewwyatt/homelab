@@ -1,0 +1,15 @@
+<%= node['provisioner']['file_header'] %>
+
+pid file = <%= @pid_file %>
+uid = <%= @uid %>
+gid = <%= @gid %>
+use chroot = <%= @use_chroot %>
+read only = <%= @read_only %>
+hosts allow = <%= @hosts_allow %>
+hosts deny = <%= @hosts_deny %>
+max connections = <%= @max_connections %>
+log format = <%= @log_format %>
+syslog facility = <%= @syslog_facility %>
+timeout = <%= @timeout %>
+
+&include /etc/rsyncd.d

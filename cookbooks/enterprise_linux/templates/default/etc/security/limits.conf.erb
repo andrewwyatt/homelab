@@ -1,0 +1,7 @@
+# /etc/security/limits.conf
+
+<%= node['linux']['chef']['file_header'] %>
+
+<% node['linux']['limits']['default'].each do |key,limit| -%>
+<%= limit %>
+<% end -%>

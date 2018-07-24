@@ -1,0 +1,7 @@
+current_dir = File.dirname(__FILE__)
+log_level                :info
+log_location             STDOUT
+node_name                "pivotal"
+client_key               "<%= @mirror_root %>/<%= @chef_server %>/pivotal.pem"
+chef_server_url          "https://<%= @chef_server %>/organizations/<%= @chef_org %>"
+versioned_cookbooks      true

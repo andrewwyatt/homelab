@@ -1,0 +1,63 @@
+#!/bin/bash
+###
+### Simple chef client test and auto heal tool
+###
+
+<%= node['linux']['chef']['file_header'] %>
+
+MAX_LAG=90
+FQDN=$(hostname)
+TEST_LOG='/var/log/chef-client.log'
+LOG_TAG='daemon.notice'
+CHEF_STATUS=$(knife status "fqdn:${FQDN}" -c /etc/chef/client.rb)
+LAST_CHECK_IN=$(echo ${CHEF_STATUS} | awk '{print $1}')
+LAST_CHECK_MH=$(echo ${CHEF_STATUS} | awk '{print $2}')
+
+### Slack Integration
+SLACK_ENABLED="<%= node['linux']['slack_enabled'] %>"
+SLACK_USER="<%= node['linux']['health_check_name'] %>"
+SLAK_CHANNEL="<%= node['linux']['slack_channel'] %>"
+SLACK_EMOJI="<%= node['linux']['health_check_emoji'] %>"
+SLACK_API_PATH="<%= node['linux']['api_path'] %>"
+
+function notify() {
+  if [ ${SLACK_ENABLED} ]
+  then
+    curl -X POST --data-urlencode "payload={\"channel\": \"${SLACK_CHANNEL}\", \"username\": \"${SLACK_USER}\", \"text\": \"$1\", \"icon_emoji\": \"${SLACK_EMOJI}\"}" "https://hooks.slack.com/services/${SLACK_API_PATH}" >/dev/null 2>&1
+  fi
+  echo $1
+}
+
+function test_client {
+  chef-client 2>&1 >${TEST_LOG}
+  return $?
+}
+
+if [[ ${LAST_CHECK_MH} =~ hour ]]
+then
+ LAST_CHECK_IN=$(( LAST_CHECK_IN * 60 ))
+fi
+
+logger -t ${LOG_TAG} "CHEF_HEALTH: ${FQDN} last checked in ${LAST_CHECK_IN} minutes ago."
+
+if (( ${LAST_CHECK_IN} > ${MAX_LAG} ))
+then
+  notify "${FQDN} has not checked into Chef for ${LAST_CHECK_IN} minutes."
+  touch /tmp/.chef_client_not_healthy
+  notify "Testing the Chef client on ${FQDN}"
+  logger -t ${LOG_TAG} "CHEF_HEALTH: Testing Chef client execution"
+  test_client
+  if [ $? == 0 ]
+  then
+    logger -t ${LOG_TAG} "CHEF_HEALTH: Client passed validation test"
+  else
+    notify "Could not heal Chef client on ${FQDN}, please review ${TEST_LOG} on this node and correct manually."
+    logger -t ${LOG_TAG} "CHEF_HEALTH: Client failed validation test, please review ${TEST_LOG} and correct manually."
+  fi
+else
+  if [ -e "/tmp/.chef_client_not_healthy" ]
+  then
+    notify "${FQDN} last checked in ${LAST_CHECK_IN} minutes ago, and is healthy again."
+    rm /tmp/.chef_client_not_healthy
+  fi
+fi

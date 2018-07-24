@@ -1,0 +1,4 @@
+<%= node['linux']['chef']['file_header'] %>
+
+[Journal]
+ForwardToSyslog=<%= node['linux']['systemd']['journald']['forward_to_syslog'] %>

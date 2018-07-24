@@ -1,0 +1,7 @@
+<%= node['linux']['chef']['file_header'] %>
+
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+<%= @ipaddress %>	<%= @fqdn %> <%= @hostname %>
+<% node['linux']['hosts'].each do |key,host| -%>
+<%= host %>
+<% end -%>

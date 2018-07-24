@@ -1,0 +1,22 @@
+<%= node['linux']['chef']['file_header'] %>
+
+weekly
+compress
+rotate 4
+create
+
+include /etc/logrotate.d
+
+/var/log/wtmp {
+    missingok
+    monthly
+    create 0664 root utmp
+    rotate 1
+}
+
+/var/log/btmp {
+    missingok
+    monthly
+    create 0660 root utmp
+    rotate 1
+}

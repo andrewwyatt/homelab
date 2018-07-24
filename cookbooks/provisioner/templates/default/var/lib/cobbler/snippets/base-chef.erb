@@ -1,0 +1,14 @@
+<%= node['provisioner']['file_header'] %>
+
+notify "<%= node['provisioner']['cobbler']['bootstrap_notice'] %>"
+curl -o ./bootstrap <%= node['provisioner']['cobbler']['bootstrap_url'] %>/bootstrap --insecure
+bash ./bootstrap -t 0 -p '<%= @chefpw %>' -s <%= node['provisioner']['chef']['default_server'] %> -f ${HOSTNAME} >/var/log/bootstrap.log 2>&1
+if [ $? = 0 ]
+then
+  notify "<%= node['provisioner']['cobbler']['bootstrap_success_notice'] %>"
+  rm -f /var/log/bootstrap.log
+else
+  FAILED=1
+  notify "<%= node['provisioner']['cobbler']['bootstrap_failure_notice'] %>"
+fi
+rm -f /bootstrap

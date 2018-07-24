@@ -1,0 +1,9 @@
+<%= node['linux']['chef']['file_header'] %>
+
+umask <%= node['linux']['user']['umask'] %>
+
+if [ ! "${TMOUT}" ]
+then
+  readonly TMOUT=<%= node['linux']['security']['shell_timeout'] %>
+  export TMOUT
+fi

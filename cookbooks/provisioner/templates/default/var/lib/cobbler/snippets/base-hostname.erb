@@ -1,0 +1,9 @@
+<%= node['provisioner']['file_header'] %>
+
+HOSTNAME=$(hostname)
+if [[ ${HOSTNAME} =~ localhost ]] || [ ! $HOSTNAME ]
+then
+  HOSTNAME=\$(curl -s "<%= node['provisioner']['cobbler']['hostname_url'] %>?authid=<%= node['provisioner']['hostname_auth_token'] %>")
+  hostname ${HOSTNAME}
+fi
+echo ${HOSTNAME} >/etc/hostname

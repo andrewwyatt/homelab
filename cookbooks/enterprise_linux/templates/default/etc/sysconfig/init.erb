@@ -1,0 +1,14 @@
+<%= node['linux']['chef']['file_header'] %>
+
+BOOTUP=color
+RES_COL=60
+MOVE_TO_COL="echo -en \\033[${RES_COL}G"
+SETCOLOR_SUCCESS="echo -en \\033[0;32m"
+SETCOLOR_FAILURE="echo -en \\033[0;31m"
+SETCOLOR_WARNING="echo -en \\033[0;33m"
+SETCOLOR_NORMAL="echo -en \\033[0;39m"
+PROMPT=no
+AUTOSWAP=no
+ACTIVE_CONSOLES=/dev/tty[1-2]
+SINGLE=/sbin/sulogin
+umask 027

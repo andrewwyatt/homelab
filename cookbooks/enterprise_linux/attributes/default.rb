@@ -1,0 +1,513 @@
+###
+### Cookbook Name:: enterprise_linux
+### Default Attributes
+###
+### Copyright 2013-2018, Andrew Wyatt
+###
+### Licensed under the Apache License, Version 2.0 (the "License");
+### you may not use this file except in compliance with the License.
+### You may obtain a copy of the License at
+###
+###    http://www.apache.org/licenses/LICENSE-2.0
+###
+### Unless required by applicable law or agreed to in writing, software
+### distributed under the License is distributed on an "AS IS" BASIS,
+### WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+### See the License for the specific language governing permissions and
+### limitations under the License.
+###
+
+###
+### *** NOTICE *** NOTICE *** NOTICE *** NOTICE *** NOTICE *** NOTICE ***
+###
+### READ THIS ATTRIBUTES DEFINITION IN ITS ENTIRETY.  IT MUST BE CONFIGURED
+### FOR YOUR ENVIRONMENT, OR IT WILL FAIL TO WORK PROPERLY.
+###
+### *** NOTICE *** NOTICE *** NOTICE *** NOTICE *** NOTICE *** NOTICE ***
+###
+
+###
+### Define sensitivity as an attribute so we can override it when necessary
+### for troubleshooting purposes.
+###
+
+default['linux']['runtime']['sensitivity']                      = true
+
+###
+### Defines the organization that Chef Client will use for connections.
+###
+
+default['linux']['organization']                                = "lab.fewt.com"
+default['linux']['org_abbreviation']                            = "lab"
+
+###
+### This defines the cname for the local deployment node, as well as the default profile for new servers.
+### Inherited by the provisioner cookbook.
+###
+
+default['linux']['cobbler']['server']                            = 'deploy.lab.fewt.com'
+default['linux']['cobbler']['profile']                           = 'CentOS-7-x86_64'
+
+###
+### Configures the default timezone for servers
+###
+
+default['linux']['timezone']                                     = "America/New_York"
+
+###
+### This defines the Chef package that is used for deployment.  It is shared by other
+### cookbooks.  Changes here affect provisioning.
+###
+
+default['linux']['chef']['install_branch']                       = 'stable'
+default['linux']['chef']['client_version']                       = '14.3.37'
+default['linux']['chef']['install_via_url']                      = false
+default['linux']['chef']['client_url']                           = "https://packages.chef.io/files/#{node['linux']['chef']['install_branch']}/chef/#{node['linux']['chef']['client_version']}/el/#{node['platform_version'][0]}/"
+
+###
+### These attributes define the basic knowledge about the Chef Organization, and how to configure nodes
+### to operate in this organization.
+###
+
+default['linux']['chef']['org_cert']                             = "lab-validator"
+default['linux']['chef']['default_environment']                  = "lab"
+default['linux']['chef']['primary_role']                         = "enterprise_linux"
+default['linux']['chef']['bootstrap_delay']                      = "30"
+default['linux']['chef']['bootstrap_user']                       = "admin"
+default['linux']['chef']['bootstrap_root']                       = "/node/"
+
+default['linux']['chef']['current_dir']                          = "File.dirname(__FILE__)"
+default['linux']['chef']['log_level']                            = ":info"
+default['linux']['chef']['log_location']                         = "STDOUT"
+default['linux']['chef']['ohai_plugin_path']                     = "/etc/chef/ohai/plugins"
+default['linux']['chef']['chef_org']                             = "/organizations/lab"
+default['linux']['chef']['cache_type']                           = "BasicFile"
+default['linux']['chef']['cache_options']                        = "\#{ENV['HOME']}/.chef/checksums"
+default['linux']['chef']['cookbook_path']                        = "\#{current_dir}/../cookbooks"
+
+default['linux']['chef_client_cron']                             = "00,30 * * * * root sleep $(( $RANDOM \\%300 )); chef-client >/var/log/chef-client.log 2>&1"
+
+default['linux']['chef']['conf_dir']                             = "/etc/chef"
+default['linux']['chef']['run_path']                             = "/var/run/chef"
+
+default['linux']['chef']['file_header']                          =
+'###
+### **********  WARNING  WARNING  WARNING  WARNING  WARNING  WARNING  **********
+###
+### THIS IS A CHEF MANAGED SERVICE!  CHANGES MADE TO THIS FILE WILL NOT PERSIST!
+### IF THIS FILE IS CHANGED, CHEF WILL REVERT IT AND RESTART THE APPLICABLE
+### SERVICE!  YOU WILL BE HELD RESPONSIBLE FOR ANY OUTAGE THAT MAY OCCUR!
+###
+### **********  WARNING  WARNING  WARNING  WARNING  WARNING  WARNING  **********
+###'
+
+###
+### Sets the default banner statement for servers.  This message is displayed when users
+### connect to a Chef Managed server.
+###
+
+default['linux']['banner']                              =
+'
+************************************************************************
+
+   WARNING: This system is for the use of authorized clients only.
+            Individuals using the computer network system without
+            authorization, or in excess of their authorization, are
+            subject to having all their activity on this computer
+            network system monitored and recorded by system
+            personnel.  To protect the computer network system from
+            unauthorized use and to ensure the computer network systems
+            is functioning properly, system administrators monitor this
+            system.  Anyone using this computer network system
+            expressly consents to such monitoring and is advised that
+            if such monitoring reveals possible conduct of criminal
+            activity, system personnel may provide the evidence of
+            such activity to law enforcement officers.
+
+            Access is restricted to authorized users only.
+            Unauthorized access is a violation of state and federal,
+            civil and criminal laws.
+
+**************************************************************************
+
+'
+
+###
+### By default we don't present a message of the day to users post login.
+###
+
+default['linux']['motd']                                        = ''
+
+###
+### The following attributes are necessary to send messages to Slack.
+###
+default['linux']['slack_enabled']                               = false
+#default['linux']['slack_user']                                  = 'Chef'
+#default['linux']['slack_channel']                               = '#homelab'
+#default['linux']['emoji']                                       = ':construction:'
+#default['linux']['api_path']                                    = 'APIKEYGOESHERE'
+
+###
+### Sets up the reboot Slack notification.
+###
+
+default['linux']['boot_notice_name']                            = node['fqdn']
+default['linux']['boot_notice_emoji']                           = ":all_the_things:"
+
+###
+### Sets up the health check notification.
+###
+
+default['linux']['health_check_name']                           = "Chef_Health"
+default['linux']['health_check_emoji']                          = ":construction:"
+
+###
+### Sets up the patching notification
+###
+
+default['linux']['patch_bot_name']                              = "Patch_Manager"
+default['linux']['patch_emoji']                                 = ":construction:"
+
+###
+### The health utility checks the status of itself to ensure it is checking into Chef,
+### if it is not checking in properly it will attempt to self heal and warn if unable.
+###
+
+default['linux']['chef_health']                                 = "00 * * * * root /usr/bin/chef-health >/dev/null 2>&1"
+
+###
+### By default all servers in this environment are configured to patch themselves weekly.
+###
+
+default['linux']['autoupdate']                                  = "00 00 * * 1 root /usr/bin/autoupdate --reboot >/dev/null 2>&1"
+
+###
+### The decom recipe also supports rebuilding, this attribute shouldn't normally be changed
+### unless the desire is to always rebuild the nodes.
+###
+
+default['linux']['decom']['final_task']                          = 'shutdown -h now'
+
+###
+### Send this notification that the node is being decommissioned to Slack
+###
+
+default['linux']['decom']['decom_notice']                        = 'WHAT? I am being decommissioned!'
+
+###
+### Setting disable_root to true will lock out the root user preventing use.  Setting to false
+### however will cause the recipe to manage the root password based on the root_hash data bag property
+### that is also consumed by the provisioning cookbook.
+###
+
+default['linux']['disable_root']                                = false
+
+default['linux']['login']['lock_inactive_users']                = true
+default['linux']['login']['inactive_user_lock_days']            = "35"
+
+###
+### Valid for EL6 (deprecated)
+###
+
+default['linux']['runlevel']                                    = '3'
+
+###
+### EL7 uses multi-user.target
+###
+
+default['linux']['target']                                      = 'multi-user'
+
+default['linux']['shell']['timeout']                            = '900'
+default['linux']['shell']['timestamp_history']                  = true
+default['linux']['shells']                                      = { 'bash' => '/bin/bash',
+                                                                    'sh'   => '/bin/sh',
+                                                                    'dash' => '/bin/dash' }
+
+default['linux']['cronallow']                                   = { }
+default['linux']['hosts']                                       = { }
+
+default['linux']['dns_search']                                  = 'lab.fewt.com fewt.com'
+default['linux']['dns_options']                                 = 'timeout:1'
+default['linux']['dns_resolvers']                               = { 'ns1' => '10.100.100.5',
+                                                                    'ns2' => '10.100.100.6',
+                                                                    'ns3' => '10.100.100.7' }
+
+default['linux']['limits']['default']                            = { 'hard_core'  => '* hard core 0',
+                                                                     'soft_core'  => '* soft core 0',
+                                                                     'soft_nproc' => '* soft nproc unlimited' }
+
+default['linux']['selinux']                                     = "disabled"
+default['linux']['selinuxtype']                                 = "targeted"
+
+default['linux']['logindefs']['maildir']                         = "/var/spool/mail"
+default['linux']['logindefs']['pass_max_days']                   = "90"
+default['linux']['logindefs']['pass_min_days']                   = "7"
+default['linux']['logindefs']['pass_min_len']                    = "14"
+default['linux']['logindefs']['pass_warn_age']                   = "7"
+default['linux']['logindefs']['uid_min']                         = "500"
+default['linux']['logindefs']['uid_max']                         = "60000"
+default['linux']['logindefs']['gid_min']                         = "500"
+default['linux']['logindefs']['gid_max']                         = "60000"
+default['linux']['logindefs']['create_home']                     = "yes"
+default['linux']['logindefs']['umask']                           = "027"
+default['linux']['logindefs']['usergroups_enab']                 = "yes"
+default['linux']['logindefs']['encrypt_method']                  = "SHA512"
+default['linux']['logindefs']['fail_delay']                      = "4"
+
+default['linux']['pwquality']['difok']                           = "5"
+default['linux']['pwquality']['minlen']                          = "14"
+default['linux']['pwquality']['dcredit']                         = "-1"
+default['linux']['pwquality']['ucredit']                         = "-1"
+default['linux']['pwquality']['lcredit']                         = "-1"
+default['linux']['pwquality']['ocredit']                         = "-1"
+default['linux']['pwquality']['minclass']                        = "0"
+default['linux']['pwquality']['maxrepeat']                       = "4"
+
+default['linux']['auth']['cracklib']                             = "retry=3 minlen=14 dcredit=-1 ucredit=-1 ocredit=-1 lcredit=-1 type="
+default['linux']['auth']['password_sufficient']                  = "remember=5 sha512 shadow nullok try_first_pass use_authtok"
+
+default['linux']['user']['umask']                                = "077"
+
+default['linux']['ntp_servers'] 	                               = { 'ntp1' => 'server 0.north-america.pool.ntp.org',
+                                                                     'ntp2' => 'server 1.north-america.pool.ntp.org' }
+default['linux']['ntp_restrictions']                             = { }
+
+default['linux']['ntp_options']                                  = { 'tinker0' => 'tinker panic 0' }
+
+default['linux']['openssh']['protocol']                          = "2"
+default['linux']['openssh']['syslogfacility']                    = "AUTHPRIV"
+default['linux']['openssh']['allowroot']                         = "no"
+default['linux']['openssh']['rhostsrsaauthentication']           = "no"
+default['linux']['openssh']['hostbasedauthentication']           = "no"
+default['linux']['openssh']['ignorerhosts']                      = "yes"
+default['linux']['openssh']['permitemptypasswords']              = "no"
+default['linux']['openssh']['passwordauth']                      = "yes"
+default['linux']['openssh']['challengeresponseauthentication']   = "no"
+default['linux']['openssh']['gssapicleanupcredentials']          = "yes"
+default['linux']['openssh']['usepam']                            = "yes"
+default['linux']['openssh']['acceptenv']                         = "LANG LC_CTYPE LC_NUMERIC LC_TIME LC_COLLATE LC_MONETARY LC_MESSAGES LC_PAPER LC_NAME LC_ADDRESS LC_TELEPHONE LC_MEASUREMENT LC_IDENTIFICATION LC_ALL LANGUAGE XMODIFIERS"
+default['linux']['openssh']['allowgroups']                       = "domain_admins domain_users"
+default['linux']['openssh']['x11forwarding']                     = "no"
+default['linux']['openssh']['sshbanner']                         = "/etc/issue"
+default['linux']['openssh']['usedns']                            = "no"
+default['linux']['openssh']['ciphers']                           = "aes128-ctr,aes192-ctr,aes256-ctr"
+default['linux']['openssh']['macs']                              = "hmac-sha1"
+default['linux']['openssh']['strictmodes']                       = "yes"
+default['linux']['openssh']['useprivilegeseparation']            = "yes"
+default['linux']['openssh']['compression']                       = "delayed"
+default['linux']['openssh']['kerberosauthentication']            = "no"
+default['linux']['openssh']['kbdinteractiveauthentication']      = "yes"
+default['linux']['openssh']['loglevel']                          = "INFO"
+default['linux']['openssh']['maxauthtries']                      = "3"
+default['linux']['openssh']['permittunnel']                      = "no"
+default['linux']['openssh']['clientaliveinterval']               = "300"
+default['linux']['openssh']['clientalivecountmax']               = "0"
+default['linux']['openssh']['permituserenvironment']             = "no"
+default['linux']['openssh']['extra_options']                     = { }
+
+default['linux']['postfix']['inet_interfaces']                   = "localhost"
+default['linux']['postfix']['inet_protocols']                    = "ipv4"
+default['linux']['postfix']['mydestination']                     = "$myhostname, localhost.$mydomain, localhost"
+default['linux']['postfix']['relayhost']                         = "mail.brighthouse.com"
+
+default['linux']['security']['secure_vartmp']                    = true
+default['linux']['security']['secure_shm']                       = true
+default['linux']['security']['secure_inittab']                   = true
+default['linux']['security']['secure_init']                      = true
+
+default['linux']['security']['remove_at_daemon']                 = true
+default['linux']['security']['disable_usb_autoload']             = true
+default['linux']['security']['disable_udf_autoload']             = true
+default['linux']['security']['disable_ctrl_alt_delete']          = true
+default['linux']['security']['set_shell_timeout']                = true
+default['linux']['security']['remove_rsh_server']                = true
+default['linux']['security']['remove_xinetd']                    = false
+default['linux']['security']['remove_telnet_server']             = true
+default['linux']['security']['remove_telnet']                    = true
+
+default['linux']['rsyslog']['rules']                             = { 'messages' => '*.info;mail.none;authpriv.none;cron.none                /var/log/messages',
+                                                                     'secure'   => 'authpriv.*                                              /var/log/secure',
+                                                                     'maillog'  => 'mail.*                                                  -/var/log/maillog',
+                                                                     'cron'     => 'cron.*                                                  /var/log/cron',
+                                                                     'emerg'    => '*.emerg                                                 *',
+                                                                     'spooler'  => 'uucp,news.crit                                          /var/log/spooler',
+                                                                     'boot'     => 'local7.*                                                /var/log/boot.log' }
+default['linux']['rsyslog']['remotes']                           = { }
+default['linux']['systemd']['journald']['forward_to_syslog']      = "yes"
+
+default['linux']['centrify']['license_type']                     = 'express'
+default['linux']['centrify']['client_type']                      = '--workstation'
+default['linux']['centrify']['join_user']                        = 'domjoin'
+default['linux']['centrify']['domain']                           = 'lab.fewt.com'
+default['linux']['centrify']['authorized_users']                 = ''
+default['linux']['centrify']['authorized_groups']                = 'domain_admins'
+
+default['linux']['sudoers']['properties']                        = { 'domain_admins' => '%domain_admins	ALL=(ALL) NOPASSWD: ALL' }
+
+default['linux']['sysctl']                                       = { 'net.ipv4.conf.default.log_martians'          => "1",
+                                                                     'net.ipv4.conf.all.log_martians'              => "1",
+                                                                     'net.ipv4.conf.default.accept_redirects'      => "0",
+                                                                     'net.ipv4.conf.default.accept_source_route'   => "0",
+                                                                     'net.ipv4.conf.default.send_redirects'        => "0",
+                                                                     'net.ipv4.conf.all.accept_source_route'       => "0",
+                                                                     'net.ipv4.conf.all.forwarding'                => "0",
+                                                                     'net.ipv4.conf.all.rp_filter'                 => "1",
+                                                                     'net.ipv4.icmp_ratelimit'                     => "100",
+                                                                     'net.ipv4.icmp_ratemask'                      => "88089",
+                                                                     'net.ipv4.tcp_timestamps'                     => "0",
+                                                                     'net.ipv4.conf.all.arp_ignore'                => "1",
+                                                                     'net.ipv4.conf.all.arp_announce'              => "2",
+                                                                     'net.ipv4.tcp_rfc1337'                        => "1",
+                                                                     'net.ipv4.conf.all.secure_redirects'          => "0",
+                                                                     'net.ipv4.conf.all.accept_redirects'          => "0",
+                                                                     'net.ipv4.conf.all.send_redirects'            => "0",
+                                                                     'net.ipv4.icmp_echo_ignore_broadcasts'        => "1",
+                                                                     'net.ipv4.tcp_max_syn_backlog'                => "1280",
+                                                                     'net.ipv4.tcp_syncookies'                     => "1",
+                                                                     'vm.swappiness'                               => "0",
+                                                                     'kernel.sysrq'                                => "0",
+                                                                     'fs.suid_dumpable'                            => "0",
+                                                                     'kernel.randomize_va_space'                   => "2",
+                                                                     'kernel.dmesg_restrict'                       => "1" }
+
+default['linux']['mounts']                                       = { 'root'    => { 'device'         => '/dev/sysvg/lv_root',
+                                                                                    'mount_point'     => '/',
+                                                                                    'fs_type'        => 'ext4',
+                                                                                    'mount_options'  => 'defaults',
+                                                                                    'dump_frequency' => '1',
+                                                                                    'fsck_pass_num'  => '1',
+                                                                                    'owner'          => 'root',
+                                                                                    'group'          => 'root',
+                                                                                    'mode'           => '0755'
+                                                                                  },
+                                                                     'boot'    => { 'device'         => '/dev/sda1',
+                                                                                    'mount_point'     => '/boot',
+                                                                                    'fs_type'        => 'ext4',
+                                                                                    'mount_options'  => 'defaults',
+                                                                                    'dump_frequency' => '1',
+                                                                                    'fsck_pass_num'  => '2',
+                                                                                    'owner'          => 'root',
+                                                                                    'group'          => 'root',
+                                                                                    'mode'           => '0755'
+                                                                                  },
+                                                                     'home'    => { 'device'         => '/dev/sysvg/lv_home',
+                                                                                    'mount_point'     => '/home',
+                                                                                    'fs_type'        => 'ext4',
+                                                                                    'mount_options'  => 'defaults,nodev',
+                                                                                    'dump_frequency' => '1',
+                                                                                    'fsck_pass_num'  => '2',
+                                                                                    'owner'          => 'root',
+                                                                                    'group'          => 'root',
+                                                                                    'mode'           => '0755'
+                                                                                  },
+                                                                     'var'     => { 'device'         => '/dev/sysvg/lv_var',
+                                                                                    'mount_point'     => '/var',
+                                                                                    'fs_type'        => 'ext4',
+                                                                                    'mount_options'  => 'defaults,nosuid,nodev,noexec',
+                                                                                    'dump_frequency' => '1',
+                                                                                    'fsck_pass_num'  => '2',
+                                                                                    'owner'          => 'root',
+                                                                                    'group'          => 'root',
+                                                                                    'mode'           => '0755'
+                                                                                  },
+                                                                     'tmp'     => { 'device'         => '/dev/sysvg/lv_tmp',
+                                                                                    'mount_point'     => '/tmp',
+                                                                                    'fs_type'        => 'ext4',
+                                                                                    'mount_options'  => 'defaults,nosuid,nodev,noexec',
+                                                                                    'dump_frequency' => '1',
+                                                                                    'fsck_pass_num'  => '2',
+                                                                                    'owner'          => 'root',
+                                                                                    'group'          => 'root',
+                                                                                    'mode'           => '1777'
+                                                                                  },
+                                                                     'swap'    => { 'device'         => '/dev/sysvg/lv_swap',
+                                                                                    'mount_point'     => 'swap',
+                                                                                    'fs_type'        => 'swap',
+                                                                                    'mount_options'  => 'defaults',
+                                                                                    'dump_frequency' => '0',
+                                                                                    'fsck_pass_num'  => '0',
+                                                                                    'owner'          => 'root',
+                                                                                    'group'          => 'root',
+                                                                                    'mode'           => '0755'
+                                                                                  },
+                                                                     'vartmp'  => { 'device'         => '/tmp',
+                                                                                    'mount_point'     => '/var/tmp',
+                                                                                    'fs_type'        => 'none',
+                                                                                    'mount_options'  => 'bind',
+                                                                                    'dump_frequency' => '0',
+                                                                                    'fsck_pass_num'  => '0',
+                                                                                    'owner'          => 'root',
+                                                                                    'group'          => 'root',
+                                                                                    'mode'           => '1777'
+                                                                                  },
+                                                                     'shm'     => { 'device'         => 'tmpfs',
+                                                                                    'mount_point'     => '/dev/shm',
+                                                                                    'fs_type'        => 'tmpfs',
+                                                                                    'mount_options'  => 'defaults,nosuid,nodev,noexec',
+                                                                                    'dump_frequency' => '0',
+                                                                                    'fsck_pass_num'  => '0',
+                                                                                    'owner'          => 'root',
+                                                                                    'group'          => 'root',
+                                                                                    'mode'           => '1777'
+                                                                                  },
+                                                                     'devpts'  => { 'device'         => 'devpts',
+                                                                                    'mount_point'    => '/dev/pts',
+                                                                                    'fs_type'        => 'devpts',
+                                                                                    'mount_options'  => 'gid=5,mode=620',
+                                                                                    'dump_frequency' => '0',
+                                                                                    'fsck_pass_num'  => '0',
+                                                                                    'owner'          => 'root',
+                                                                                    'group'          => 'root',
+                                                                                    'mode'           => '0755'
+                                                                                  },
+                                                                     'sysfs'   => { 'device'         => 'sysfs',
+                                                                                    'mount_point'    => '/sys',
+                                                                                    'fs_type'        => 'sysfs',
+                                                                                    'mount_options'  => 'defaults,nosuid,nodev,noexec',
+                                                                                    'dump_frequency' => '0',
+                                                                                    'fsck_pass_num'  => '0',
+                                                                                    'owner'          => 'root',
+                                                                                    'group'          => 'root',
+                                                                                    'mode'           => '0555'
+                                                                                  },
+                                                                     'proc'    => { 'device'         => 'proc',
+                                                                                    'mount_point'    => '/proc',
+                                                                                    'fs_type'        => 'proc',
+                                                                                    'mount_options'  => 'defaults,nosuid,nodev,noexec',
+                                                                                    'dump_frequency' => '0',
+                                                                                    'fsck_pass_num'  => '0',
+                                                                                    'owner'          => 'root',
+                                                                                    'group'          => 'root',
+                                                                                    'mode'           => '0555'
+                                                                                  }
+                                                                   }
+
+default['linux']['yum']['local_mirror']                          = 'mirror.lab.fewt.com'
+
+default['linux']['yum']['package_mirrors']['CentOS_7_x86_64']    = { 'base'    => {  'name'             => 'CentOS-$releasever - Base',
+                                                                                     'baseurl'          => "http://#{node['linux']['yum']['local_mirror']}/mirrors/centos/7/os/x86_64",
+                                                                                     'gpgcheck'         => '1',
+                                                                                     'enabled'          => '1',
+                                                                                     'gpgkey'           => 'file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7' },
+                                                                     'updates' => {  'name'             => 'CentOS-$releasever - Updates',
+                                                                                     'baseurl'          => "http://#{node['linux']['yum']['local_mirror']}/mirrors/centos/7/updates/x86_64",
+                                                                                     'gpgcheck'         => '1',
+                                                                                     'enabled'          => '1',
+                                                                                     'gpgkey'           => 'file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7' },
+                                                                     'extras'  => {  'name'             => 'CentOS-$releasever - Extras',
+                                                                                     'baseurl'          => "http://#{node['linux']['yum']['local_mirror']}/mirrors/centos/7/extras/x86_64",
+                                                                                     'gpgcheck'         => '1',
+                                                                                     'enabled'          => '1',
+                                                                                     'gpgkey'           => 'file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7' },
+                                                                     'epel'    => {  'name'             => 'CentOS-$releasever - EPEL',
+                                                                                     'baseurl'          => "http://#{node['linux']['yum']['local_mirror']}/mirrors/epel/7/x86_64/",
+                                                                                     'gpgcheck'         => '1',
+                                                                                     'enabled'          => '1',
+                                                                                     'gpgkey'           => "http://#{node['linux']['yum']['local_mirror']}/mirrors/epel/RPM-GPG-KEY-EPEL-7" } }
+
+default['linux']['yum']['local_repositories']                    = { 'stable'  => {  'name'             => 'Home Lab Stable Repository',
+                                                                                     'baseurl'          => "http://#{node['linux']['yum']['local_mirror']}/mirrors/local/#{node['platform_version'][0]}/STABLE/RPMS",
+                                                                                     'gpgcheck'         => '1',
+                                                                                     'enabled'          => '1',
+                                                                                     'gpgkey'           => "http://#{node['linux']['yum']['local_mirror']}/mirrors/local/RPM-GPG-KEY-LAB-#{node['platform_version'][0]}",
+                                                                                     'metadata_expire'  => '300' } }

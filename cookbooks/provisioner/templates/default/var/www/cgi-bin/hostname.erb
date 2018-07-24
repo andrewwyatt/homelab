@@ -1,0 +1,105 @@
+#!/bin/bash
+###
+### Hostname generator - This is just a simple hostname generator.
+###
+### Call it with curl from kickstart like this:
+###
+### HOSTNAME=\$(curl -s "http://cobbler.lab.fewt.com/get/hostname?authid={AUTH_TOKEN}")
+###
+### The auth token will be generated the first time the script is called if it is not
+### previously defined.
+###
+
+<%= node['provisioner']['file_header'] %>
+
+PREFIX="<%= node['provisioner']['hostname_prefix'] %>"
+DOMAIN="<%= node['provisioner']['domain'] %>"
+HNPATH="<%= node['provisioner']['name_gen_path'] %>"
+TOKEN="${HNPATH}/.token"
+HOSTLIST="${HNPATH}/list"
+TIMESTAMP="${HNPATH}/timestamp"
+DEBUG=false
+MAXHOSTS=<%= node['provisioner']['max_num_hosts'] %>
+RESET=<%= node['provisioner']['name_gen_reset'] %>
+SECONDS=$(date +%s)
+
+if [ ! -d "${HNPATH}" ]
+then
+  mkdir -p ${HNPATH} 2>/dev/null
+fi
+
+while [ -f "${HOSTLIST}.lock" ]
+do
+  sleep 1
+done
+
+touch ${HOSTLIST}.lock
+if [ ! -e ${TOKEN} ]
+then
+  find /var 2>&1 | sha256sum | awk '{print $1}' >${TOKEN}
+fi
+
+QTOKEN=`echo "$QUERY_STRING" | sed -n 's/^.*authid=\([^&]*\).*$/\1/p' | sed "s/%20/ /g"`
+MTOKEN=`cat ${TOKEN} 2>/dev/null`
+
+if [ ! "${QTOKEN}" = "${MTOKEN}" ]
+then
+cat <<EOF
+Content-Type: text/plain
+
+ACCESS DENIED: Auth token not provided, or invalid.
+EOF
+  rm ${HOSTLIST}.lock
+  exit 0
+fi
+
+LASTUPDATE=$(cat ${TIMESTAMP} 2>/dev/null || echo 0)
+$DEBUG && echo "[${SECONDS}][${LASTUPDATE}]"
+ELAPSED=$(( ${SECONDS} - ${LASTUPDATE} ))
+$DEBUG && echo "It has been ${ELAPSED} seconds since the last update"
+if (( ${ELAPSED} >= ${RESET} )) && (( ${LASTUPDATE} > 0 ))
+then
+  $DEBUG && echo "Resetting all the bits"
+  rm -f ${HOSTLIST} ${TIMESTAMP}
+fi
+rm ${HOSTLIST}.lock
+
+for ((i=1;i<${MAXHOSTS};i++)) {
+  SEQ=$(printf "%04d\n" $i)
+  HOSTNAME="${PREFIX}${SEQ}.${DOMAIN}"
+  ### Test to see if the name is in DNS, if not it's available
+  curl -v telnet://${HOSTNAME}/80 --max-time 2 --connect-timeout 2 2>&1 | grep resolve 2>&1 >/dev/null
+  if [ ! $? = 0 ]
+  then
+    $DEBUG && echo "Name ${HOSTNAME} exists in DNS"
+    continue
+  fi
+  ### Test to see if it has been assigned
+  if [ ! -e "${HOSTLIST}" ]
+  then
+    touch ${HOSTLIST}
+  fi
+  while [ -f "${HOSTLIST}.lock" ]
+  do
+    sleep 1
+  done
+  touch ${HOSTLIST}.lock
+  grep ${HOSTNAME} ${HOSTLIST} >/dev/null 2>&1
+  if [ ! $? == 0 ]
+  then
+    $DEBUG && echo "Choosing ${HOSTNAME}"
+    echo ${HOSTNAME} >> ${HOSTLIST}
+    echo ${SECONDS} > ${TIMESTAMP}
+    rm ${HOSTLIST}.lock
+    break
+  else
+    rm ${HOSTLIST}.lock
+    $DEBUG && echo "Name ${HOSTNAME} has already been assigned"
+    continue
+  fi
+}
+cat <<EOF
+Content-Type: text/plain
+
+${HOSTNAME}
+EOF

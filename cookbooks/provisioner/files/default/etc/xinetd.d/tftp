@@ -1,0 +1,23 @@
+###
+### **********  WARNING  WARNING  WARNING  WARNING  WARNING  WARNING  **********
+###
+### THIS IS A CHEF MANAGED SERVICE!  CHANGES MADE TO THIS FILE WILL NOT PERSIST!
+### IF THIS FILE IS CHANGED, CHEF WILL REVERT IT AND RESTART THE APPLICABLE
+### SERVICE!  YOU WILL BE HELD RESPONSIBLE FOR ANY OUTAGE THAT MAY OCCUR!
+###
+### **********  WARNING  WARNING  WARNING  WARNING  WARNING  WARNING  **********
+###
+
+service tftp
+{
+        disable                 = no
+        socket_type             = dgram
+        protocol                = udp
+        wait                    = yes
+        user                    = root
+        server                  = /usr/sbin/in.tftpd
+        server_args             = -B 1380 -v -s /var/lib/tftpboot
+        per_source              = 11
+        cps                     = 100 2
+        flags                   = IPv4
+}

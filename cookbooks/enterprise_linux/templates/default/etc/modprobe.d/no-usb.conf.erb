@@ -1,0 +1,6 @@
+<%= node['linux']['chef']['file_header'] %>
+
+### This will prevent usb-storage from autoloading
+### when a usb drive is attached to a system.
+
+install usb-storage /bin/true

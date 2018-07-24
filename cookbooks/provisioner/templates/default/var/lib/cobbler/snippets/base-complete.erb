@@ -1,0 +1,8 @@
+<%= node['provisioner']['file_header'] %>
+
+if [ ${FAILED} ]
+then
+  notify "<%= node['provisioner']['cobbler']['build_failure_notice'] %>"
+else
+  notify "<%= node['provisioner']['cobbler']['build_success_notice'] %>"
+fi

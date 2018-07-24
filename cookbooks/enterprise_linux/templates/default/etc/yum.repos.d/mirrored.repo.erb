@@ -1,0 +1,9 @@
+<%= node['linux']['chef']['file_header'] %>
+
+<% node['linux']['yum']['package_mirrors']["#{@mirror}"].each do |id,data| -%>
+[<%= id %>]
+<% data.each do |key,value| -%>
+<%= key %>=<%= value %>
+<% end -%>
+
+<% end -%>

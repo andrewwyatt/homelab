@@ -1,0 +1,96 @@
+#!/bin/bash
+
+<%= node['linux']['chef']['file_header'] %>
+
+###
+### Autoupdate tool
+### Ported from the infrastructure scripts used at Fuduntu
+### Sources can be found in the Fuduntu SVN repo
+###
+### -Andrew
+###
+
+### Slack Integration
+SLACK_ENABLED="<%= node['linux']['slack_enabled'] %>"
+SLACK_USER="<%= node['linux']['patch_bot_name'] %>"
+SLACK_CHANNEL="<%= node['linux']['slack_channel'] %>"
+SLACK_EMOJI="<%= node['linux']['patch_emoji'] %>"
+SLACK_API_PATH="<%= node['linux']['api_path'] %>"
+
+function notify() {
+  if [ ${SLACK_ENABLED} ]
+  then
+    curl -X POST --data-urlencode "payload={\"channel\": \"${SLACK_CHANNEL}\", \"username\": \"${SLACK_USER}\", \"text\": \"$1\", \"icon_emoji\": \"${SLACK_EMOJI}\"}" "https://hooks.slack.com/services/${SLACK_API_PATH}" >/dev/null 2>&1
+  fi
+  echo $1
+}
+
+HOSTNAME=$(hostname -f)
+DEBUG=false
+
+while [ $# -gt 0 ]; do
+  $DEBUG && echo "$(date): Executed with parameter ${1}."
+  case "${1}" in
+    --help | -h | --h* )
+       echo "USAGE: autoupdate --now --reboot" >&2
+       exit 0
+       ;;
+    --now | -n | now )
+      NODELAY=true
+      shift
+      ;;
+    --reboot | -r | reboot )
+      REBOOT=true
+      shift
+      ;;
+  esac
+done
+$DEBUG && echo "$(date): Excited while / case loop."
+
+notify "It is time to patch ${HOSTNAME}"
+
+if [ -e "/var/lib/reboot_needed" ]
+then
+  rm -f /var/lib/reboot_needed
+fi
+
+if [ ! ${NODELAY} = true ]
+then
+  SKEW=10
+  TICK=60
+  DELAY=${RANDOM}
+  let "DELAY %= $SKEW"
+  SLEEPTIME=$(echo "$DELAY * $TICK" | bc)
+  notify "${HOSTNAME} has a patching delay of ${DELAY} seconds, pausing."
+  $DEBUG && echo "$(date): Calculated delay of ${DELAY} minutes, waiting."
+  sleep $SLEEPTIME
+fi
+
+notify "Patching ${HOSTNAME}"
+$DEBUG && echo "$(date): Running yum upgrade."
+yum -y upgrade >/var/log/yum-update.log 2>&1
+if [ ! $? = 0 ]
+then
+  notify "Patching failed on ${HOSTNAME}, you might want to take a look."
+  $DEBUG && echo "$(date): Warning, patching was not successful."
+  exit 1
+fi
+
+if [ ${REBOOT} ]
+then
+  $DEBUG && echo "$(date): Reboot requested."
+  if [ "$(yum history list | grep "$(date +%Y-%m-%d).*U.*" | wc -l)" = "0" ]
+  then
+    notify "There are no relevant patches for ${HOSTNAME}."
+    $DEBUG && echo "$(date): No updates found, not rebooting."
+    exit 0
+  else
+    notify "${HOSTNAME} has been patched, rebooting."
+    $DEBUG && echo "$(date): Updates were installed, rebooting."
+    reboot
+  fi
+else
+  notify "${HOSTNAME} has been patched, please reboot manually when possible."
+  $DEBUG && echo "$(date): Flagging for reboot."
+  echo "$(date)" >/var/lib/reboot_needed
+fi

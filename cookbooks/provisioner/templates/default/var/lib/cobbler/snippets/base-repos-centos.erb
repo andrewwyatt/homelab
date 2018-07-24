@@ -1,0 +1,24 @@
+<%= node['provisioner']['file_header'] %>
+
+rm /etc/yum.repos.d/* || true
+
+cat <<id >/etc/yum.repos.d/upstream.repo
+<% node['linux']['yum']['package_mirrors']["#{@mirror}"].each do |id,data| -%>
+[<%= id %>]
+<% data.each do |key,value| -%>
+<%= key %>=<%= value %>
+<% end -%>
+
+<% end -%>
+
+id
+
+cat <<id >/etc/yum.repos.d/local.repo
+<% node['linux']['yum']['local_repositories'].each do |id,data| -%>
+[<%= id %>]
+<% data.each do |key,value| -%>
+<%= key %>=<%= value %>
+<% end -%>
+
+id
+<% end -%>

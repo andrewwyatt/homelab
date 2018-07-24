@@ -1,0 +1,59 @@
+<%= node['provisioner']['file_header'] %>
+
+install
+$SNIPPET('base-rootpw')
+firewall --disabled
+selinux --disabled
+authconfig --enableshadow
+timezone --utc <%= node['linux']['timezone'] %>
+bootloader --location=mbr
+
+$SNIPPET('base-partitions')
+
+firstboot --disable
+keyboard us
+lang en_US
+url --url=$tree
+
+<%node['provisioner']['cobbler']['distros']["CentOS-#{node['platform_version'][0]}-x86_64"]['repos'].each do | name,url | %>
+repo --name=<%= name %> --baseurl=<%= url %>
+<% end %>
+
+# Network information
+$SNIPPET('network_config')
+
+reboot
+
+%pre --interpreter=/bin/bash
+$SNIPPET('base-notify')
+$SNIPPET('log_ks_pre')
+$SNIPPET('kickstart_start')
+$SNIPPET('base-hostname')
+$SNIPPET('base-build-notice')
+$SNIPPET('pre_install_network_config')
+notify "<%= node['provisioner']['cobbler']['hostname_notice'] %>"
+# Enable installation monitoring
+$SNIPPET('pre_anamon')
+notify "<%= node['provisioner']['cobbler']['provisioning_notice'] %>
+%end
+
+$SNIPPET('base-packages')
+
+%post --interpreter=/bin/bash
+$SNIPPET('base-variables')
+$SNIPPET('base-notify')
+$SNIPPET('post_install_kernel_options')
+$SNIPPET('post_install_network_config')
+$SNIPPET('base-resolver')
+$SNIPPET("base-repos-centos-CentOS_7_x86_64")
+$SNIPPET('base-chef')
+$SNIPPET('post_anamon')
+$SNIPPET('koan_environment')
+$SNIPPET('cobbler_register')
+$SNIPPET('kickstart_done')
+$SNIPPET('base-complete')
+
+### Set the root password with chpasswd so it's not forced reset on first use
+### breaking cron.
+echo 'root:<%= @rootpw %>' | chpasswd -e
+%end

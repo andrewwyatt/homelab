@@ -1,0 +1,5 @@
+<%= node['linux']['chef']['file_header'] %>
+
+<% node['linux']['mounts'].each do |key,mount| -%>
+<%= mount['device'] %> <%= mount['mount_point'] %> <%= mount['fs_type'] %> <%= mount['mount_options'] %> <%= mount['dump_frequency'] %> <%= mount['fsck_pass_num'] %>
+<% end -%>

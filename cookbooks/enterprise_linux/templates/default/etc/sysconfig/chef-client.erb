@@ -1,0 +1,5 @@
+<%= node['linux']['chef']['file_header'] %>
+
+CONFIG=<%= node['linux']['chef']['conf_dir'] %>/client.rb
+PIDFILE=<%= node['linux']['chef']['run_path'] %>/client.pid
+OPTIONS=<%= node['linux']['chef']['daemon_options'] %>

@@ -1,0 +1,5 @@
+<%= node['linux']['chef']['file_header'] %>
+
+<% node['linux']['pwquality'].each do |key,value| -%>
+<%= key %> = <%= value %>
+<% end -%>

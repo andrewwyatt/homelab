@@ -1,0 +1,8 @@
+<%= node['linux']['chef']['file_header'] %>
+
+search <%= node['linux']['dns_search'] %>
+
+<% node['linux']['dns_resolvers'].each do |key,resolver| -%>
+nameserver <%= resolver %>
+<% end -%>
+options <%= node['linux']['dns_options'] %>

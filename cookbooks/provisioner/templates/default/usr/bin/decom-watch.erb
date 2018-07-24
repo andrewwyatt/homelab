@@ -1,0 +1,57 @@
+#!/bin/bash
+###
+### decom-watch
+###
+### This script watches Chef to see if a host has been removed from the system
+### normally via decom automation.  It then tests if the AD record still exists
+### if not, it removes the record.
+###
+
+<%= node['provisioner']['file_header'] %>
+
+SLACK_ENABLED=<%= node['provisioner']['slack_enabled'] %>
+SLACK_USER=<%= node['provisioner']['kickstart_name'] %>
+SLACK_CHANNEL=<%= node['provisioner']['slack_channel'] %>
+SLACK_EMOJI=<%= node['provisioner']['kickstart_emoji'] %>
+SLACK_API_PATH=<%= node['provisioner']['api_path'] %>
+
+function notify() {
+  if [ ${SLACK_ENABLED} ]
+  then
+    curl -X POST --data-urlencode "payload={\"channel\": \"${SLACK_CHANNEL}\", \"username\": \"${SLACK_USER}\", \"text\": \"$1\", \"icon_emoji\": \"${SLACK_EMOJI}\"}" "https://hooks.slack.com/services/${SLACK_API_PATH}" >/dev/null 2>&1
+  fi
+}
+
+# The default node should always pass
+CHEF_NODES=(default $(knife node list -k /etc/chef/client.pem -c /etc/chef/client.rb))
+COBBLER_NODES=($(cobbler system list))
+
+for CBNODE in ${COBBLER_NODES[@]}
+do
+  for CHNODE in ${CHEF_NODES[@]}
+  do
+    FOUND=0
+    if [ ${CBNODE} == ${CHNODE} ]
+    then
+      FOUND=1
+      break
+    fi
+  done
+  if [ ! ${FOUND} = 1 ]
+  then
+    ### Is it being provisioned?
+    INSTALLING_TEST=$(cobbler system dumpvars --name ${CBNODE} 2>/dev/null | grep netboot_enabled | awk '{print $3}')
+    if [[ ${INSTALLING_TEST} =~ True ]]
+    then
+      break
+    fi
+    ### No, does it have a DNS record?
+    HOST_TEST=$(host ${CBNODE} 2>&1)
+    if [[ ${HOST_TEST} =~ NXDOMAIN ]]
+    then
+      ### No, remove it.
+      notify "Host ${CBNODE} has been decommissioned or no longer exists, expiring system record."
+      cobbler system remove --name ${CBNODE}
+    fi
+  fi
+done

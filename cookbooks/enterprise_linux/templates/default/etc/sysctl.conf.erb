@@ -1,0 +1,5 @@
+<%= node['linux']['chef']['file_header'] %>
+
+<% @node['linux']['sysctl'].each do |parameter, value| %>
+<%= "#{parameter}=#{value}" %>
+<% end %>

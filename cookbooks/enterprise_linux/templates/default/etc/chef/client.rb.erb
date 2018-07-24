@@ -1,0 +1,11 @@
+<%= node['linux']['chef']['file_header'] %>
+
+current_dir              = <%= node['linux']['chef']['current_dir'] %>
+log_level                <%= node['linux']['chef']['log_level'] %>
+log_location             <%= node['linux']['chef']['log_location'] %>
+node_name                "<%= @fqdn %>"
+chef_server_url          "https://<%= @chefsvr %><%= node['linux']['chef']['chef_org'] %>"
+cache_type               "<%= node['linux']['chef']['cache_type'] %>"
+cache_options( :path =>  "<%= node['linux']['chef']['cache_options'] %>" )
+cookbook_path            ["<%= node['linux']['chef']['cookbook_path'] %>"]
+ohai.plugin_path         << '<%= node['linux']['chef']['ohai_plugin_path'] %>'

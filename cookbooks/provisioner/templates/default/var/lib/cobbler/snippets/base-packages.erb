@@ -1,0 +1,7 @@
+<%= node['provisioner']['file_header'] %>
+
+%packages --nobase
+<% node['provisioner']['cobbler']['default_packages'].each do |key,package| -%>
+<%= package %>
+<% end -%>
+%end

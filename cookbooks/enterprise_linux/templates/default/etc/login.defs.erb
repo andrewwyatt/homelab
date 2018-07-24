@@ -1,0 +1,67 @@
+<%= node['linux']['chef']['file_header'] %>
+
+#
+# Please note that the parameters in this configuration file control the
+# behavior of the tools from the shadow-utils component. None of these
+# tools uses the PAM mechanism, and the utilities that use PAM (such as the
+# passwd command) should therefore be configured elsewhere. Refer to
+# /etc/pam.d/system-auth for more information.
+#
+
+# *REQUIRED*
+#   Directory where mailboxes reside, _or_ name of file, relative to the
+#   home directory.  If you _do_ define both, MAIL_DIR takes precedence.
+#   QMAIL_DIR is for Qmail
+#
+MAIL_DIR	<%= node['linux']['logindefs']['maildir'] %>
+
+# Password aging controls:
+#
+#	PASS_MAX_DAYS	Maximum number of days a password may be used.
+#	PASS_MIN_DAYS	Minimum number of days allowed between password changes.
+#	PASS_MIN_LEN	Minimum acceptable password length.
+#	PASS_WARN_AGE	Number of days warning given before a password expires.
+#
+PASS_MAX_DAYS <%= node['linux']['logindefs']['pass_max_days'] %>
+PASS_MIN_DAYS <%= node['linux']['logindefs']['pass_min_days'] %>
+PASS_MIN_LEN <%= node['linux']['logindefs']['pass_min_len'] %>
+PASS_WARN_AGE <%= node['linux']['logindefs']['pass_warn_age'] %>
+
+#
+# Min/max values for automatic uid selection in useradd
+#
+UID_MIN    node['linux']['logindefs']['uid_min'] %>
+UID_MAX <%= node['linux']['logindefs']['uid_max'] %>
+
+#
+# Min/max values for automatic gid selection in groupadd
+#
+GID_MIN <%= node['linux']['logindefs']['gid_min'] %>
+GID_MAX <%= node['linux']['logindefs']['gid_max'] %>
+
+#
+# If defined, this command is run when removing a user.
+# It should remove any at/cron/print jobs etc. owned by
+# the user to be removed (passed as the first argument).
+#
+#USERDEL_CMD	/usr/sbin/userdel_local
+
+#
+# If useradd should create home directories for users by default
+# On RH systems, we do. This option is overridden with the -m flag on
+# useradd command line.
+#
+CREATE_HOME	<%= node['linux']['logindefs']['create_home'] %>
+
+# The permission mask is initialized to this value. If not specified,
+# the permission mask will be initialized to 022.
+UMASK <%= node['linux']['logindefs']['umask'] %>
+
+# This enables userdel to remove user groups if no members exist.
+#
+USERGROUPS_ENAB <%= node['linux']['logindefs']['usergroups_enab'] %>
+
+# Use SHA512 to encrypt password.
+ENCRYPT_METHOD <%= node['linux']['logindefs']['encrypt_method'] %>
+
+FAIL_DELAY <%= node['linux']['logindefs']['fail_delay'] %>

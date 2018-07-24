@@ -1,0 +1,22 @@
+<%= node['linux']['chef']['file_header'] %>
+
+restrict default kod nomodify notrap nopeer noquery
+restrict -6 default kod nomodify notrap nopeer noquery
+
+restrict 127.0.0.1
+restrict -6 ::1
+
+<% node['linux']['ntp_restrictions'].each do |key,ntpr| -%>
+<%= ntpr %>
+<% end -%>
+
+<% node['linux']['ntp_servers'].each do |key,ntps| -%>
+<%= ntps %>
+<% end -%>
+
+<% node['linux']['ntp_options'].each do |key,ntpe| -%>
+<%= ntpe %>
+<% end -%>
+
+includefile /etc/ntp/crypto/pw
+keys /etc/ntp/keys
