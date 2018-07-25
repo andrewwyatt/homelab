@@ -163,23 +163,23 @@ In order to provision a Chef server we need to ensure a few things.  The Chef se
 
 4. Create the directory to store the keys created during this process.
 
-        # mkdir /root/$(hostname -f)
+        # mkdir /etc/opscode/keys
 
 5. Add the administrative account to Chef.
 
-        # chef-server-ctl user-create admin System Admin {EMAIL ADDRESS} '{RANDOM}' -f /root/$(hostname -f)/admin.pem
+        # chef-server-ctl user-create admin System Admin {EMAIL ADDRESS} '{RANDOM}' -f /etc/opscode/keys/admin.pem
 
 6. Create an organization, and add the administrative user.
 
-        # chef-server-ctl org-create {ORG} {ORG Name} --association_user admin -f /root/$(hostname -f)/{ORG}-validator.pem
+        # chef-server-ctl org-create {ORG} {ORG Name} --association_user admin -f /etc/opscode/keys/{ORG}-validator.pem
 
 7. Generate an encrypted data bag secret key.
 
-        # openssl rand -base64 512 | tr -d '\r\n' >/root/$(hostname -f)/encrypted_data_bag_secret
+        # openssl rand -base64 512 | tr -d '\r\n' >/etc/opscode/keys/encrypted_data_bag_secret
 
 8. Copy the secret key to /etc/Chef.
 
-        # cp /root/$(hostname -f)/encrypted_data_bag_secret /etc/chef
+        # cp /etc/opscode/keys/encrypted_data_bag_secret /etc/chef
 
 9. Install the Chef client on the server using the package from (Chef)[https://downloads.chef.io/chef].
 
@@ -197,7 +197,7 @@ In order to provision a Chef server we need to ensure a few things.  The Chef se
 
 11. Bootstrap the Chef server to itself.
 
-        # chef-client -S https://$(hostname -f)/organizations/{ORG} -K /root/$(hostname -f)/{ORG}-validator.pem -c /etc/chef/client.rb
+        # chef-client -S https://$(hostname -f)/organizations/{ORG} -K /etc/opscode/keys/{ORG}-validator.pem -c /etc/chef/client.rb
 
 12. Install the Chef manage package using chef-server-ctl.
 
