@@ -82,7 +82,8 @@ end
 
 existing_chef_accounts.each do | account |
   execute "Processing account revocations." do #~FC022
-    command "chef-server-ctl user-delete #{account} -R -y ||:"
+    command "chef-server-ctl user-delete #{account} -R -y ||:; \
+             notify \"#{node['fqdn']}\" \"#{node['chef']['slack_channel']}\" \"#{node['chef']['emoji']}\" \"#{node['chef']['api_path']}\" \"#{account} has been revoked from the Chef server.\""
     action :run
     sensitive node['chef']['runtime']['sensitivity']
     not_if { authorized_users[account].is_a?(Hash) == true }
@@ -117,7 +118,8 @@ authorized_users.each do | account, map |
     ulast=`adquery user -p #{account} | awk '{printf $2}'`
     email=`printf $(adquery user -b mail #{account})`
     execute "Processing account additions (account)." do #~FC022
-      command "chef-server-ctl user-create #{account} #{ufirst} #{ulast} #{email} \'#{password}\'"
+      command "chef-server-ctl user-create #{account} #{ufirst} #{ulast} #{email} \'#{password}\'; \
+               notify \"#{node['fqdn']}\" \"#{node['chef']['slack_channel']}\" \"#{node['chef']['emoji']}\" \"#{node['chef']['api_path']}\" \"#{account} has been granted access to Chef.\""
       action :run
       sensitive node['chef']['runtime']['sensitivity']
       not_if { existing_account == true }
@@ -170,7 +172,8 @@ EOF
         admin = '--admin'
       end
       execute "Adding #{ufirst} #{ulast} to the #{org} org." do
-        command "chef-server-ctl org-user-add #{org} #{account} #{admin}"
+        command "chef-server-ctl org-user-add #{org} #{account} #{admin}; \
+                 notify \"#{node['fqdn']}\" \"#{node['chef']['slack_channel']}\" \"#{node['chef']['emoji']}\" \"#{node['chef']['api_path']}\" \"#{account} has been granted #{attributes['account']} access to the #{org}\""
         action :run
         sensitive node['chef']['runtime']['sensitivity']
         only_if { add_to_org == true }
