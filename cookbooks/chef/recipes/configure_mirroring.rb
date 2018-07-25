@@ -46,7 +46,7 @@ unless node['chef']['sync_host'] == node['fqdn']
   end
   tag(node['chef']['worker_tag'])
   if node['chef']['sync'] == true
-    directory "#{node['chef']['mirror_root']}" do
+    directory node['chef']['mirror_root'] do
       owner 'root'
       group 'root'
       mode '0700'

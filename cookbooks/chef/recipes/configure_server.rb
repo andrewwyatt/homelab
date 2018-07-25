@@ -105,7 +105,7 @@ end
 ### This directory is used to stage the encrypted package that we'll use later for bootstrapping
 ###
 
-directory "#{node['chef']['keys']}" do
+directory node['chef']['keys'] do
   owner 'root'
   group 'root'
   mode 0700

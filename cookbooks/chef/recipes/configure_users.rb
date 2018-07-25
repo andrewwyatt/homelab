@@ -81,7 +81,7 @@ end
 ###
 
 existing_chef_accounts.each do | account |
-  execute "Processing account revocations." do
+  execute "Processing account revocations." do #~FC022
     command "chef-server-ctl user-delete #{account} -R -y ||:"
     action :run
     sensitive node['chef']['runtime']['sensitivity']
@@ -116,13 +116,13 @@ authorized_users.each do | account, map |
     ufirst=`adquery user -p #{account} | awk '{printf $1}'`
     ulast=`adquery user -p #{account} | awk '{printf $2}'`
     email=`printf $(adquery user -b mail #{account})`
-    execute "Processing account additions (account)." do
+    execute "Processing account additions (account)." do #~FC022
       command "chef-server-ctl user-create #{account} #{ufirst} #{ulast} #{email} \'#{password}\'"
       action :run
       sensitive node['chef']['runtime']['sensitivity']
       not_if { existing_account == true }
     end
-    execute "Processing account notifications." do
+    execute "Processing account notifications." do #~FC022
       command <<-EOC
 cat << EOF | mail -t
 From: Account Management <chef_accounts@#{node['fqdn']}>
