@@ -22,3 +22,10 @@ manpage_directory = /usr/share/man
 sample_directory = /usr/share/doc/postfix-2.6.6/samples
 readme_directory = /usr/share/doc/postfix-2.6.6/README_FILES
 relayhost = <%= node['linux']['postfix']['relayhost'] %>
+smtp_sasl_auth_enable =  <%= node['linux']['postfix']['smtp_sasl_auth_enable'] %>
+smtp_sasl_password_maps =  <%= node['linux']['postfix']['smtp_sasl_password_maps'] %>
+smtp_sasl_security_options =  <%= node['linux']['postfix']['smtp_sasl_security_options'] %>
+smtp_sasl_mechanism_filter =  <%= node['linux']['postfix']['smtp_sasl_mechanism_filter'] %>
+smtp_tls_CAfile =  <%= node['linux']['postfix']['smtp_tls_CAfile'] %>
+smtp_use_tls =  <%= node['linux']['postfix']['smtp_use_tls'] %>
+smtp_tls_security_level =  <%= node['linux']['postfix']['smtp_tls_security_level'] %>

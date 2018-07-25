@@ -308,7 +308,14 @@ default['linux']['openssh']['extra_options']                     = { }
 default['linux']['postfix']['inet_interfaces']                   = "localhost"
 default['linux']['postfix']['inet_protocols']                    = "ipv4"
 default['linux']['postfix']['mydestination']                     = "$myhostname, localhost.$mydomain, localhost"
-default['linux']['postfix']['relayhost']                         = "mail.brighthouse.com"
+default['linux']['postfix']['relayhost']                         = "[smtp.gmail.com]:587"
+default['linux']['postfix']['smtp_sasl_auth_enable']             = 'yes'
+default['linux']['postfix']['smtp_sasl_password_maps']           = 'hash:/etc/postfix/sasl_passwd'
+default['linux']['postfix']['smtp_sasl_security_options']        = 'noanonymous'
+default['linux']['postfix']['smtp_sasl_mechanism_filter']        = 'plain'
+default['linux']['postfix']['smtp_tls_CAfile']                   = '/etc/pki/tls/certs/ca-bundle.crt'
+default['linux']['postfix']['smtp_use_tls']                      = 'yes'
+default['linux']['postfix']['smtp_tls_security_level']           = 'encrypt'
 
 default['linux']['security']['secure_vartmp']                    = true
 default['linux']['security']['secure_shm']                       = true

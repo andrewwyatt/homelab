@@ -281,6 +281,7 @@ This bag contains the basic credentials necessary to configure servers in the en
       "id": "passwords",
       "bootstrap_passphrase": "{RANDOM PASSPHRASE}",
       "root_hash": "{ROOT HASH}",
+      "sasl_passwd": "{SASL PASSWORD}",
       "cobbler": "{COBBLER_ROOT_HASH}",
       "ad_bind_account": "{CHEF_SERVICE_ACCOUNT_PASSWORD}",
       "automate_token": "{AUTOMATE TOKEN}"
@@ -293,6 +294,12 @@ This cookbook adds a feature to Chef servers adding the ability to bootstrap new
 #### root\_hash
 
 This is the root password hash that is applied to the root account on all managed servers.
+
+### sasl\_passwd
+
+This is the relay and password data needed to configure postfix for SASL email relay.  The format for this attribute is as follows:
+
+    [relay]:port username:password
 
 #### cobbler
 

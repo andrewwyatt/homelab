@@ -17,7 +17,16 @@
 ### limitations under the License.
 ###
 
-yum_package 'postfix' do
+###
+### The encrypted payload password is stored in credentials -> passwords.  To configure
+### SASL, set 'sasl_passwd' to '[relay]:port username:password' in the data bag.
+###
+
+passwords = data_bag_item('credentials', 'passwords', IO.read(Chef::Config['encrypted_data_bag_secret']))
+
+yum_package [ 'postfix',
+              'cyrus-sasl-plain',
+               'mailx' ] do
   action :install
 end
 
@@ -30,6 +39,25 @@ template "/etc/postfix/main.cf" do
   sensitive node['linux']['runtime']['sensitivity']
   notifies :restart, "service[postfix]", :immediately
 end
+
+ file "/etc/postfix/sasl_passwd" do
+   owner "root"
+   group "root"
+   mode 0600
+   content passwords['sasl_passwd']
+   action :create
+   only_if { node['linux']['postfix']['smtp_sasl_auth_enable'] == "yes" }
+   only_if { (defined?(passwords['sasl_passwd'])).nil? == false }
+ end
+
+ execute "Configuring postfix SASL creds." do
+   command "postmap /etc/postfix/sasl_passwd"
+   action :run
+   notifies :restart, "service[postfix]", :immediately
+   not_if { ::File.exists?("/etc/postfix/sasl_passwd.db") }
+   only_if { node['linux']['postfix']['smtp_sasl_auth_enable'] == "yes" }
+   only_if { (defined?(passwords['sasl_passwd'])).nil? == false }
+ end
 
 service "postfix" do
   supports :status => true, :restart => true
