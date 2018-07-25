@@ -164,8 +164,8 @@ default['provisioner']['repositories']                          = { 'stable'   =
                                                                     'unstable' => 'UNSTABLE' }
 
 default['provisioner']['slack_enabled']                         = false
-#default['provisioner']['slack_channel']                         = '#homelab'
-#default['provisioner']['api_path']                              = 'API KEY GOES HERE'
+default['provisioner']['slack_channel']                         = '#homelab'
+default['provisioner']['api_path']                              = 'API KEY GOES HERE'
 
 default['provisioner']['kickstart_name']                        = 'System_Builder'
 default['provisioner']['kickstart_emoji']                       = ':construction_worker:'

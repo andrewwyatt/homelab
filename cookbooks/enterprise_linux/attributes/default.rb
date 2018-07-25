@@ -142,10 +142,10 @@ default['linux']['motd']                                        = ''
 ### The following attributes are necessary to send messages to Slack.
 ###
 default['linux']['slack_enabled']                               = false
-#default['linux']['slack_user']                                  = 'Chef'
-#default['linux']['slack_channel']                               = '#homelab'
-#default['linux']['emoji']                                       = ':construction:'
-#default['linux']['api_path']                                    = 'APIKEYGOESHERE'
+default['linux']['slack_user']                                  = 'Chef'
+default['linux']['slack_channel']                               = '#homelab'
+default['linux']['emoji']                                       = ':construction:'
+default['linux']['api_path']                                    = 'APIKEYGOESHERE'
 
 ###
 ### Sets up the reboot Slack notification.

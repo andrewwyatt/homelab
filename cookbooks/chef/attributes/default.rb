@@ -51,13 +51,14 @@ default['chef']['reporting_version']             = '1.8.0'
 ###
 ### I want some notifications to go to Slack, so we'll define the attributes here.
 ###
+
 default['chef']['slack_enabled']                 = false
-#default['chef']['slack_channel']                 = '#homelab'
-#default['chef']['api_path']                      = 'APIKEYGOESHERE'
-#default['chef']['slack_name']                    = 'Chef_Management'
-#default['chef']['slack_emoji']                   = ':chef:'
-#default['chef']['bootstrap_name']                = 'Bootstrap'
-#default['chef']['bootstrap_emoji']               = ':sunglasses:'
+default['chef']['slack_channel']                 = '#homelab'
+default['chef']['api_path']                      = 'APIKEYGOESHERE'
+default['chef']['slack_name']                    = 'Chef_Management'
+default['chef']['slack_emoji']                   = ':chef:'
+default['chef']['bootstrap_name']                = 'Bootstrap'
+default['chef']['bootstrap_emoji']               = ':sunglasses:'
 
 ###
 ### Define sensitivity as an attribute so we can override it when necessary
