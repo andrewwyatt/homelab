@@ -18,6 +18,13 @@
 ###
 
 ###
+### The encrypted payload password is stored in credentials -> passwords.  To configure
+### SASL, set 'sasl_passwd' to '[relay]:port username:password' in the data bag.
+###
+
+passwords = data_bag_item('credentials', 'passwords', IO.read(Chef::Config['encrypted_data_bag_secret']))
+
+###
 ### passfile is used to encrypt and decrypt file based Chef secrets.
 ###
 
