@@ -95,14 +95,14 @@ directory "/etc/chef-manage" do
 end
 
 if node['chef']['manage_manage'] == true
-  def walk_config(value)
+  def walk_config(value,prefix)
     data = String.new
     value.each do | key, value |
-      data << "[\'#{key}\']"
       if value.is_a?(Hash)
+        data << "[\'#{key}\']"
         data << walk_config(value).to_s
       else
-        data << " = \'#{value}\'"
+        data << prefix + "[\'#{key}\'] = \'#{value}\'\n"
       end
     end
     return data
@@ -111,8 +111,7 @@ if node['chef']['manage_manage'] == true
   output = String.new
   node['chef']['manage_attributes'].each do | key, value |
     if value.is_a?(Hash)
-      output << key
-      output << walk_config(value).to_s
+      output << walk_config(value,key).to_s
     else
       output << "#{key} = \'#{value}\'"
     end

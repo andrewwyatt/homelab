@@ -204,50 +204,39 @@ end
 
 ###
 ### Look for a credentials => certificates bag, if it exists, look for the hostname.
-### If it doesn't exist, look for the wildcard cert.  If that doesn't exist, provision a local cert.
+### If it doesn't exist, look for the wildcard cert.  If that doesn't exist, do nothing
+### and Chef will provision a local cert.
 ###
 
-begin
-  certificates = data_bag_item('credentials', 'certificates', IO.read(Chef::Config['encrypted_data_bag_secret']))
-  certificate = String.new
-  key = String.new
-  if certificates["#{node['fqdn']}-crt"].nil? == false && certificates["#{node['fqdn']}-key"].nil? == false
-    certificate = certificates["#{node['fqdn']}-crt"]
-    key = certificates["#{node['fqdn']}-key"]
-  elsif certificates["#{node['chef']['runtime']['domain']}-crt"].nil? == false && certificates["#{node['chef']['runtime']['domain']}-key"].nil? == false
-    certificate = certificates["#{node['chef']['runtime']['domain']}-crt"]
-    key = certificates["#{node['chef']['runtime']['domain']}-key"]
-  end
-  file "/etc/opscode/#{node['fqdn']}.crt" do
-    owner 'opscode'
-    group 'opscode'
-    mode 0600
-    content certificate
-    sensitive true
-    action :create
-    only_if { (defined?(certificate)).empty? == false }
-  end
+certificates = data_bag_item('credentials', 'certificates', IO.read(Chef::Config['encrypted_data_bag_secret']))
+certificate = String.new
+key = String.new
+if certificates["#{node['fqdn']}-crt"].nil? == false && certificates["#{node['fqdn']}-key"].nil? == false
+  certificate = certificates["#{node['fqdn']}-crt"]
+  key = certificates["#{node['fqdn']}-key"]
+elsif certificates["#{node['chef']['runtime']['domain']}-crt"].nil? == false && certificates["#{node['chef']['runtime']['domain']}-key"].nil? == false
+  certificate = certificates["#{node['chef']['runtime']['domain']}-crt"]
+  key = certificates["#{node['chef']['runtime']['domain']}-key"]
+end
 
-  file "/etc/opscode/#{node['fqdn']}.pem" do
-    owner 'opscode'
-    group 'opscode'
-    mode 0600
-    content key
-    sensitive true
-    action :create
-    only_if { (defined?(key)).empty? == false }
-  end
+file "/etc/opscode/#{node['fqdn']}.crt" do
+  owner 'opscode'
+  group 'opscode'
+  mode 0600
+  content certificate
+  sensitive true
+  action :create
+  only_if { (defined?(certificate)).empty? == false }
+end
 
-rescue
-
-  ###
-  ### If there's no defined SSL certificate, set the self generated cert, and
-  ### null the key.
-  ###
-
-  node.default['chef']['ssl_certificate'] = "/var/opt/opscode/nginx/ca/#{node['fqdn']}.crt"
-  node.default['chef']['ssl_certificate_key'] = nil
-
+file "/etc/opscode/#{node['fqdn']}.pem" do
+  owner 'opscode'
+  group 'opscode'
+  mode 0600
+  content key
+  sensitive true
+  action :create
+  only_if { (defined?(key)).empty? == false }
 end
 
 ###
@@ -256,14 +245,14 @@ end
 ###
 
 if node['chef']['manage_chef'] == true
-  def walk_config(value)
+  def walk_config(value,prefix)
     data = String.new
     value.each do | key, value |
-      data << "[\'#{key}\']"
       if value.is_a?(Hash)
+        data << "[\'#{key}\']"
         data << walk_config(value).to_s
       else
-        data << " = \'#{value}\'"
+        data << prefix + "[\'#{key}\'] = \'#{value}\'\n"
       end
     end
     return data
@@ -272,8 +261,7 @@ if node['chef']['manage_chef'] == true
   output = String.new
   node['chef']['server_attributes'].each do | key, value |
     if value.is_a?(Hash)
-      output << key
-      output << walk_config(value).to_s
+      output << walk_config(value,key).to_s
     else
       output << "#{key} = \'#{value}\'"
     end
