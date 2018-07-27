@@ -45,7 +45,8 @@ yum_package [ 'wget',
               'vlock',
               'scrub',
               'openssh-clients',
-              'rsync' ] do
+              'rsync',
+              'yum-utils' ] do
   action :install
 end
 

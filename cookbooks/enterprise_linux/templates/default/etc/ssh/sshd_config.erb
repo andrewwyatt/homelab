@@ -2,42 +2,10 @@
 
 <%= node['linux']['chef']['file_header'] %>
 
-Protocol <%= node['linux']['openssh']['protocol'] %>
-SyslogFacility <%= node['linux']['openssh']['syslogfacility'] %>
-PermitRootLogin <%= node['linux']['openssh']['allowroot'] %>
-RhostsRSAAuthentication <%= node['linux']['openssh']['rhostsrsaauthentication'] %>
-HostbasedAuthentication <%= node['linux']['openssh']['hostbasedauthentication'] %>
-IgnoreRhosts <%= node['linux']['openssh']['ignorerhosts'] %>
-PermitEmptyPasswords <%= node['linux']['openssh']['permitemptypasswords'] %>
-PasswordAuthentication <%= node['linux']['openssh']['passwordauth'] %>
-ChallengeResponseAuthentication <%= node['linux']['openssh']['challengeresponseauthentication'] %>
-GSSAPICleanupCredentials <%= node['linux']['openssh']['gssapicleanupcredentials'] %>
-UsePAM <%= node['linux']['openssh']['usepam'] %>
-AcceptEnv <%= node['linux']['openssh']['acceptenv'] %>
-ClientAliveInterval <%= node['linux']['openssh']['clientaliveinterval'] %>
-ClientAliveCountMax <%= node['linux']['openssh']['clientalivecountmax'] %>
-PermitUserEnvironment <%= node['linux']['openssh']['permituserenvironment'] %>
-UseDNS <%= node['linux']['openssh']['usedns'] %>
-X11Forwarding <%= node['linux']['openssh']['x11forwarding'] %>
-Banner <%= node['linux']['openssh']['sshbanner'] %>
-AllowGroups <%= node['linux']['openssh']['allowgroups'] %>
+<% node['linux']['openssh'].each do |key,value| -%>
+<%= key %> <%= value %>
+<% end -%>
 
-Ciphers <%= node['linux']['openssh']['ciphers'] %>
-MACs <%= node['linux']['openssh']['macs'] %>
-StrictModes <%= node['linux']['openssh']['strictmodes'] %>
-UsePrivilegeSeparation <%= node['linux']['openssh']['useprivilegeseparation'] %>
-Compression <%= node['linux']['openssh']['compression'] %>
-KerberosAuthentication <%= node['linux']['openssh']['kerberosauthentication'] %>
-KbdInteractiveAuthentication <%= node['linux']['openssh']['kbdinteractiveauthentication'] %>
-
-LogLevel <%= node['linux']['openssh']['loglevel'] %>
-MaxAuthTries <%= node['linux']['openssh']['maxauthtries'] %>
-PermitTunnel <%= node['linux']['openssh']['permittunnel'] %>
-
-<% if node['linux']['openssh']['enable_sftp'] %>
+<% if node['linux']['openssh']['sftp_subsystem'] %>
 Subsystem	sftp	/usr/libexec/openssh/sftp-server
 <% end %>
-
-<% node['linux']['openssh']['extra_options'].each do |key,ssh_option| -%>
-<%= ssh_option %>
-<% end -%>
