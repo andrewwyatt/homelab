@@ -39,31 +39,56 @@ end
 
 yum_package 'arpwatch' do
   action :install
+  only_if { node['linux']['security']['enable_arpwatch'] == true }
 end
 
-service "arpwatch" do
+service 'arpwatch' do
   supports :status => true, :restart => true
   action [ :enable, :start ]
+  only_if { node['linux']['security']['enable_arpwatch'] == true }
+end
+
+yum_package 'usbguard' do
+  action :install
+  only_if { node['linux']['security']['enable_usbguard'] == true }
+end
+
+template '/etc/usbguard/usbguard-daemon.conf' do
+  owner 'root'
+  group 'root'
+  mode  '0600'
+  source 'etc/usbguard/usbguard-daemon.conf.erb'
+  action :create
+  sensitive node['linux']['runtime']['sensitivity']
+  notifies :restart, "service[usbguard]", :immediately
+end
+
+service 'usbguard' do
+  supports :status => true, :restart => true
+  action [ :enable, :start ]
+  only_if { node['linux']['security']['enable_usbguard'] == true }
 end
 
 yum_package 'psacct' do
   action :install
+  only_if { node['linux']['security']['enable_psacct'] == true }
 end
 
 service "psacct" do
   supports :status => true, :restart => true
   action [ :enable, :start ]
+  only_if { node['linux']['security']['enable_psacct'] == true }
 end
 
 yum_package 'aide' do
   action :install
   notifies :run, "execute[aide init]", :immediately
+  only_if { node['linux']['security']['enable_aide'] == true }
 end
 
 execute 'aide init' do
   command '/usr/sbin/aide --init && mv /var/lib/aide/aide.db.new.gz /var/lib/aide/aide.db.gz'
   sensitive node['linux']['runtime']['sensitivity']
-
   action :nothing
 end
 
@@ -73,6 +98,17 @@ file '/var/lib/aide/aide.db.gz' do
   mode '0600'
   action :create
   only_if { File.exists? '/var/lib/aide/aide.db.gz' }
+end
+
+###
+### Harden the assembler binary.
+###
+
+file '/usr/bin/as' do
+  owner 'root'
+  group 'root'
+  mode '0750'
+  only_if { node['linux']['security']['harden_as'] == true }
 end
 
 ###
@@ -119,6 +155,16 @@ template '/etc/modprobe.d/blacklist-hardware.conf' do
   action :create
   sensitive node['linux']['runtime']['sensitivity']
   only_if { node['linux']['security']['disable_hardware'] == true }
+end
+
+template '/etc/modprobe.d/blacklist-modules.conf' do
+  owner 'root'
+  group 'root'
+  mode  '0640'
+  source 'etc/modprobe.d/blacklist-modules.conf.erb'
+  action :create
+  sensitive node['linux']['runtime']['sensitivity']
+  only_if { node['linux']['security']['disable_modules'] == true }
 end
 
 template '/etc/modprobe.d/no-usb.conf' do

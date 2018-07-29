@@ -253,6 +253,7 @@ default['linux']['logindefs']['umask']                           = "027"
 default['linux']['logindefs']['usergroups_enab']                 = "yes"
 default['linux']['logindefs']['encrypt_method']                  = "SHA512"
 default['linux']['logindefs']['fail_delay']                      = "4"
+default['linux']['logindefs']['faillog_enab']                    = "yes"
 
 default['linux']['pwquality']['difok']                           = "5"
 default['linux']['pwquality']['minlen']                          = "14"
@@ -335,15 +336,17 @@ default['linux']['security']['secure_inittab']                   = true
 default['linux']['security']['secure_init']                      = true
 
 default['linux']['security']['remove_at_daemon']                 = true
-default['linux']['security']['disable_hardware']                 = true
-default['linux']['security']['disable_usb_autoload']             = true
-default['linux']['security']['disable_udf_autoload']             = true
+default['linux']['security']['disable_modules']                  = true
 default['linux']['security']['disable_ctrl_alt_delete']          = true
-default['linux']['security']['set_shell_timeout']                = true
 default['linux']['security']['remove_rsh_server']                = true
 default['linux']['security']['remove_xinetd']                    = false
 default['linux']['security']['remove_telnet_server']             = true
 default['linux']['security']['remove_telnet']                    = true
+default['linux']['security']['harden_as']                        = true
+default['linux']['security']['enable_aide']                      = true
+default['linux']['security']['enable_psacct']                    = true
+default['linux']['security']['enable_usbguard']                  = true
+default['linux']['security']['enable_arpwatch']                  = true
 
 default['linux']['rsyslog']['rules']                             = { 'messages' => '*.info;mail.none;authpriv.none;cron.none                /var/log/messages',
                                                                      'secure'   => 'authpriv.*                                              /var/log/secure',
@@ -394,6 +397,8 @@ default['linux']['sysctl']                                       = { 'net.ipv4.c
                                                                      'kernel.exec-shield'                          => "1",
                                                                      'fs.suid_dumpable'                            => "0",
                                                                      'kernel.randomize_va_space'                   => "2",
+                                                                     'kernel.yama.ptrace_scope'                    => "1",
+                                                                     'kernel.kptr_restrict'                        => "2",
                                                                      'kernel.dmesg_restrict'                       => "1" }
 
 default['linux']['mounts']                                       = { 'root'    => { 'device'         => '/dev/sysvg/lv_root',
@@ -499,7 +504,7 @@ default['linux']['mounts']                                       = { 'root'    =
                                                                      'proc'    => { 'device'         => 'proc',
                                                                                     'mount_point'    => '/proc',
                                                                                     'fs_type'        => 'proc',
-                                                                                    'mount_options'  => 'defaults,nosuid,nodev,noexec',
+                                                                                    'mount_options'  => 'defaults,nosuid,nodev,noexec,hidepid=2',
                                                                                     'dump_frequency' => '0',
                                                                                     'fsck_pass_num'  => '0',
                                                                                     'owner'          => 'root',

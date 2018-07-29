@@ -41,7 +41,7 @@ file '/etc/profile.d/history.sh' do
   action :delete
   sensitive node['linux']['runtime']['sensitivity']
   not_if { node['linux']['shell']['timestamp_history'] == true }
-  only_if { File.exists? '/etc/profile.d/tmout.sh' }
+  only_if { File.exists? '/etc/profile.d/history.sh' }
 end
 
 
@@ -52,7 +52,7 @@ template '/etc/profile.d/tmout.sh' do
    source 'etc/profile.d/tmout.sh.erb'
    action :create
    sensitive node['linux']['runtime']['sensitivity']
-   only_if { node['linux']['shell']['timeout'] == true }
+   only_if { node['linux']['shell']['timeout'] =~ /[0-9]/ }
 end
 
 
@@ -60,5 +60,5 @@ file '/etc/profile.d/tmout.sh' do
   action :delete
   sensitive node['linux']['runtime']['sensitivity']
   only_if { File.exists? '/etc/profile.d/tmout.sh' }
-  not_if { node['linux']['shell']['timeout'] == true }
+  not_if { node['linux']['shell']['timeout'] =~ /[0-9]/ }
 end

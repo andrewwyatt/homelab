@@ -1,0 +1,17 @@
+<%= node['linux']['chef']['file_header'] %>
+
+###
+### Disable modules that are not in use.
+###
+
+blacklist firewire-core
+blacklist thunderbolt
+
+install squashfs /bin/false
+install cramfs /bin/false
+install freevxfs /bin/false
+install hfs /bin/false
+install hfsplus /bin/false
+install jffs2 /bin/false
+install udf /bin/false
+install usb-storage /bin/false

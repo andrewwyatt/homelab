@@ -4,6 +4,6 @@ umask <%= node['linux']['user']['umask'] %>
 
 if [ ! "${TMOUT}" ]
 then
-  readonly TMOUT=<%= node['linux']['security']['shell_timeout'] %>
+  readonly TMOUT=<%= node['linux']['shell']['timeout'] %>
   export TMOUT
 fi

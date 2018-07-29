@@ -26,6 +26,15 @@ template "/etc/sysconfig/init" do
   sensitive node['linux']['runtime']['sensitivity']
 end
 
+template "/etc/init.d/functions" do
+  source "etc/init.d/functions.erb"
+  owner "root"
+  group "root"
+  mode 0644
+  action :create
+  sensitive node['linux']['runtime']['sensitivity']
+end
+
 execute "Setting #{node['linux']['target']}" do
   command "systemctl set-default #{node['linux']['target']}.target"
   action :run
