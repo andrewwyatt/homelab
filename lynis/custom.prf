@@ -1,0 +1,9 @@
+###
+### Tables are managed by Chef, no need for this one.
+###
+skip-test=FIRE-4513
+
+###
+### The lab is an internal isolated network, no need to move the sshd port.
+###
+skip-test=SSH-7408:Port
