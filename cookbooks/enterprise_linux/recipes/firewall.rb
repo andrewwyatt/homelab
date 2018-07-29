@@ -53,6 +53,7 @@ current_ports.each do | current_port |
     sensitive node['linux']['runtime']['sensitivity']
     not_if { desired_ports.include?(current_port) }
     only_if { node['linux']['firewall']['enable'] == true }
+    only_if { (`systemctl status firewalld`).include?("active") == true }
   end
 end
 
@@ -67,6 +68,7 @@ end
     sensitive node['linux']['runtime']['sensitivity']
     not_if { (current_ports.join(' ')).include?(desired_port) }
     only_if { node['linux']['firewall']['enable'] == true }
+    only_if { (`systemctl status firewalld`).include?("active") == true }
   end
 end
 
@@ -88,6 +90,7 @@ current_services.each do | current_service |
     sensitive node['linux']['runtime']['sensitivity']
     not_if { desired_services.include?(current_service) }
     only_if { node['linux']['firewall']['enable'] == true }
+    only_if { (`systemctl status firewalld`).include?("active") == true }
   end
 end
 
@@ -97,10 +100,11 @@ end
 
 (node['linux']['firewall']['services'].keys).each do | desired_service |
   execute "Adding #{desired_service} to the firewall" do
-    command "firewall-cmd --add-service=#{desired_service} --permanent && firewall-cmd --reload"
+    command "firewall-cmd --list-services | grep #{desired_service} || firewall-cmd --add-service=#{desired_service} --permanent && firewall-cmd --reload"
     action :run
     sensitive node['linux']['runtime']['sensitivity']
     not_if { (current_services.join(' ')).include?(desired_service) }
     only_if { node['linux']['firewall']['enable'] == true }
+    only_if { (`systemctl status firewalld`).include?("active") == true }
   end
 end

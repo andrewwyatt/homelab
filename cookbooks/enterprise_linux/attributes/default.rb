@@ -309,7 +309,7 @@ default['linux']['openssh']['Compression']                       = "no"
 default['linux']['openssh']['LogLevel']                          = "VERBOSE"
 default['linux']['openssh']['MaxSessions']                       = "2"
 default['linux']['openssh']['TCPKeepAlive']                      = "no"
-default['linux']['openssh']['MaxAuthTries']                      = "2"
+default['linux']['openssh']['MaxAuthTries']                      = "3"
 default['linux']['openssh']['MaxSessions']                       = "2"
 
 default['linux']['postfix']['inet_interfaces']                   = "localhost"
