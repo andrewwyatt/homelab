@@ -74,7 +74,7 @@ template '/etc/modprobe.d/blacklist-hardware.conf' do
   source 'etc/modprobe.d/blacklist-hardware.conf.erb'
   action :create
   sensitive node['linux']['runtime']['sensitivity']
-  only_if { node['linux']['security']['disable_dma'] == true }
+  only_if { node['linux']['security']['disable_hardware'] == true }
 end
 
 template '/etc/modprobe.d/no-usb.conf' do
@@ -108,14 +108,42 @@ template '/etc/init/control-alt-delete.conf' do
   only_if { node['linux']['security']['disable_ctrl_alt_delete'] == true }
 end
 
-link "/etc/systemd/system/ctrl-alt-del.target" do
-  to "/dev/null"
+link '/etc/systemd/system/ctrl-alt-del.target' do
+  to '/dev/null'
   owner 'root'
   group 'root'
   mode  '0644'
   action :create
   only_if { node['platform_version'] =~ /^7/ }
   only_if { node['linux']['security']['disable_ctrl_alt_delete'] == true }
+end
+
+directory '/etc/audit/rules.d' do
+  owner 'root'
+  group 'root'
+  mode  '0750'
+  action :create
+end
+
+template '/etc/audit/rules.d/audit.rules' do
+  source 'etc/audit/audit.rules.erb'
+  owner 'root'
+  group 'root'
+  mode  '0600'
+  action :create
+  sensitive node['linux']['runtime']['sensitivity']
+  notifies :run, "execute[restart auditd]", :immediately
+end
+
+execute 'restart auditd' do
+  command '/sbin/service auditd restart'
+  sensitive node['chef']['runtime']['sensitivity']
+  action :nothing
+end
+
+service "auditd" do
+  supports :status => true, :restart => true
+  action [ :enable, :start ]
 end
 
 yum_package 'xinetd' do

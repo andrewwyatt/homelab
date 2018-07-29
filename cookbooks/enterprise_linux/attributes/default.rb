@@ -297,8 +297,8 @@ default['linux']['openssh']['AllowGroups']                       = "domain_admin
 default['linux']['openssh']['X11Forwarding']                     = "no"
 default['linux']['openssh']['Banner']                            = "/etc/issue"
 default['linux']['openssh']['UseDNS']                            = "no"
-default['linux']['openssh']['Ciphers']                           = "aes128-ctr,aes192-ctr,aes256-ctr"
-default['linux']['openssh']['MACs']                              = "hmac-sha1"
+default['linux']['openssh']['Ciphers']                           = "chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr"
+default['linux']['openssh']['MACs']                              = "hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,umac-128-etm@openssh.com"
 default['linux']['openssh']['StrictModes']                       = "yes"
 default['linux']['openssh']['Compression']                       = "delayed"
 default['linux']['openssh']['KerberosAuthentication']            = "no"
@@ -324,6 +324,7 @@ default['linux']['postfix']['smtp_tls_CAfile']                   = '/etc/pki/tls
 default['linux']['postfix']['smtp_use_tls']                      = 'yes'
 default['linux']['postfix']['smtp_tls_security_level']           = 'encrypt'
 
+default['linux']['firewall']['enable']                           = true
 default['linux']['firewall']['ports']                            = { }
 default['linux']['firewall']['services']                         = { 'ssh'           => true,
                                                                      'dhcpv6-client' => true }
@@ -334,6 +335,7 @@ default['linux']['security']['secure_inittab']                   = true
 default['linux']['security']['secure_init']                      = true
 
 default['linux']['security']['remove_at_daemon']                 = true
+default['linux']['security']['disable_hardware']                 = true
 default['linux']['security']['disable_usb_autoload']             = true
 default['linux']['security']['disable_udf_autoload']             = true
 default['linux']['security']['disable_ctrl_alt_delete']          = true
@@ -406,9 +408,9 @@ default['linux']['mounts']                                       = { 'root'    =
                                                                      'boot'    => { 'device'         => '/dev/sda1',
                                                                                     'mount_point'     => '/boot',
                                                                                     'fs_type'        => 'ext4',
-                                                                                    'mount_options'  => 'defaults',
-                                                                                    'dump_frequency' => '1',
-                                                                                    'fsck_pass_num'  => '2',
+                                                                                    'mount_options'  => 'defaults,nodev,noexec,nosuid',
+                                                                                    'dump_frequency' => '0',
+                                                                                    'fsck_pass_num'  => '0',
                                                                                     'owner'          => 'root',
                                                                                     'group'          => 'root',
                                                                                     'mode'           => '0755'
@@ -416,7 +418,7 @@ default['linux']['mounts']                                       = { 'root'    =
                                                                      'home'    => { 'device'         => '/dev/sysvg/lv_home',
                                                                                     'mount_point'     => '/home',
                                                                                     'fs_type'        => 'ext4',
-                                                                                    'mount_options'  => 'defaults,nodev',
+                                                                                    'mount_options'  => 'defaults,nodev,nosuid,nodev,noexec',
                                                                                     'dump_frequency' => '1',
                                                                                     'fsck_pass_num'  => '2',
                                                                                     'owner'          => 'root',

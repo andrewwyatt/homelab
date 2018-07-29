@@ -27,6 +27,12 @@ end
 
 service 'firewalld' do
   action [:enable, :start]
+  only_if { node['linux']['firewall']['enable'] == true }
+end
+
+service 'firewalld' do
+  action [:disable, :stop]
+  only_if { node['linux']['firewall']['enable'] == false }
 end
 
 ###
@@ -46,6 +52,7 @@ current_ports.each do | current_port |
     action :run
     sensitive node['linux']['runtime']['sensitivity']
     not_if { desired_ports.include?(current_port) }
+    only_if { node['linux']['firewall']['enable'] = true }
   end
 end
 
@@ -59,6 +66,7 @@ end
     action :run
     sensitive node['linux']['runtime']['sensitivity']
     not_if { (current_ports.join(' ')).include?(desired_port) }
+    only_if { node['linux']['firewall']['enable'] == true }
   end
 end
 
@@ -79,6 +87,7 @@ current_services.each do | current_service |
     action :run
     sensitive node['linux']['runtime']['sensitivity']
     not_if { desired_services.include?(current_service) }
+    only_if { node['linux']['firewall']['enable'] == true }
   end
 end
 
@@ -92,5 +101,6 @@ end
     action :run
     sensitive node['linux']['runtime']['sensitivity']
     not_if { (current_services.join(' ')).include?(desired_service) }
+    only_if { node['linux']['firewall']['enable'] == true }
   end
 end

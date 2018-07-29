@@ -35,6 +35,24 @@ template '/etc/bashrc' do
   sensitive node['linux']['runtime']['sensitivity']
 end
 
+template '/etc/profile' do
+  owner 'root'
+  group 'root'
+  mode  '0644'
+  source 'etc/profile.erb'
+  action :create
+  sensitive node['linux']['runtime']['sensitivity']
+end
+
+template '/etc/csh.cshrc' do
+  owner 'root'
+  group 'root'
+  mode  '0644'
+  source 'etc/csh.cshrc.erb'
+  action :create
+  sensitive node['linux']['runtime']['sensitivity']
+end
+
 file '/etc/shadow' do
   owner 'root'
   group 'root'
