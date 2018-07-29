@@ -55,6 +55,26 @@ service "psacct" do
   action [ :enable, :start ]
 end
 
+yum_package 'aide' do
+  action :install
+  notifies :run, "execute[aide init]", :immediately
+end
+
+execute 'aide init' do
+  command '/usr/sbin/aide --init && mv /var/lib/aide/aide.db.new.gz /var/lib/aide/aide.db.gz'
+  sensitive node['linux']['runtime']['sensitivity']
+
+  action :nothing
+end
+
+file '/var/lib/aide/aide.db.gz' do
+  owner 'root'
+  group 'root'
+  mode '0600'
+  action :create
+  only_if { File.exists? '/var/lib/aide/aide.db.gz' }
+end
+
 ###
 ### This directory must exist to satisfy CIS level 1
 ###
@@ -150,7 +170,7 @@ end
 
 execute 'restart auditd' do
   command '/sbin/service auditd restart'
-  sensitive node['chef']['runtime']['sensitivity']
+  sensitive node['linux']['runtime']['sensitivity']
   action :nothing
 end
 
