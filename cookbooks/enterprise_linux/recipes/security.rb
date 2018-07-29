@@ -30,6 +30,24 @@ ks_artifacts.each do | artifact |
   end
 end
 
+yum_package 'arpwatch' do
+  action :install
+end
+
+service "arpwatch" do
+  supports :status => true, :restart => true
+  action [ :enable, :start ]
+end
+
+yum_package 'psacct' do
+  action :install
+end
+
+service "psacct" do
+  supports :status => true, :restart => true
+  action [ :enable, :start ]
+end
+
 ###
 ### This directory must exist to satisfy CIS level 1
 ###
@@ -47,6 +65,16 @@ file '/boot/grub2/grub.cfg' do
   mode '0600'
   action :create
   only_if { File.exists? '/boot/grub2/grub.cfg' }
+end
+
+template '/etc/modprobe.d/blacklist-hardware.conf' do
+  owner 'root'
+  group 'root'
+  mode  '0750'
+  source 'etc/modprobe.d/blacklist-hardware.conf.erb'
+  action :create
+  sensitive node['linux']['runtime']['sensitivity']
+  only_if { node['linux']['security']['disable_dma'] == true }
 end
 
 template '/etc/modprobe.d/no-usb.conf' do

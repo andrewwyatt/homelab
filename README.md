@@ -72,6 +72,7 @@ The cookbooks in this project do not have default recipes, and that is by design
     Node Name: Any
     Function: Destroy and shutdown the node that the recipe is assigned.
 
+**Note:** *The lab management recipes have a specific inheritance order making it necessary to remove the lab_management::standard\_server recipe from your node roles when using them due to conflicts.  These recipes already include the standard_server recipe.*
 
 ## Installation
 
@@ -233,11 +234,12 @@ In order to provision a Chef server we need to ensure a few things.  The Chef se
 22. The role for the Chef server should be the servers FQDN with the periods changed to underbars.
 
     * Ex. cdc0001.{DOMAIN} -> cdc0001_lab_fewt_com
-    * Add the lab\_management::lab\_build and lab\_management::chef\_server recipes to the role.
+    * Add the lab\_management::lab\_build to the role.
 
 23. Apply the role to the Chef server.
-24. Run chef-client on the Chef server to complete provisioning.
-25. Once provisioning is complete, remove the lab\_build role and apply lab\_management::standard\_node in its place.
+24. Run chef-client on the Chef server.
+25. Remove the lab\_management::lab\_build role and add the lab\_management::chef\_server recipe to the role.
+26. Run chef-client on the Chef server to complete provisioning.
 
 The Chef server should now be managing itself, run Chef client again to verify.
 

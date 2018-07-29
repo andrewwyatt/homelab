@@ -203,7 +203,7 @@ default['linux']['decom']['decom_notice']                        = 'WHAT? I am b
 default['linux']['disable_root']                                = false
 
 default['linux']['login']['lock_inactive_users']                = true
-default['linux']['login']['inactive_user_lock_days']            = "35"
+default['linux']['login']['inactive_user_lock_days']            = "30"
 
 ###
 ### Valid for EL6 (deprecated)
@@ -275,6 +275,7 @@ default['linux']['ntp_restrictions']                             = { }
 default['linux']['ntp_options']                                  = { 'tinker0' => 'tinker panic 0' }
 
 default['linux']['openssh']['Protocol']                          = "2"
+default['linux']['openssh']['Port']                              = "22"
 default['linux']['openssh']['SyslogFacility']                    = "AUTHPRIV"
 default['linux']['openssh']['PermitRootLogin']                   = "no"
 default['linux']['openssh']['UsePrivilegeSeparation']            = "sandbox"
@@ -290,6 +291,7 @@ default['linux']['openssh']['AcceptEnv']                         = "LANG LC_CTYP
 default['linux']['openssh']['PermitTunnel']                      = "no"
 default['linux']['openssh']['ClientAliveInterval']               = "300"
 default['linux']['openssh']['ClientAliveCountMax']               = "0"
+default['linux']['openssh']['LoginGraceTime']                    = "60"
 default['linux']['openssh']['PermitUserEnvironment']             = "no"
 default['linux']['openssh']['AllowGroups']                       = "domain_admins domain_users"
 default['linux']['openssh']['X11Forwarding']                     = "no"
@@ -321,6 +323,10 @@ default['linux']['postfix']['smtp_sasl_mechanism_filter']        = 'plain'
 default['linux']['postfix']['smtp_tls_CAfile']                   = '/etc/pki/tls/certs/ca-bundle.crt'
 default['linux']['postfix']['smtp_use_tls']                      = 'yes'
 default['linux']['postfix']['smtp_tls_security_level']           = 'encrypt'
+
+default['linux']['firewall']['ports']                            = { }
+default['linux']['firewall']['services']                         = { 'ssh'           => true,
+                                                                     'dhcpv6-client' => true }
 
 default['linux']['security']['secure_vartmp']                    = true
 default['linux']['security']['secure_shm']                       = true
@@ -376,6 +382,11 @@ default['linux']['sysctl']                                       = { 'net.ipv4.c
                                                                      'net.ipv4.icmp_echo_ignore_broadcasts'        => "1",
                                                                      'net.ipv4.tcp_max_syn_backlog'                => "1280",
                                                                      'net.ipv4.tcp_syncookies'                     => "1",
+                                                                     'net.ipv4.conf.default.secure_redirects'      => "0",
+                                                                     'net.ipv6.conf.default.accept_redirects'      => "0",
+                                                                     'net.ipv6.conf.all.accept_redirects'          => "0",
+                                                                     'net.ipv6.conf.default.accept_ra'             => "0",
+                                                                     'net.ipv6.conf.all.accept_ra'                 => "0",
                                                                      'vm.swappiness'                               => "0",
                                                                      'kernel.sysrq'                                => "0",
                                                                      'fs.suid_dumpable'                            => "0",
@@ -445,7 +456,7 @@ default['linux']['mounts']                                       = { 'root'    =
                                                                      'vartmp'  => { 'device'         => '/tmp',
                                                                                     'mount_point'     => '/var/tmp',
                                                                                     'fs_type'        => 'none',
-                                                                                    'mount_options'  => 'bind',
+                                                                                    'mount_options'  => 'bind,nosuid,nodev,noexec',
                                                                                     'dump_frequency' => '0',
                                                                                     'fsck_pass_num'  => '0',
                                                                                     'owner'          => 'root',

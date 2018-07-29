@@ -17,6 +17,10 @@
 ### limitations under the License.
 ###
 
+node.default['linux']['firewall']['services']['rsyncd']   = true
+node.default['linux']['firewall']['ports']['80/tcp']      = true
+node.default['linux']['firewall']['ports']['443/tcp']     = true
+
 node.default['linux']['mounts']['data']['device']         = '/dev/wwwvg/lv_www'
 node.default['linux']['mounts']['data']['mount_point']    = '/var/www'
 node.default['linux']['mounts']['data']['fs_type']        = 'ext4'
@@ -27,4 +31,5 @@ node.default['linux']['mounts']['data']['owner']          = 'root'
 node.default['linux']['mounts']['data']['group']          = 'root'
 node.default['linux']['mounts']['data']['mode']           = '0755'
 
+include_recipe 'lab_management::standard_node'
 include_recipe 'provisioner::replicator'

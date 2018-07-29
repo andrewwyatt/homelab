@@ -38,8 +38,32 @@ end
 file '/etc/shadow' do
   owner 'root'
   group 'root'
-  mode  '0000'
+  mode  '0640'
   sensitive node['linux']['runtime']['sensitivity']
+end
+
+file '/etc/shadow-' do
+  owner 'root'
+  group 'root'
+  mode  '0600'
+  sensitive node['linux']['runtime']['sensitivity']
+  only_if { File.exists? "/etc/shadow-" }
+end
+
+file '/etc/gshadow' do
+  owner 'root'
+  group 'root'
+  mode  '0640'
+  sensitive node['linux']['runtime']['sensitivity']
+  only_if { File.exists? "/etc/gshadow" }
+end
+
+file '/etc/gshadow-' do
+  owner 'root'
+  group 'root'
+  mode  '0600'
+  sensitive node['linux']['runtime']['sensitivity']
+  only_if { File.exists? "/etc/gshadow-" }
 end
 
 file '/etc/passwd' do
@@ -47,6 +71,29 @@ file '/etc/passwd' do
   group 'root'
   mode  '0644'
   sensitive node['linux']['runtime']['sensitivity']
+end
+
+file '/etc/passwd-' do
+  owner 'root'
+  group 'root'
+  mode  '0600'
+  sensitive node['linux']['runtime']['sensitivity']
+  only_if { File.exists? "/etc/passwd-" }
+end
+
+file '/etc/group' do
+  owner 'root'
+  group 'root'
+  mode  '0644'
+  sensitive node['linux']['runtime']['sensitivity']
+end
+
+file '/etc/group-' do
+  owner 'root'
+  group 'root'
+  mode  '0600'
+  sensitive node['linux']['runtime']['sensitivity']
+  only_if { File.exists? "/etc/group-" }
 end
 
 bash "Ensure inactive users are disabled after 35 days" do

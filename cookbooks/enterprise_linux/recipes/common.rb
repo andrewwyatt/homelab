@@ -46,6 +46,7 @@ yum_package [ 'wget',
               'scrub',
               'openssh-clients',
               'rsync',
+              'rkhunter',
               'yum-utils' ] do
   action :install
 end

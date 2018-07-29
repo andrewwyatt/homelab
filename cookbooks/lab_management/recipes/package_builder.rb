@@ -17,4 +17,9 @@
 ### limitations under the License.
 ###
 
+node.default['linux']['firewall']['services']['rsyncd'] = true
+node.default['linux']['firewall']['ports']['80/tcp']    = true
+node.default['linux']['firewall']['ports']['443/tcp']   = true
+
+include_recipe 'lab_management::standard_node'
 include_recipe 'provisioner::packager'

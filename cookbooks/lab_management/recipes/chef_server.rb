@@ -17,9 +17,13 @@
 ### limitations under the License.
 ###
 
-node.default['linux']['sysctl']['kernel.shmmax'] = '17179869184'
-node.default['linux']['sysctl']['kernel.shmall'] = '4194304'
+node.default['linux']['firewall']['ports']['80/tcp']  = true
+node.default['linux']['firewall']['ports']['443/tcp'] = true
 
+node.default['linux']['sysctl']['kernel.shmmax']      = '17179869184'
+node.default['linux']['sysctl']['kernel.shmall']      = '4194304'
+
+include_recipe 'lab_management::standard_node'
 include_recipe 'chef::configure_server'
 include_recipe 'chef::configure_manage'
 include_recipe 'chef::configure_reporting'
