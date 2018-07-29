@@ -26,32 +26,11 @@ template "/etc/sysconfig/init" do
   sensitive node['linux']['runtime']['sensitivity']
 end
 
-template "/etc/inittab" do
-  source "etc/inittab.erb"
-  owner "root"
-  group "root"
-  mode 0644
-  action :create
-  sensitive node['linux']['runtime']['sensitivity']
-  only_if { node['platform_version'] =~ /^6/ }
-end
-
 execute "Setting #{node['linux']['target']}" do
   command "systemctl set-default #{node['linux']['target']}.target"
   action :run
   not_if { `systemctl get-default` =~ /#{node['linux']['target']}/ }
   only_if { node['platform_version'] =~ /^7/ }
-end
-
-template "/etc/init.d/bootnotice" do
-  source "etc/init.d/bootnotice.erb"
-  owner "root"
-  group "root"
-  mode 0750
-  action :create
-  sensitive node['linux']['runtime']['sensitivity']
-  notifies :enable, "service[bootnotice]", :immediately
-  only_if { node['platform_version'] =~ /^6/ }
 end
 
 template "/usr/sbin/bootnotice" do

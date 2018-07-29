@@ -97,17 +97,6 @@ template '/etc/modprobe.d/no-udf.conf' do
   only_if { node['linux']['security']['disable_udf_autoload'] == true }
 end
 
-template '/etc/init/control-alt-delete.conf' do
-  owner 'root'
-  group 'root'
-  mode  '0644'
-  source 'etc/init/control-alt-delete.conf.erb'
-  action :create
-  sensitive node['linux']['runtime']['sensitivity']
-  only_if { node['platform_version'] =~ /^6/ }
-  only_if { node['linux']['security']['disable_ctrl_alt_delete'] == true }
-end
-
 link '/etc/systemd/system/ctrl-alt-del.target' do
   to '/dev/null'
   owner 'root'

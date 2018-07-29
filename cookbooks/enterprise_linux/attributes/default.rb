@@ -391,6 +391,7 @@ default['linux']['sysctl']                                       = { 'net.ipv4.c
                                                                      'net.ipv6.conf.all.accept_ra'                 => "0",
                                                                      'vm.swappiness'                               => "0",
                                                                      'kernel.sysrq'                                => "0",
+                                                                     'kernel.exec-shield'                          => "1",
                                                                      'fs.suid_dumpable'                            => "0",
                                                                      'kernel.randomize_va_space'                   => "2",
                                                                      'kernel.dmesg_restrict'                       => "1" }
