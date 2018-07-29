@@ -18,6 +18,13 @@
 ###
 
 ###
+### Encrypted passwords are stored in the credentials > passwords encrypted
+### data bag.
+###
+
+passwords = data_bag_item('credentials', 'passwords', IO.read(Chef::Config['encrypted_data_bag_secret']))
+
+###
 ### Remove kickstart artifacts from /root
 ###
 
@@ -65,6 +72,23 @@ file '/boot/grub2/grub.cfg' do
   mode '0600'
   action :create
   only_if { File.exists? '/boot/grub2/grub.cfg' }
+end
+
+execute 'Remove unrestricted grub option' do
+  command 'sed -i "/^CLASS=/s/ --unrestricted//" /etc/grub.d/10_linux'
+  action :run
+  sensitive node['linux']['runtime']['sensitivity']
+  only_if 'grep unrestricted /etc/grub.d/10_linux'
+end
+
+file '/boot/grub2/user.cfg' do
+  owner 'root'
+  group 'root'
+  mode '0600'
+  content passwords['grub2_hash']
+  action :create
+  sensitive node['linux']['runtime']['sensitivity']
+  only_if { (defined?(passwords['grub2_hash'])).nil? == false }
 end
 
 template '/etc/modprobe.d/blacklist-hardware.conf' do

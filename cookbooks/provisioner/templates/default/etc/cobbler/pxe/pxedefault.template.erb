@@ -5,6 +5,7 @@ PROMPT 0
 MENU TITLE <%= node['linux']['organization'] %> build service
 TIMEOUT <%= node['provisioner']['cobbler']['pxe_timeout'] %>
 TOTALTIMEOUT 6000
+MENU MASTER PASSWD <%= @root_hash %>
 ONTIMEOUT $pxe_timeout_profile
 
 LABEL local

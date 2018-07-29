@@ -306,7 +306,7 @@ template "/etc/cron.d/builder" do
   sensitive node['provisioner']['runtime']['sensitivity']
 end
 
-directory "/home/#{node['provisioner']['user']}/signing_keys" do
+directory "#{node['provisioner']['path']}/signing_keys" do
   owner node['provisioner']['user']
   group node['provisioner']['package_group']
   mode "0700"

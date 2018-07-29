@@ -283,9 +283,9 @@ This bag contains the basic credentials necessary to configure servers in the en
       "id": "passwords",
       "bootstrap_passphrase": "{RANDOM PASSPHRASE}",
       "root_hash": "{ROOT HASH}",
+      "grub2_hash": "GRUB2_PASSWORD={GRUB2 HASH}",
       "sasl_passwd": "{SASL PASSWORD}",
-      "cobbler": "{COBBLER_ROOT_HASH}",
-      "ad_bind_account": "{CHEF_SERVICE_ACCOUNT_PASSWORD}",
+      "ad_bind_account": "{CHEF SERVICE ACCOUNT PASSWORD}",
       "automate_token": "{AUTOMATE TOKEN}"
     }
 
@@ -295,17 +295,24 @@ This cookbook adds a feature to Chef servers adding the ability to bootstrap new
 
 #### root\_hash
 
-This is the root password hash that is applied to the root account on all managed servers.
+This is the root password hash that is applied to the root account on all managed servers.  You can generate a SHA512 password hash using Python.
+
+    python -c 'import crypt,getpass; print(crypt.crypt(getpass.getpass(), crypt.mksalt(crypt.METHOD_SHA512)))'
+
+#### grub2\_hash
+
+This configures the grub password, making it required for accessing servers.  It should contain the GRUB2_PASSWORD= key prefix.  It can be created using grub2-setpassword.
+
+    # grub2-setpassword
+    # cat /boot/grub2/user.cfg
+    
+Copy the entire content of /boot/grub2/user.cfg.
 
 ### sasl\_passwd
 
 This is the relay and password data needed to configure postfix for SASL email relay.  The format for this attribute is as follows:
 
     [relay]:port username:password
-
-#### cobbler
-
-This is the password hash that is applied to the kickstart used to provision servers.
 
 #### ad\_bind\_account
 
@@ -321,7 +328,7 @@ This bag contains the credentials needed to join computers and manage DNS record
 
     {
       "id": "centrify",
-      "{DOMAIN_USER}": "{DOMAIN_PASSWORD}"
+      "{DOMAIN_USER}": "{DOMAIN PASSWORD}"
     }
 
 ### DOMAIN\_USER
@@ -363,11 +370,11 @@ This bag contains credentials needed to create and sign RPM packages.
 
     {
       "id": "builder",
-      "rpmmacros": "{RPM_MACROS_FILE}",
-      "signing_passphrase": "{SIGNING_PASSPHRASE}",
-      "private_key": "{SIGNING_PRIVATE_KEY}",
-      "public_key": "{SIGNING_PUBLIC_KEY}",
-      "gpgid": "{KEY_GPG_ID}"
+      "rpmmacros": "{RPM MACROS FILE CONTENT}",
+      "signing_passphrase": "{SIGNING PASSPHRASE}",
+      "private_key": "{SIGNING PRIVATE KEY}",
+      "public_key": "{SIGNING PUBLIC KEY}",
+      "gpgid": "{KEY GPG ID}"
     }
 
 #### rpmmacros
@@ -384,6 +391,8 @@ This is the passphrase used by the GPG key defined in the rpmmacros to sign pack
 #### private\_key
 
 The private key configured on the packaging server used to sign packages.
+
+    $ gpg --gen-key
 
 #### public\_key
 

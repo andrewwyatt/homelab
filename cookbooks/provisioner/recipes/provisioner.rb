@@ -109,7 +109,7 @@ template '/etc/cobbler/pxe/pxedefault.template' do
   sensitive node['provisioner']['runtime']['sensitivity']
   notifies :restart, "service[cobblerd]", :immediate
   variables({
-    :password   => passwords['cobbler']
+    :root_hash   => passwords['root_hash']
   })
   notifies :restart, "service[cobblerd]", :immediate
 end
