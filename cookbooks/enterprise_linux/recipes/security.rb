@@ -70,7 +70,7 @@ end
 template '/etc/modprobe.d/blacklist-hardware.conf' do
   owner 'root'
   group 'root'
-  mode  '0750'
+  mode  '0640'
   source 'etc/modprobe.d/blacklist-hardware.conf.erb'
   action :create
   sensitive node['linux']['runtime']['sensitivity']
@@ -80,7 +80,7 @@ end
 template '/etc/modprobe.d/no-usb.conf' do
   owner 'root'
   group 'root'
-  mode  '0750'
+  mode  '0640'
   source 'etc/modprobe.d/no-usb.conf.erb'
   action :create
   sensitive node['linux']['runtime']['sensitivity']
@@ -90,7 +90,7 @@ end
 template '/etc/modprobe.d/no-udf.conf' do
   owner 'root'
   group 'root'
-  mode  '0750'
+  mode  '0640'
   source 'etc/modprobe.d/no-udf.conf.erb'
   action :create
   sensitive node['linux']['runtime']['sensitivity']
