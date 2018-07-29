@@ -46,6 +46,7 @@ end
    mode 0600
    content passwords['sasl_passwd']
    action :create
+   sensitive node['linux']['runtime']['sensitivity']
    only_if { node['linux']['postfix']['smtp_sasl_auth_enable'] == "yes" }
    only_if { (defined?(passwords['sasl_passwd'])).nil? == false }
  end
@@ -54,6 +55,7 @@ end
    command "postmap /etc/postfix/sasl_passwd"
    action :run
    notifies :restart, "service[postfix]", :immediately
+   sensitive node['linux']['runtime']['sensitivity']
    not_if { ::File.exists?("/etc/postfix/sasl_passwd.db") }
    only_if { node['linux']['postfix']['smtp_sasl_auth_enable'] == "yes" }
    only_if { (defined?(passwords['sasl_passwd'])).nil? == false }
