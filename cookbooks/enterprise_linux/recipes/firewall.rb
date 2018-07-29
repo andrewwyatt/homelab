@@ -52,7 +52,7 @@ current_ports.each do | current_port |
     action :run
     sensitive node['linux']['runtime']['sensitivity']
     not_if { desired_ports.include?(current_port) }
-    only_if { node['linux']['firewall']['enable'] = true }
+    only_if { node['linux']['firewall']['enable'] == true }
   end
 end
 
