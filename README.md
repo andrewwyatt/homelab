@@ -1,4 +1,4 @@
-# ![Homelab](logo.png)
+![Homelab](logo.png)
 
 ## About
 
