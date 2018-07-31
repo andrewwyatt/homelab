@@ -30,7 +30,7 @@ PASS_WARN_AGE <%= node['linux']['logindefs']['pass_warn_age'] %>
 #
 # Min/max values for automatic uid selection in useradd
 #
-UID_MIN    node['linux']['logindefs']['uid_min'] %>
+UID_MIN <%= node['linux']['logindefs']['uid_min'] %>
 UID_MAX <%= node['linux']['logindefs']['uid_max'] %>
 
 #
