@@ -1,4 +1,4 @@
-# ~/Lab, Managed by Chef
+# ![Homelab](logo.png)
 
 ## About
 
