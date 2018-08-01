@@ -2484,10 +2484,6 @@ nss.runtime.defaultvalue.var.domain: $DOMAIN
 # adclient.krb5.keytab.clean.nonfips.enctypes: false
 #
 
-### Chef managed users and groups
-<% unless node['linux']['centrify']['authorized_groups'].empty? %>
-pam.allow.groups: <%= node['linux']['centrify']['authorized_groups'] %>
-<% end %>
-<% unless node['linux']['centrify']['authorized_users'].empty? %>
-pam.allow.users: <%= node['linux']['centrify']['authorized_users'] %>
-<% end %>
+### Chef managed group access
+
+pam.allow.groups: @allowed_groups

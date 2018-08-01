@@ -18,8 +18,12 @@
 ###
 
 ###
-### This recipe should only be used for the initial lab build.  Once the lab
-### servers are up and running with Chef, switch them to the standard_node recipe.
+### This is the initial lab build recipe, use it first before applying other
+### recipes to the system.  Once run, remove it.
+###
+
+###
+### It does not contain chef client management, or the AD integration recipes.
 ###
 
 include_recipe 'enterprise_linux::hosts'
@@ -31,14 +35,12 @@ include_recipe 'enterprise_linux::init'
 include_recipe 'enterprise_linux::login'
 include_recipe 'enterprise_linux::pam'
 include_recipe 'enterprise_linux::local_users'
-#include_recipe 'enterprise_linux::chef-client'
 include_recipe 'enterprise_linux::banner'
 include_recipe 'enterprise_linux::timezone'
 include_recipe 'enterprise_linux::ntp'
 include_recipe 'enterprise_linux::yum'
 include_recipe 'enterprise_linux::common'
 include_recipe 'enterprise_linux::vmware'
-include_recipe 'enterprise_linux::centrify'
 include_recipe 'enterprise_linux::security'
 include_recipe 'enterprise_linux::shells'
 include_recipe 'enterprise_linux::sudoers'

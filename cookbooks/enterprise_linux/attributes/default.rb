@@ -275,6 +275,29 @@ default['linux']['ntp_restrictions']                             = { }
 
 default['linux']['ntp_options']                                  = { 'tinker0' => 'tinker panic 0' }
 
+###
+### The authentication mechanism supports 'jumpcloud' and 'centrify'
+###
+
+default['linux']['authentication']['mechanism']                  = 'centrify'
+default['linux']['authgroup']['users']                           = 'domain_users'
+default['linux']['authgroup']['administrators']                  = 'domain_admins'
+
+default['linux']['jumpcloud']['url']                             = 'https://kickstart.jumpcloud.com/Kickstart'
+default['linux']['jumpcloud']['allowSshPasswordAuthentication']  = true
+default['linux']['jumpcloud']['allowPublicKeyAuthentication']    = true
+default['linux']['jumpcloud']['allowSshRootLogin']               = false
+default['linux']['jumpcloud']['allowMultiFactorAuthentication']  = false
+
+default['linux']['centrify']['license_type']                     = 'express'
+default['linux']['centrify']['client_type']                      = '--workstation'
+default['linux']['centrify']['join_user']                        = 'domjoin'
+default['linux']['centrify']['domain']                           = 'lab.fewt.com'
+default['linux']['centrify']['authorized_users']                 = ''
+default['linux']['centrify']['authorized_groups']                = 'domain_admins'
+
+default['linux']['sudoers']['properties']                        = { 'administrators' => "%#{node['linux']['authgroup']['administrators']}	ALL=(ALL) NOPASSWD: ALL" }
+
 default['linux']['openssh']['Protocol']                          = "2"
 default['linux']['openssh']['Port']                              = "22"
 default['linux']['openssh']['SyslogFacility']                    = "AUTHPRIV"
@@ -294,7 +317,7 @@ default['linux']['openssh']['ClientAliveInterval']               = "300"
 default['linux']['openssh']['ClientAliveCountMax']               = "0"
 default['linux']['openssh']['LoginGraceTime']                    = "60"
 default['linux']['openssh']['PermitUserEnvironment']             = "no"
-default['linux']['openssh']['AllowGroups']                       = "domain_admins domain_users"
+default['linux']['openssh']['AllowGroups']                       = "node['linux']['authgroup']['administrators'] node['linux']['authgroup']['users']"
 default['linux']['openssh']['X11Forwarding']                     = "no"
 default['linux']['openssh']['Banner']                            = "/etc/issue"
 default['linux']['openssh']['UseDNS']                            = "no"
@@ -358,14 +381,6 @@ default['linux']['rsyslog']['rules']                             = { 'messages' 
 default['linux']['rsyslog']['remotes']                           = { }
 default['linux']['systemd']['journald']['forward_to_syslog']      = "yes"
 
-default['linux']['centrify']['license_type']                     = 'express'
-default['linux']['centrify']['client_type']                      = '--workstation'
-default['linux']['centrify']['join_user']                        = 'domjoin'
-default['linux']['centrify']['domain']                           = 'lab.fewt.com'
-default['linux']['centrify']['authorized_users']                 = ''
-default['linux']['centrify']['authorized_groups']                = 'domain_admins'
-
-default['linux']['sudoers']['properties']                        = { 'domain_admins' => '%domain_admins	ALL=(ALL) NOPASSWD: ALL' }
 
 default['linux']['sysctl']                                       = { 'net.ipv4.conf.default.log_martians'          => "1",
                                                                      'net.ipv4.conf.all.log_martians'              => "1",
@@ -504,7 +519,7 @@ default['linux']['mounts']                                       = { 'root'    =
                                                                      'proc'    => { 'device'         => 'proc',
                                                                                     'mount_point'    => '/proc',
                                                                                     'fs_type'        => 'proc',
-                                                                                    'mount_options'  => 'defaults,nosuid,nodev,noexec,hidepid=2',
+                                                                                    'mount_options'  => 'defaults,nosuid,nodev,noexec,hidepid=2sta',
                                                                                     'dump_frequency' => '0',
                                                                                     'fsck_pass_num'  => '0',
                                                                                     'owner'          => 'root',
