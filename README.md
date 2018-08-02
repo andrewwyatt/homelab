@@ -81,8 +81,7 @@ Building a test lab with Chef is simplified using these cookbooks.  They require
 * An ESXi host
 * One or more MSAD domain controllers (cdw0001.{DOMAIN}, cdw0002.{DOMAIN})
 * Build the system definitions listed at the bottom of the README manually, or by using the kickstart data in the ks directory
-* Install the [Centrify RPMs](https://www.centrify.com/express/linux-unix/download-files/) on each of the servers created.
-* In AD, create CNAMES for each server.
+* Create an account at JumpCloud, a user account for yourself, domain-users and domain-admins groups.
 
 ## Operating System Support
 
@@ -321,15 +320,6 @@ This entry contains the password for the Chef service account used for authentic
 #### automate_token
 
 This defines the automate token used to authenticate Chef clients and server to an Automate instance.
-
-### Credentials / centrify
-
-This bag contains the credentials needed to join computers and manage DNS records.
-
-    {
-      "id": "centrify",
-      "{DOMAIN_USER}": "{DOMAIN PASSWORD}"
-    }
 
 ### DOMAIN\_USER
 
