@@ -73,7 +73,6 @@ if File.exists?("/opt/jc/jcagent.conf")
   end
 end
 
-
 remote_file "#{Chef::Config['file_cache_path']}/#{node['linux']['chef']['bootstrap_user']}.pem.enc" do
   source "https://#{node['linux']['chef']['server']}#{node['linux']['chef']['bootstrap_root']}#{node['linux']['chef']['bootstrap_user']}.pem.enc"
   owner 'root'

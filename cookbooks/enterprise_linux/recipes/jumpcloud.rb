@@ -60,8 +60,7 @@ if sgmembers.length < 1
   sgmembers = "{}"
 end
 
-#sgattrs = JSON.parse(sgmembers)
-#sgattrs = Hash[*sgattrs.collect{|h| h.to_a}.flatten]
+lattrs = Hash.new
 
 if File.exists?("/opt/jc/jcagent.conf")
   localdata = `cat /opt/jc/jcagent.conf 2>/dev/null`
@@ -72,16 +71,16 @@ if File.exists?("/opt/jc/jcagent.conf")
 
   lattrs = JSON.parse(localdata)
   lattrs = Hash[*lattrs.collect{|h| h.to_a}.flatten]
+end
 
-  bash "Ensuring #{node['fqdn']} is assigned to the appropriate system group." do
-    code <<-EOF
-      curl -X POST "#{node['linux']['jumpcloud']['api_url']}/v2/systemgroups/#{node['linux']['jumpcloud']['server_groupid']}/members" \
-           -H 'Accept: application/json'                 \
-           -H 'Content-Type: application/json'           \
-           -H 'x-api-key: #{passwords['jumpcloud_api']}' \
-           -d '{ "op": "add", "type": "system", "id": "#{lattrs['systemKey']}" }' 2>/dev/null
-    EOF
-    sensitive node['linux']['runtime']['sensitivity']
-    not_if { sgmembers =~ /lattrs['systemKey']/ }
-  end
+bash "Ensuring #{node['fqdn']} is assigned to the appropriate system group." do
+  code <<-EOF
+    curl -X POST "#{node['linux']['jumpcloud']['api_url']}/v2/systemgroups/#{node['linux']['jumpcloud']['server_groupid']}/members" \
+         -H 'Accept: application/json'                 \
+         -H 'Content-Type: application/json'           \
+         -H 'x-api-key: #{passwords['jumpcloud_api']}' \
+         -d '{ "op": "add", "type": "system", "id": "#{lattrs['systemKey']}" }' 2>/dev/null
+  EOF
+  sensitive node['linux']['runtime']['sensitivity']
+  not_if { sgmembers =~ /lattrs['systemKey']/ }
 end
