@@ -281,7 +281,7 @@ default['linux']['authgroup']['administrators']                  = 'domain-admin
 
 default['linux']['jumpcloud']['ks_url']                          = 'https://kickstart.jumpcloud.com/Kickstart'
 default['linux']['jumpcloud']['api_url']                         = 'https://console.jumpcloud.com/api'
-default['linux']['jumpcloud']['server_groupid']                  = '5b60c4cf45886d0bf0ca9593'
+default['linux']['jumpcloud']['server_groupid']                  = ''
 
 default['linux']['sudoers']['properties']                        = { 'administrators' => "%#{node['linux']['authgroup']['administrators']}	ALL=(ALL) NOPASSWD: ALL" }
 
