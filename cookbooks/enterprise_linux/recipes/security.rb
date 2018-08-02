@@ -147,16 +147,6 @@ file '/boot/grub2/user.cfg' do
   only_if { (defined?(passwords['grub2_hash'])).nil? == false }
 end
 
-template '/etc/modprobe.d/blacklist-hardware.conf' do
-  owner 'root'
-  group 'root'
-  mode  '0640'
-  source 'etc/modprobe.d/blacklist-hardware.conf.erb'
-  action :create
-  sensitive node['linux']['runtime']['sensitivity']
-  only_if { node['linux']['security']['disable_hardware'] == true }
-end
-
 template '/etc/modprobe.d/blacklist-modules.conf' do
   owner 'root'
   group 'root'
@@ -165,26 +155,6 @@ template '/etc/modprobe.d/blacklist-modules.conf' do
   action :create
   sensitive node['linux']['runtime']['sensitivity']
   only_if { node['linux']['security']['disable_modules'] == true }
-end
-
-template '/etc/modprobe.d/no-usb.conf' do
-  owner 'root'
-  group 'root'
-  mode  '0640'
-  source 'etc/modprobe.d/no-usb.conf.erb'
-  action :create
-  sensitive node['linux']['runtime']['sensitivity']
-  only_if { node['linux']['security']['disable_usb_autoload'] == true }
-end
-
-template '/etc/modprobe.d/no-udf.conf' do
-  owner 'root'
-  group 'root'
-  mode  '0640'
-  source 'etc/modprobe.d/no-udf.conf.erb'
-  action :create
-  sensitive node['linux']['runtime']['sensitivity']
-  only_if { node['linux']['security']['disable_udf_autoload'] == true }
 end
 
 link '/etc/systemd/system/ctrl-alt-del.target' do
@@ -214,7 +184,7 @@ template '/etc/audit/rules.d/audit.rules' do
   notifies :run, "execute[restart auditd]", :immediately
 end
 
-execute 'restart auditd' do
+execute 'restart auditd' do #~FC004 - Wish I could foodcritic, wish I could. :)
   command '/sbin/service auditd restart'
   sensitive node['linux']['runtime']['sensitivity']
   action :nothing
