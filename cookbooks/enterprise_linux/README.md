@@ -1,4 +1,6 @@
-# ~/Lab - Enterprise Linux Cookbook
+![Homelab](../../logo.png)
+
+# Enterprise Linux Cookbook
 
 ## About
 

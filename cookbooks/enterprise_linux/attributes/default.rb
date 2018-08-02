@@ -337,8 +337,7 @@ default['linux']['postfix']['smtp_tls_security_level']           = 'encrypt'
 
 default['linux']['firewall']['enable']                           = true
 default['linux']['firewall']['ports']                            = { }
-default['linux']['firewall']['services']                         = { 'ssh'           => true,
-                                                                     'dhcpv6-client' => true }
+default['linux']['firewall']['services']                         = { 'ssh'           => true }
 
 default['linux']['security']['secure_vartmp']                    = true
 default['linux']['security']['secure_shm']                       = true

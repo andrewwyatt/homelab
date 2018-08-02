@@ -401,18 +401,35 @@ The gpgid variable is used by the builder recipe to track the keys.
 
 Prior to configuring the provisioners, set the local repository attribute to disabled.  Once everything is configured, and chef client has been run on all nodes successfully it is OK to turn this back on.
 
-## Domain Configuration
-### DC Time Sync
+## JumpCloud Configuration
 
-Configure each DC to use an external time source.
+Create an account for domain at JumpCloud.  You will need the following to configure the cookbook:
 
-    w32tm /config /computer:ulcdw0001.{DOMAIN} /manualpeerlist:time.windows.com /syncfromflags:manual /update
+### User Accounts
 
-    w32tm /config /computer:ulcdw0002.{DOMAIN} /manualpeerlist:time.windows.com /syncfromflags:manual /update
+* Chef Authenticator with LDAP Bind enabled
+* User Access Accounts
 
-### DC User accounts
+### User Groups
 
-Create an account for joining the domain, and grant delegation to create and destroy computer accounts.  Also grant access as a DNS admin for DNS (de)provisioning.
+* Chef Admins (chef-admins)
+* Chef Users (chef-users)
+* Domain Admins (domain-admins)
+* Domain Users (domain-users)
+
+### System Groups
+
+* Servers
+
+### Chef Configuration
+
+JumpCloud is configured by Chef via the enterprise_linux::jumpcloud recipe.  In order to use this recipe, the following needs to be configured in Chef.
+
+* The JumpCloud Connect key (Add to the credentials -> passwords data bag)
+* The JumpCloud API key (Add to the credentials -> passwords data bag)
+* The GroupID of the servers system group (found via [API query](https://docs.jumpcloud.com/2.0/system-groups/list-all-systems-groups))
+
+Servers will automatically install the JCAgent software, and add themselves to the Servers sytem group.  When decommissioning using the decom recipe, they will remove themselves before powering down or restarting.
 
 ## Adding nodes
 

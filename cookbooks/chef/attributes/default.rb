@@ -113,8 +113,8 @@ default['chef']['organizations']                 = { 'lab'        => { 'short_na
                                                                                                   'last_name'  => 'Administrator',
                                                                                                   'email'      => 'admin@lab.fewt.com'
                                                                                                 },
-                                                                       'groups'              => { 'admin'        => 'chef_admins',
-                                                                                                  'users'        => 'chef_users'
+                                                                       'groups'              => { 'admin'        => 'chef-admins',
+                                                                                                  'users'        => 'chef-users'
                                                                                                 },
                                                                        'unmanaged_accounts'  => [ 'admin',
                                                                                                   'pivotal',

@@ -1,4 +1,6 @@
-# ~/Lab - Chef Server Cookbook
+![Homelab](../../logo.png)
+
+# Chef Server Cookbook
 
 ## About
 

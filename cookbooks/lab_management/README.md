@@ -1,4 +1,6 @@
-# ~/Lab - Lab Management Cookbook
+![Homelab](../../logo.png)
+
+# Lab Management Cookbook
 
 ## About
 

@@ -1,4 +1,6 @@
-# ~/Lab - Provisioner Cookbook
+![Homelab](../../logo.png)
+
+# Provisioner Cookbook
 
 ## About
 
