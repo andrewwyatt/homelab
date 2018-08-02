@@ -186,7 +186,7 @@ end
 ###
 
 tag('mirror')
-tag(node['provisioner']['mirror_cname'])
+tag(node['provisioner']['cnames'][node['fqdn']])
 
 ### Send a notification that this system is now an upstream mirror
 notification = 'FYI.. I am now configured as an upstream mirror.'

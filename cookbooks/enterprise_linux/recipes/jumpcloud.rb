@@ -42,8 +42,46 @@ passwords = data_bag_item('credentials', 'passwords', IO.read(Chef::Config['encr
 ###
 
 execute 'install_agent' do
-  command "curl --tlsv1.2 --silent --show-error --header 'x-connect-key: #{passwords['jumpcloud']}' '#{node['fqdn']}' | bash >/dev/null 2>&1"
-  path    [ '/sbin', '/bin', '/usr/sbin', '/usr/bin' ]
-  timeout 600
+  command "curl --tlsv1.2 --silent --show-error --header 'x-connect-key: #{passwords['jumpcloud_connect']}' '#{node['linux']['jumpcloud']['ks_url']}' | bash"
+  sensitive node['linux']['runtime']['sensitivity']
   not_if { File.exists? "/opt/jc/policyConf.json" }
+end
+
+###
+### Add the server to the appropriate group if it doesn't already exist.
+###
+
+sgmembers=`curl -X GET "#{node['linux']['jumpcloud']['api_url']}/v2/systemgroups/#{node['linux']['jumpcloud']['server_groupid']}/membership" \
+           -H 'Accept: application/json'       \
+           -H 'Content-Type: application/json' \
+           -H 'x-api-key: #{passwords['jumpcloud_api']}' 2>/dev/null`
+
+if sgmembers.length < 1
+  sgmembers = "{}"
+end
+
+#sgattrs = JSON.parse(sgmembers)
+#sgattrs = Hash[*sgattrs.collect{|h| h.to_a}.flatten]
+
+if File.exists?("/opt/jc/jcagent.conf")
+  localdata = `cat /opt/jc/jcagent.conf 2>/dev/null`
+
+  if localdata.length < 1
+    localdata = "{}"
+  end
+
+  lattrs = JSON.parse(localdata)
+  lattrs = Hash[*lattrs.collect{|h| h.to_a}.flatten]
+
+  bash "Ensuring #{node['fqdn']} is assigned to the appropriate system group." do
+    code <<-EOF
+      curl -X POST "#{node['linux']['jumpcloud']['api_url']}/v2/systemgroups/#{node['linux']['jumpcloud']['server_groupid']}/members" \
+           -H 'Accept: application/json'                 \
+           -H 'Content-Type: application/json'           \
+           -H 'x-api-key: #{passwords['jumpcloud_api']}' \
+           -d '{ "op": "add", "type": "system", "id": "#{lattrs['systemKey']}" }' 2>/dev/null
+    EOF
+    sensitive node['linux']['runtime']['sensitivity']
+    not_if { sgmembers =~ /lattrs['systemKey']/ }
+  end
 end

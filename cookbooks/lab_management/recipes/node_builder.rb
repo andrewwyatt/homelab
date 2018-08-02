@@ -20,9 +20,11 @@
 
 node.default['linux']['firewall']['services']['dhcp' ]    = true
 node.default['linux']['firewall']['ports']['80/tcp']      = true
-node.default['linux']['firewall']['ports']['443/tcp']     = true
+node.default['linux']['firewall']['ports']['53/tcp']      = true
+node.default['linux']['firewall']['ports']['53/udp']      = true
 node.default['linux']['firewall']['ports']['69/tcp']      = true
 node.default['linux']['firewall']['ports']['69/udp']      = true
+node.default['linux']['firewall']['ports']['443/tcp']     = true
 node.default['linux']['firewall']['ports']['4011/udp']    = true
 
 node.default['linux']['mounts']['data']['device']         = '/dev/sysvg/lv_www'

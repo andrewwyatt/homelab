@@ -24,9 +24,14 @@ node.default['linux']['sysctl']['kernel.shmmax']      = '17179869184'
 node.default['linux']['sysctl']['kernel.shmall']      = '4194304'
 
 include_recipe 'lab_management::standard_node'
+
+###
+### Needs to be refactored.
+###
+
 include_recipe 'chef::configure_server'
 include_recipe 'chef::configure_manage'
 include_recipe 'chef::configure_reporting'
 include_recipe 'chef::configure_bootstrap'
-include_recipe 'chef::configure_users'
+#include_recipe 'chef::configure_users'
 include_recipe 'chef::configure_mirroring'

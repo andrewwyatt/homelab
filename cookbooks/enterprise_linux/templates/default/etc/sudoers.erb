@@ -32,10 +32,6 @@ Defaults    env_keep = "COLORS DISPLAY HOSTNAME HISTSIZE INPUTRC KDEDIR \
 ## Allow root to run any commands anywhere
 root	ALL=(ALL) 	ALL
 
-<% node['linux']['sudoers']['properties'].each do |key,configitem| -%>
-<%= configitem %>
-<% end -%>
-
 ## Provide support for /etc/sudoers.d for role based access control
 ## configuration.
 #includedir /etc/sudoers.d

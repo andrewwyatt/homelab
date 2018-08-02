@@ -21,6 +21,7 @@ require 'fileutils'
 
 yum_package [ 'httpd',
               'dhcp',
+              'bind',
               'xinetd',
               'tftp-server',
               'hardlink',
@@ -78,6 +79,36 @@ end
 
 template '/etc/cobbler/dhcp.template' do
   source 'etc/cobbler/dhcp.template.erb'
+  owner 'root'
+  group 'root'
+  mode 0644
+  action :create
+  sensitive node['provisioner']['runtime']['sensitivity']
+  notifies :restart, "service[cobblerd]", :immediate
+end
+
+template '/etc/cobbler/named.template' do
+  source 'etc/cobbler/named.template.erb'
+  owner 'root'
+  group 'root'
+  mode 0644
+  action :create
+  sensitive node['provisioner']['runtime']['sensitivity']
+  notifies :restart, "service[cobblerd]", :immediate
+end
+
+template '/etc/cobbler/zone.template' do
+  source 'etc/cobbler/zone.template.erb'
+  owner 'root'
+  group 'root'
+  mode 0644
+  action :create
+  sensitive node['provisioner']['runtime']['sensitivity']
+  notifies :restart, "service[cobblerd]", :immediate
+end
+
+template '/etc/cobbler/named.template' do
+  source 'etc/cobbler/named.template.erb'
   owner 'root'
   group 'root'
   mode 0644
@@ -337,6 +368,14 @@ bash "Configure the cobbler default profile" do
   not_if { default_system == node['linux']['cobbler']['profile'] }
 end
 
+node['provisioner']['cnames'].each do | server, cname |
+  cname_test=`cobbler system dumpvars --name #{server} 2>/dev/null | grep cnames_ | awk '{print $3}'`
+  execute "Applying cname #{cname }to #{server}." do
+    command "cobbler system edit --name #{server} --cname #{cname}"
+    not_if { cname_test =~ /#{cname}/ }
+  end
+end
+
 bash "Execute Cobbler Sync" do
   code <<-EOF
     cobbler sync
@@ -344,6 +383,7 @@ bash "Execute Cobbler Sync" do
   action :run
   sensitive node['provisioner']['runtime']['sensitivity']
   subscribes :run, 'file[/etc/cobbler/dhcp.template]', :delayed
+  subscribes :run,'template[/etc/cobbler/named.template]', :delayed
 end
 
 service "httpd" do
@@ -354,6 +394,12 @@ end
 service "xinetd" do
   supports :status => true, :restart => true
   action [ :enable, :start ]
+end
+
+service "named" do
+  supports :status => true, :restart => true
+  action [ :enable, :start ]
+  only_if { node['provisioner']['manage_dns'] == "1" }
 end
 
 service "dhcpd" do
@@ -389,7 +435,7 @@ end
 ###
 
 tag('provisioner')
-tag(node['provisioner']['provisioner_cname'])
+tag(node['provisioner']['cnames'][node['fqdn']])
 
 ### Send a notification that this system is now a provisioner
 notification = 'FYI.. I am now configured as a VM provisioner.'

@@ -160,16 +160,7 @@ default['chef']['manage_chef']                = true
 ### include attributes added to Chef to correct bugs, or provide service optimizations.
 ###
 
-default['chef']['server_attributes']             = { 'ldap'            => { 'base_dn'         => 'DC=lab,DC=fewt,DC=com',
-                                                                            'bind_dn'         => 'CN=Chef Authenticator,CN=Users,DC=lab,DC=fewt,DC=com',
-                                                                            'host'            => 'lab.fewt.com',
-                                                                            'enable_tls'      => true,
-                                                                            'port'            => '389' },
-                                                     'nginx'           => { 'ssl_certificate'     => "/etc/opscode/#{node['fqdn']}.crt",
-                                                                            'ssl_certificate_key' => "/etc/opscode/#{node['fqdn']}.pem",
-                                                                            'ssl_protocols'       => 'TLSv1.1 TLSv1.2' },
-                                                     'license'             => { 'nodes' => '20' }
-                                                   }
+default['chef']['server_attributes']             = { }
 
 ### Disabled, Automate license has expired.
 # 'data_collector' => { 'root_url' => 'https://automate.lab.fewt.com/data-collector/v0/' },

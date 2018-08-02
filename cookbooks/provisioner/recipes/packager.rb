@@ -441,7 +441,7 @@ end
 ###
 
 tag('builder')
-tag(node['provisioner']['builder_cname'])
+tag(node['provisioner']['cnames'][node['fqdn']])
 
 
 ###

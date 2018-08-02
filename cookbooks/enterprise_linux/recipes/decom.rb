@@ -52,33 +52,13 @@ bash "Send decom notice" do
   sensitive node['linux']['runtime']['sensitivity']
 end
 
-centrify = data_bag_item('credentials', 'centrify', IO.read(Chef::Config['encrypted_data_bag_secret']))
-join_password = centrify[node['linux']['centrify']['join_user']]
-
-notification="Removing my DNS records from DNS servers at #{node['linux']['centrify']['domain']}."
-dns_test=`host #{node['fqdn']}`
-unless dns_test =~/NXDOMAIN/i
-  bash "Ensuring DNS record for server #{node['fqdn']} is removed" do
+if node['linux']['authentication']['mechanism'] == 'joincloud'
+  bash "Ensuring #{node['fqdn']} is removed from JoinCloud." do
     code <<-EOF
-      notify "#{node['fqdn']}" "#{node['linux']['slack_channel']}" "#{node['linux']['emoji']}" "#{node['linux']['api_path']}" "#{notification}"
-      addns -D --user #{node['linux']['centrify']['join_user']} --password \'#{join_password}\'
-    EOF
-    sensitive node['linux']['runtime']['sensitivity']
-  end
-end
-
-service "centrifydc" do
-  supports :status => true, :restart => true
-  action [ :disable, :stop ]
-end
-
-notification="Removing myself from Active Directory domain #{node['linux']['centrify']['domain']}."
-joined_test=`adinfo | head -n 1`
-if joined_test =~/#{node['hostname']}/i
-  bash "Leave Domain (#{node['linux']['centrify']['domain']})" do
-    code <<-EOF
-      notify "#{node['fqdn']}" "#{node['linux']['slack_channel']}" "#{node['linux']['emoji']}" "#{node['linux']['api_path']}" "#{notification}"
-      adleave --user #{node['linux']['centrify']['join_user']} --password \'#{join_password}\' -r
+      curl -X DELETE "#{node['linux']['jumpcloud']['api_url']}/#{node['linux']['jumpcloud']['server_groupid']}" \
+           -H 'Accept: application/json'                \
+           -H 'Content-Type: application/json'          \
+           -H 'x-api-key: #{passwords['jumpcloud_api']}'
     EOF
     sensitive node['linux']['runtime']['sensitivity']
   end

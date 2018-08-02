@@ -228,9 +228,9 @@ default['linux']['hosts']                                       = { }
 
 default['linux']['dns_search']                                  = 'lab.fewt.com fewt.com'
 default['linux']['dns_options']                                 = 'timeout:1'
-default['linux']['dns_resolvers']                               = { 'ns1' => '10.100.100.5',
-                                                                    'ns2' => '10.100.100.6',
-                                                                    'ns3' => '10.100.100.7' }
+default['linux']['dns_resolvers']                               = { 'ns1' => '10.100.100.224',
+                                                                    'ns2' => '8.8.8.8',
+                                                                    'ns3' => '8.8.4.4' }
 
 default['linux']['limits']['default']                            = { 'hard_core'  => '* hard core 0',
                                                                      'soft_core'  => '* soft core 0',
@@ -275,26 +275,13 @@ default['linux']['ntp_restrictions']                             = { }
 
 default['linux']['ntp_options']                                  = { 'tinker0' => 'tinker panic 0' }
 
-###
-### The authentication mechanism supports 'jumpcloud' and 'centrify'
-###
+default['linux']['authentication']['mechanism']                  = 'jumpcloud'
+default['linux']['authgroup']['users']                           = 'domain-users'
+default['linux']['authgroup']['administrators']                  = 'domain-admins'
 
-default['linux']['authentication']['mechanism']                  = 'centrify'
-default['linux']['authgroup']['users']                           = 'domain_users'
-default['linux']['authgroup']['administrators']                  = 'domain_admins'
-
-default['linux']['jumpcloud']['url']                             = 'https://kickstart.jumpcloud.com/Kickstart'
-default['linux']['jumpcloud']['allowSshPasswordAuthentication']  = true
-default['linux']['jumpcloud']['allowPublicKeyAuthentication']    = true
-default['linux']['jumpcloud']['allowSshRootLogin']               = false
-default['linux']['jumpcloud']['allowMultiFactorAuthentication']  = false
-
-default['linux']['centrify']['license_type']                     = 'express'
-default['linux']['centrify']['client_type']                      = '--workstation'
-default['linux']['centrify']['join_user']                        = 'domjoin'
-default['linux']['centrify']['domain']                           = 'lab.fewt.com'
-default['linux']['centrify']['authorized_users']                 = ''
-default['linux']['centrify']['authorized_groups']                = 'domain_admins'
+default['linux']['jumpcloud']['ks_url']                          = 'https://kickstart.jumpcloud.com/Kickstart'
+default['linux']['jumpcloud']['api_url']                         = 'https://console.jumpcloud.com/api'
+default['linux']['jumpcloud']['server_groupid']                  = '5b60c4cf45886d0bf0ca9593'
 
 default['linux']['sudoers']['properties']                        = { 'administrators' => "%#{node['linux']['authgroup']['administrators']}	ALL=(ALL) NOPASSWD: ALL" }
 
@@ -317,7 +304,7 @@ default['linux']['openssh']['ClientAliveInterval']               = "300"
 default['linux']['openssh']['ClientAliveCountMax']               = "0"
 default['linux']['openssh']['LoginGraceTime']                    = "60"
 default['linux']['openssh']['PermitUserEnvironment']             = "no"
-default['linux']['openssh']['AllowGroups']                       = "node['linux']['authgroup']['administrators'] node['linux']['authgroup']['users']"
+default['linux']['openssh']['AllowGroups']                       = "#{node['linux']['authgroup']['administrators']} #{node['linux']['authgroup']['users']}"
 default['linux']['openssh']['X11Forwarding']                     = "no"
 default['linux']['openssh']['Banner']                            = "/etc/issue"
 default['linux']['openssh']['UseDNS']                            = "no"
@@ -358,7 +345,7 @@ default['linux']['security']['secure_shm']                       = true
 default['linux']['security']['secure_inittab']                   = true
 default['linux']['security']['secure_init']                      = true
 
-default['linux']['security']['remove_at_daemon']                 = true
+default['linux']['security']['remove_at_daemon']                 = false
 default['linux']['security']['disable_modules']                  = true
 default['linux']['security']['disable_ctrl_alt_delete']          = true
 default['linux']['security']['remove_rsh_server']                = true
@@ -519,7 +506,7 @@ default['linux']['mounts']                                       = { 'root'    =
                                                                      'proc'    => { 'device'         => 'proc',
                                                                                     'mount_point'    => '/proc',
                                                                                     'fs_type'        => 'proc',
-                                                                                    'mount_options'  => 'defaults,nosuid,nodev,noexec,hidepid=2sta',
+                                                                                    'mount_options'  => 'defaults,nosuid,nodev,noexec,hidepid=2',
                                                                                     'dump_frequency' => '0',
                                                                                     'fsck_pass_num'  => '0',
                                                                                     'owner'          => 'root',

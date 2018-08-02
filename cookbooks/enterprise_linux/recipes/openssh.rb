@@ -21,7 +21,11 @@ yum_package 'openssh-server' do
   action :install
 end
 
-template '/etc/ssh/sshd_config' do
+###
+### Jumpcloud will always overlay the configuration file with the .orig
+###
+
+template '/etc/ssh/sshd_config.orig' do
   source "etc/ssh/sshd_config.erb"
   owner "root"
   group "root"

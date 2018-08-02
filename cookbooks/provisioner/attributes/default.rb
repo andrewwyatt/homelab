@@ -63,18 +63,24 @@ default['provisioner']['name_gen_reset']                        = '900'
 default['provisioner']['hostname_auth_token']                   = '393f30f15a4a24d4f7385faf38543036e2687bb813b8627ac8ca9fcfa20650c0'
 
 default['provisioner']['chef']['default_server']                = 'cdc0001.lab.fewt.com'
-default['provisioner']['mirror_cname']                          = 'mirror.lab.fewt.com'
-default['provisioner']['builder_cname']                         = "build#{node['platform_version'][0]}.lab.fewt.com"
-default['provisioner']['provisioner_cname']                     = 'deploy.lab.fewt.com'
+
+default['provisioner']['cnames']                                = { 'cdc0001.lab.fewt.com' => 'chef.lab.fewt.com',
+                                                                    'cdc0002.lab.fewt.com' => 'mirror.lab.fewt.com',
+                                                                    'cdc0003.lab.fewt.com' => 'build7.lab.fewt.com',
+                                                                    'cdc0004.lab.fewt.com' => 'deploy.lab.fewt.com' }
+
 
 default['provisioner']['subnet']                                = '10.100.100.0'
 default['provisioner']['netmask']                               = '255.255.255.0'
 default['provisioner']['routers']                               = '10.100.100.1'
-default['provisioner']['domain_name_servers']                   = '10.100.100.5, 10.100.100.6, 10.100.100.1'
+default['provisioner']['domain_name_servers']                   = '10.100.100.224, 8.8.8.8, 10.100.100.1'
 default['provisioner']['dhcp_range']                            = '10.100.100.170 10.100.100.240'
 default['provisioner']['dhcp_default_lease_time']               = '21600'
 default['provisioner']['dhcp_max_lease_time']                   = '43200'
 
+default['provisioner']['manage_dns']                            = '1'
+default['provisioner']['manage_forward_zones']                  = '\'lab.fewt.com\''
+default['provisioner']['manage_reverse_zones']                  = '\'10.100.100\''
 
 default['provisioner']['manage_dhcp']                           = '1'
 default['provisioner']['next_server']                           = node['ipaddress']
@@ -82,7 +88,7 @@ default['provisioner']['pxe_just_once']                         = '1'
 default['provisioner']['register_new_installs']                 = '1'
 default['provisioner']['cobbler_server']                        = node['ipaddress']
 
-default['provisioner']['cobbler']['hostname_url']                = "http://#{node['provisioner']['provisioner_cname']}/get/hostname"
+default['provisioner']['cobbler']['hostname_url']                = "http://deploy.lab.fewt.com/get/hostname"
 default['provisioner']['cobbler']['bootstrap_url']               = "https://#{node['provisioner']['chef']['default_server']}/node"
 default['provisioner']['cobbler']['pxe_timeout']                 = '10'
 
@@ -101,23 +107,23 @@ default['provisioner']['cobbler']['default_packages']            = { 'core' => '
 
 default['provisioner']['cobbler']['bootimage_path']              = '/var/www/html/images'
 
-default['provisioner']['cobbler']['bootimages']                  = { 'vmlinuz'    => "http://#{node['provisioner']['mirror_cname']}/mirrors/centos/7/os/x86_64/images/pxeboot/vmlinuz",
-                                                                     'initrd.img' => "http://#{node['provisioner']['mirror_cname']}/mirrors/centos/7/os/x86_64/images/pxeboot/initrd.img" }
+default['provisioner']['cobbler']['bootimages']                  = { 'vmlinuz'    => "http://mirror.lab.fewt.com/mirrors/centos/7/os/x86_64/images/pxeboot/vmlinuz",
+                                                                     'initrd.img' => "http://mirror.lab.fewt.com/mirrors/centos/7/os/x86_64/images/pxeboot/initrd.img" }
 
 default['provisioner']['cobbler']['default_profile']             = node['linux']['cobbler']['profile']
 default['provisioner']['cobbler']['distros']                     = { 'CentOS-7-x86_64' => { 'name'       => 'CentOS-7-x86_64',
                                                                                             'owners'     => 'admin',
                                                                                             'kernel'     => "/var/www/html/images/CentOS-7-x86_64/pxeboot/vmlinuz",
                                                                                             'initrd'     => "/var/www/html/images/CentOS-7-x86_64/pxeboot/initrd.img",
-                                                                                            'ksmeta'     => "tree=http://#{node['provisioner']['mirror_cname']}/mirrors/centos/7/os/x86_64",
+                                                                                            'ksmeta'     => "tree=http://mirror.lab.fewt.com/mirrors/centos/7/os/x86_64",
                                                                                             'arch'       => 'x86_64',
                                                                                             'breed'      => 'redhat',
                                                                                             'os-version' => 'rhel7',
-                                                                                            'repos'      => { 'base'    => "http://#{node['provisioner']['mirror_cname']}/mirrors/centos/7/os/x86_64",
-                                                                                                              'updates' => "http://#{node['provisioner']['mirror_cname']}/mirrors/centos/7/updates/x86_64",
-                                                                                                              'extras'  => "http://#{node['provisioner']['mirror_cname']}/mirrors/centos/7/extras/x86_64",
-                                                                                                              'epel'    => "http://#{node['provisioner']['mirror_cname']}/mirrors/epel/7/x86_64/",
-                                                                                                              'stable'  => "http://#{node['provisioner']['mirror_cname']}/mirrors/local/7/STABLE/RPMS"
+                                                                                            'repos'      => { 'base'    => "http://mirror.lab.fewt.com/mirrors/centos/7/os/x86_64",
+                                                                                                              'updates' => "http://mirror.lab.fewt.com/mirrors/centos/7/updates/x86_64",
+                                                                                                              'extras'  => "http://mirror.lab.fewt.com/mirrors/centos/7/extras/x86_64",
+                                                                                                              'epel'    => "http://mirror.lab.fewt.com/mirrors/epel/7/x86_64/",
+                                                                                                              'stable'  => "http://mirror.lab.fewt.com/mirrors/local/7/STABLE/RPMS"
                                                                                                             }
                                                                                          }
                                                                    }
@@ -126,7 +132,7 @@ default['provisioner']['cobbler']['repos']                       = { 'CentOS-7-x
                                                                                             'arch'          => 'x86_64',
                                                                                             'breed'         => 'yum',
                                                                                             'keep-updated'  => 'False',
-                                                                                            'mirror'        => "http://#{node['provisioner']['mirror_cname']}/mirrors/centos/7/os/x86_64/",
+                                                                                            'mirror'        => "http://mirror.lab.fewt.com/mirrors/centos/7/os/x86_64/",
                                                                                             'owners'        => 'admin' }}
 
 default['provisioner']['cobbler']['profiles']                    = { 'CentOS-7-x86_64' => { 'name'                => 'CentOS-7-x86_64',
