@@ -284,7 +284,8 @@ This bag contains the basic credentials necessary to configure servers in the en
       "root_hash": "{ROOT HASH}",
       "grub2_hash": "GRUB2_PASSWORD={GRUB2 HASH}",
       "sasl_passwd": "{SASL PASSWORD}",
-      "ad_bind_account": "{CHEF SERVICE ACCOUNT PASSWORD}",
+      "jumpcloud_api": "{JumpCloud API key}",
+      "jumpcloud_connect": "{JumpCloud Connect key}",
       "automate_token": "{AUTOMATE TOKEN}"
     }
 
@@ -313,6 +314,14 @@ This is the relay and password data needed to configure postfix for SASL email r
 
     [relay]:port username:password
 
+#### jumpcloud\_api
+
+This is the API key for accessing the JumpCloud API.
+
+#### jumpcloud\_connect
+
+This is the connect key used for adding hosts to JumpCloud.
+
 #### ad\_bind\_account
 
 This entry contains the password for the Chef service account used for authentication to Chef manage.
@@ -320,10 +329,6 @@ This entry contains the password for the Chef service account used for authentic
 #### automate_token
 
 This defines the automate token used to authenticate Chef clients and server to an Automate instance.
-
-### DOMAIN\_USER
-
-Set this to the domain service account used to manage computer and DNS objects in the domain.
 
 ### Credentials / certificates
 

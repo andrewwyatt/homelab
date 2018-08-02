@@ -52,10 +52,19 @@ bash "Send decom notice" do
   sensitive node['linux']['runtime']['sensitivity']
 end
 
-if node['linux']['authentication']['mechanism'] == 'joincloud'
-  bash "Ensuring #{node['fqdn']} is removed from JoinCloud." do
+if File.exists?("/opt/jc/jcagent.conf")
+  localdata = `cat /opt/jc/jcagent.conf 2>/dev/null`
+
+  if localdata.length < 1
+    localdata = "{}"
+  end
+
+  lattrs = JSON.parse(localdata)
+  lattrs = Hash[*lattrs.collect{|h| h.to_a}.flatten]
+
+  bash "Ensuring #{node['fqdn']} is removed from JumpCloud." do
     code <<-EOF
-      curl -X DELETE "#{node['linux']['jumpcloud']['api_url']}/#{node['linux']['jumpcloud']['server_groupid']}" \
+      curl -X DELETE "#{node['linux']['jumpcloud']['api_url']}/systems/#{lattrs['systemKey']}" \
            -H 'Accept: application/json'                \
            -H 'Content-Type: application/json'          \
            -H 'x-api-key: #{passwords['jumpcloud_api']}'
@@ -63,6 +72,7 @@ if node['linux']['authentication']['mechanism'] == 'joincloud'
     sensitive node['linux']['runtime']['sensitivity']
   end
 end
+
 
 remote_file "#{Chef::Config['file_cache_path']}/#{node['linux']['chef']['bootstrap_user']}.pem.enc" do
   source "https://#{node['linux']['chef']['server']}#{node['linux']['chef']['bootstrap_root']}#{node['linux']['chef']['bootstrap_user']}.pem.enc"
