@@ -25,7 +25,7 @@ end
 ### Jumpcloud will always overlay the configuration file with the .orig
 ###
 
-template '/etc/ssh/sshd_config.orig' do
+template '/etc/ssh/sshd_config' do
   source "etc/ssh/sshd_config.erb"
   owner "root"
   group "root"
