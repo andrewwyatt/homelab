@@ -41,15 +41,11 @@ do
   then
     ### Is it being provisioned?
     INSTALLING_TEST=$(cobbler system dumpvars --name ${CBNODE} 2>/dev/null | grep netboot_enabled | awk '{print $3}')
-    if [[ ${INSTALLING_TEST} =~ True ]]
+    if [[ ! ${INSTALLING_TEST} =~ True ]]
     then
-      break
-    fi
-    ### Does it have a CNAME, making it persistent?
-    PERSISTENCE_TEST=$(cobbler system dumpvars --name ${CBNODE} 2>/dev/null | grep cnames_ | awk '{print $3}')
-    if [[ ${PERSISTENCE_TEST} =~ True ]]
-    then
-      break
+      ### No, remove it.
+      notify "Host ${CBNODE} has been decommissioned or no longer exists, expiring system record."
+      cobbler system remove --name ${CBNODE}
     fi
   fi
 done
