@@ -79,9 +79,8 @@ The cookbooks in this project do not have default recipes, and that is by design
 Building a test lab with Chef is simplified using these cookbooks.  They require the following configuration.
 
 * An ESXi host
-* One or more MSAD domain controllers (cdw0001.{DOMAIN}, cdw0002.{DOMAIN})
+* An account set up at JumpCloud (See below)
 * Build the system definitions listed at the bottom of the README manually, or by using the kickstart data in the ks directory
-* Create an account at JumpCloud, a user account for yourself, domain-users and domain-admins groups.
 
 ## Operating System Support
 

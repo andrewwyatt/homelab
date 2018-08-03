@@ -113,8 +113,8 @@ default['chef']['organizations']                 = { 'lab'        => { 'short_na
                                                                                                   'last_name'  => 'Administrator',
                                                                                                   'email'      => 'admin@lab.fewt.com'
                                                                                                 },
-                                                                       'groups'              => { 'admin'        => 'chef-admins',
-                                                                                                  'users'        => 'chef-users'
+                                                                       'groups'              => { 'admin'        => '{JUMPCLOUD ADMIN GROUP ID}',
+                                                                                                  'users'        => '{JUMPCLOUD USER GROUP ID}'
                                                                                                 },
                                                                        'unmanaged_accounts'  => [ 'admin',
                                                                                                   'pivotal',

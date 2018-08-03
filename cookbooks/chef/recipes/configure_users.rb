@@ -18,11 +18,11 @@
 ###
 
 ###
-### Flush the AD cache so we're always getting fresh data from AD, otherwise
-### we may get stale data from Centrify.
+### Encrypted passwords are stored in the credentials > passwords encrypted
+### data bag.
 ###
 
-adflush=`adflush >/dev/null 2>&1`
+passwords = data_bag_item('credentials', 'passwords', IO.read(Chef::Config['encrypted_data_bag_secret']))
 
 ###
 ### Build an array of accounts that are currently provisioned on the Chef
@@ -57,19 +57,47 @@ node['chef']['organizations'].each do | org_name , organization |
   end
 
   ###
-  ### Inspect each AD group and build an access table.
+  ### Inspect each group and build an access table.
   ###
 
-  organization['groups'].each do | chef_group, group |
-    chef_members=`adquery group #{group} -m`.split("\n")
-    chef_members.each do | account |
-      authorized_users[account] = Hash.new
-      authorized_users[account][org_name] = Hash.new
-      authorized_users[account][org_name]['type'] = 'ad'
-      if chef_group =~ /admin/
-        authorized_users[account][org_name]['access'] = 'admin'
-      else
-        authorized_users[account][org_name]['access'] = 'user'
+  organization['groups'].each do | chef_group, groupid |
+    cudata = `curl -X GET https://console.jumpcloud.com/api/v2/usergroups/#{groupid}/members \
+                   -H 'Accept: application/json' \
+                   -H 'Content-Type: application/json' \
+                   -H 'x-api-key: #{passwords['jumpcloud_api']}' 2>/dev/null`
+
+    if cudata.length < 1
+      cudata = "{}"
+    end
+
+    cuattrs = Hash.new
+    cuattrs = JSON.parse(cudata)
+
+    cuattrs.each do | key |
+      key.each do | key, member |
+        if member.is_a?(Hash)
+            mdata = `curl -X GET https://console.jumpcloud.com/api/systemusers/#{member['id']} \
+                          -H 'Accept: application/json' \
+                          -H 'Content-Type: application/json' \
+                          -H 'x-api-key: #{passwords['jumpcloud_api']}' 2>/dev/null`
+            if mdata.length < 1
+              mdata = "{}"
+            end
+            mattrs = Hash.new
+            mattrs = JSON.parse(mdata)
+
+            authorized_users[mattrs['username']] = Hash.new
+            authorized_users[mattrs['username']][org_name] = Hash.new
+            authorized_users[mattrs['username']][org_name]['firstname'] = mattrs['firstname']
+            authorized_users[mattrs['username']][org_name]['lastname'] = mattrs['lastname']
+            authorized_users[mattrs['username']][org_name]['email'] = mattrs['email']
+            authorized_users[mattrs['username']][org_name]['type'] = 'JumpCloud'
+            if chef_group == 'admins'
+                authorized_users[mattrs['username']][org_name]['access'] = 'admin'
+              else
+                authorized_users[mattrs['username']][org_name]['access'] = 'user'
+            end
+        end
       end
     end
   end
@@ -114,11 +142,8 @@ authorized_users.each do | account, map |
        paschar=passchars[(rand(passchars.length)-1)]
        password << paschar
     end
-    ufirst=`adquery user -p #{account} | awk '{printf $1}'`
-    ulast=`adquery user -p #{account} | awk '{printf $2}'`
-    email=`printf $(adquery user -b mail #{account})`
     execute "Processing account additions (account)." do #~FC022
-      command "chef-server-ctl user-create #{account} #{ufirst} #{ulast} #{email} \'#{password}\'; \
+      command "chef-server-ctl user-create #{account} #{attributes['firstname']} #{attributes['lastname']} #{attributes['email']} \'#{password}\'; \
                notify \"#{node['fqdn']}\" \"#{node['chef']['slack_channel']}\" \"#{node['chef']['emoji']}\" \"#{node['chef']['api_path']}\" \"#{account} has been granted access to Chef.\""
       action :run
       sensitive node['chef']['runtime']['sensitivity']
@@ -128,12 +153,12 @@ authorized_users.each do | account, map |
       command <<-EOC
 cat << EOF | mail -t
 From: Account Management <chef_accounts@#{node['fqdn']}>
-To: #{ufirst} #{ulast} <#{email}>
+To: #{attributes['firstname']} #{attributes['lastname']} <#{attributes['email']}>
 Subject: Chef server access (#{node['fqdn']}) (DO NOT REPLY)
 Content-Type: text/html
 MIME-Version: 1.0
 
-Hello #{ufirst} #{ulast}!  You have been provisioned access to the #{node['chef']['runtime']['environment']} Chef server <a href="https://#{node['fqdn']}">https://#{node['fqdn']}</a>, servicing the #{node['chef']['runtime']['network']} network.  You have been generated a temporary password of '#{password}'.  Please log in and link your Chef account to your Active Directory account as soon as possible.  The system generated password will expire on first use.  Once logged into Chef, browse to Administration > Users, and reset your private key.  Save the private key to #{account}.pem when configuring knife for access to the Chef server.
+Hello #{attributes['firstname']} #{attributes['lastname']}!  You have been provisioned access to the #{node['chef']['runtime']['environment']} Chef server <a href="https://#{node['fqdn']}">https://#{node['fqdn']}</a>, servicing the #{node['chef']['runtime']['network']} network.  You have been generated a temporary password of '#{password}'.  Please log in and link your Chef account to your Active Directory account as soon as possible.  The system generated password will expire on first use.  Once logged into Chef, browse to Administration > Users, and reset your private key.  Save the private key to #{account}.pem when configuring knife for access to the Chef server.
 
 You can configure knife by cloning the <a href="https://github.com/andrewwyatt/knifecfg">knifectl</a> project on Github.
 
@@ -171,7 +196,7 @@ EOF
       if attributes['account'] == 'admin'
         admin = '--admin'
       end
-      execute "Adding #{ufirst} #{ulast} to the #{org} org." do
+      execute "Adding #{attributes['firstname']} #{attributes['lastname']} to the #{org} org." do
         command "chef-server-ctl org-user-add #{org} #{account} #{admin}; \
                  notify \"#{node['fqdn']}\" \"#{node['chef']['slack_channel']}\" \"#{node['chef']['emoji']}\" \"#{node['chef']['api_path']}\" \"#{account} has been granted #{attributes['account']} access to the #{org}\""
         action :run
