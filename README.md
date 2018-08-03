@@ -10,7 +10,7 @@ This repository contains a suite of cookbooks that I use to manage my home lab. 
 * PXE deployment servers (just create a VM and turn it on)
 * Provisioning and managing RPM building and hosting servers.
 * Provisioning and managing CentOS mirror servers.
-* Integrating managed servers with AD for access and authorization
+* Integrating server and Chef authentication with JumpCloud for access and authorization
 * Hardening managed servers to be nearly CIS 1 compliant.
 * Configuring and enforcing desired state
 * Replicate environments, databags, roles, and cookbooks.
@@ -145,15 +145,16 @@ In order to provision a Chef server we need to ensure a few things.  The Chef se
 1. Install the chef-server-core package from [Chef](https://downloads.chef.io/chef-server).
 2. Create /etc/opscode/chef-server.rb.
 
-        ldap['base_dn'] = '{DOMAIN DN}'
-        ldap['bind_dn'] = '{AD CHEF SERVICE ACCOUNT DN)'
-        ldap['host'] = '{DOMAIN}'
-        ldap['enable_tls'] = 'true'
-        ldap['port'] = '389'
-        nginx['ssl_protocols'] = 'TLSv1.1 TLSv1.2'
-        ### Comment the certificates if using self signed.
-        nginx['ssl_certificate'] = "/etc/opscode/{FQDN}.crt"
-        nginx['ssl_certificate_key'] = "/etc/opscode/{FQDN}.pem"
+		ldap['base_dn'] = 'ou=Users,o={YOUR JUMPCLOUD ORG},dc=jumpcloud,dc=com'
+		ldap['bind_dn'] = 'uid=chef_authenticator,ou=Users,o={YOUR JUMPCLOUD ORG},dc=jumpcloud,dc=com'
+		ldap['host'] = 'ldap.jumpcloud.com'
+		ldap['enable_tls'] = 'true'
+		ldap['port'] = '389'
+		ldap['login_attribute'] = 'uid'
+		nginx['ssl_protocols'] = 'TLSv1.1 TLSv1.2'
+		### Comment the certificates if using self signed.
+		nginx['ssl_certificate'] = "/etc/opscode/{FQDN}.crt"
+		nginx['ssl_certificate_key'] = "/etc/opscode/{FQDN}.pem"
 
 3. Configure the Chef server.
 
@@ -191,7 +192,6 @@ In order to provision a Chef server we need to ensure a few things.  The Chef se
         chef_server_url          "https://{FQDN}/organizations/{ORG}"
         cache_type               "BasicFile"
         cache_options( :path =>  "#{ENV['HOME']}/.chef/checksums" )
-        cookbook_path            ["#{current_dir}/../cookbooks"]
         ohai.plugin_path         << '/etc/chef/ohai/plugins'
 
 11. Bootstrap the Chef server to itself.
@@ -416,9 +416,13 @@ Create an account for domain at JumpCloud.  You will need the following to confi
 * Domain Admins (domain-admins)
 * Domain Users (domain-users)
 
+Configuration of the Chef recipe requires the JumpCloud group ids, using the group names will result in errors.  To get the group names, use the [JumpCloud API documentation](https://docs.jumpcloud.com/2.0/user-groups/list-all-users-groups) to find the GIDs for your groups.
+
 ### System Groups
 
 * Servers
+
+Configuration of the Enterprise Linux recipe requires the Servers group id.  Use the [JumpCloud API documentation](https://docs.jumpcloud.com/2.0/system-groups/list-all-systems-groups) to find the GID for your group.
 
 ### Chef Configuration
 
