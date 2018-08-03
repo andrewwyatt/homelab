@@ -2,7 +2,7 @@
 
 ## About
 
-This repository contains a suite of cookbooks that I use to manage my home lab.  They provide a suite of capabilities that allow systems to automatically provision and also be destroyed and replaced very quickly allowing me to rapidly deploy and test new software and technologies.
+This repository contains a set of cookbooks that I use to manage my home lab.  They provide a suite of capabilities that allow systems to automatically provision and also be destroyed and replaced very quickly allowing me to rapidly deploy and test new software and technologies.
 
 ### This project enables
 
