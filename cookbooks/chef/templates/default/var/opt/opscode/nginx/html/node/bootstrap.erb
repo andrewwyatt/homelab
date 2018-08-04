@@ -279,7 +279,7 @@ chmod 0700 /root/.bootstrap/.password
 
 if [ ${SERVER} ]
 then
-  for item in ${SERVER}.crt ${ORGCERT}.pem ${ORGUSER}.pem encrypted_data_bag_secret
+  for item in ${ORGCERT}.pem ${ORGUSER}.pem encrypted_data_bag_secret
   do
     notify "Downloading ${item} from ${SERVER} and decrypting it"
     ERRORMSG=$(curl -o /root/.bootstrap/${item}.enc -L -s -q https://${SERVER}${BOOTSTRAPROOT}${item}.enc --insecure | grep 404)
@@ -309,17 +309,6 @@ then
   mv encrypted_data_bag_secret /etc/chef/encrypted_data_bag_secret
 else
   notify "ERROR: The data bag encryption key does not exist in the payload, dying."
-  cleanup 2>/dev/null
-  exit 1
-fi
-
-notify "Provisioning the ${SERVER} certificates"
-mkdir /etc/chef/trusted_certs
-if [ -e "${SERVER}.crt" ]
-then
-  mv ${SERVER}.crt /etc/chef/trusted_certs
-else
-  notify "ERROR: The ${SERVER} certificate does not exist in the payload, dying."
   cleanup 2>/dev/null
   exit 1
 fi
@@ -359,6 +348,7 @@ EOF
 
 
 notify "Connecting ${FQDN} to the ${ORG} organization on ${SERVER}"
+knife ssl fetch -c /etc/chef/client.rb
 chef-client -S https://${SERVER}/organizations/${ORG} -K /etc/chef/${ORGCERT}.pem -c /etc/chef/client.rb
 if [ $? = 0 ]
 then
