@@ -136,7 +136,7 @@ end
 directory '/etc/opscode' do
   owner 'root'
   group 'root'
-  mode 0750
+  mode 0755
   action :create
 end
 
@@ -174,7 +174,7 @@ end
 file "/etc/opscode/#{node['fqdn']}.crt" do
   owner 'opscode'
   group 'opscode'
-  mode 0600
+  mode 0644
   content certificate
   sensitive true
   action :create

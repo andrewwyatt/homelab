@@ -62,25 +62,25 @@ default['provisioner']['max_num_hosts']                         = '9999'
 default['provisioner']['name_gen_reset']                        = '900'
 default['provisioner']['hostname_auth_token']                   = '393f30f15a4a24d4f7385faf38543036e2687bb813b8627ac8ca9fcfa20650c0'
 
-default['provisioner']['chef']['default_server']                = 'cdc0001.lab.fewt.com'
+default['provisioner']['chef']['default_server']                = 'chef.lab.fewt.com'
 
-default['provisioner']['cnames']                                = { 'cdc0001.lab.fewt.com' => 'chef.lab.fewt.com',
-                                                                    'cdc0002.lab.fewt.com' => 'mirror.lab.fewt.com',
-                                                                    'cdc0003.lab.fewt.com' => 'build7.lab.fewt.com',
-                                                                    'cdc0004.lab.fewt.com' => 'deploy.lab.fewt.com' }
+###
+### Format host => cname, used for tagging (will be deprecated in the future)
+###
 
+default['provisioner']['cnames']                                = { }
 
 default['provisioner']['subnet']                                = '10.100.100.0'
 default['provisioner']['netmask']                               = '255.255.255.0'
 default['provisioner']['routers']                               = '10.100.100.1'
-default['provisioner']['domain_name_servers']                   = '10.100.100.224, 8.8.8.8, 10.100.100.1'
+default['provisioner']['domain_name_servers']                   = '8.8.8.8, 8.8.4.4'
 default['provisioner']['dhcp_range']                            = '10.100.100.170 10.100.100.240'
 default['provisioner']['dhcp_default_lease_time']               = '21600'
 default['provisioner']['dhcp_max_lease_time']                   = '43200'
 
-default['provisioner']['manage_dns']                            = '1'
-default['provisioner']['manage_forward_zones']                  = '\'lab.fewt.com\''
-default['provisioner']['manage_reverse_zones']                  = '\'10.100.100\''
+default['provisioner']['manage_dns']                            = '0'
+default['provisioner']['manage_forward_zones']                  = ''
+default['provisioner']['manage_reverse_zones']                  = ''
 
 default['provisioner']['manage_dhcp']                           = '1'
 default['provisioner']['next_server']                           = node['ipaddress']

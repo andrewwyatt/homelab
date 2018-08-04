@@ -158,9 +158,9 @@ Subject: Chef server access (#{node['fqdn']}) (DO NOT REPLY)
 Content-Type: text/html
 MIME-Version: 1.0
 
-Hello #{attributes['firstname']} #{attributes['lastname']}!  You have been provisioned access to the #{node['chef']['runtime']['environment']} Chef server <a href="https://#{node['fqdn']}">https://#{node['fqdn']}</a>, servicing the #{node['chef']['runtime']['network']} network.  You have been generated a temporary password of '#{password}'.  Please log in and link your Chef account to your Active Directory account as soon as possible.  The system generated password will expire on first use.  Once logged into Chef, browse to Administration > Users, and reset your private key.  Save the private key to #{account}.pem when configuring knife for access to the Chef server.
+Hello #{attributes['firstname']} #{attributes['lastname']}!  You have been provisioned access to the #{node['chef']['runtime']['environment']} Chef server https://#{node['fqdn']}, servicing the #{node['chef']['runtime']['network']} network.  You have been generated a temporary password of '#{password}'.  Please log in and link your Chef account to your Active Directory account as soon as possible.  The system generated password will expire on first use.  Once logged into Chef, browse to Administration > Users, and reset your private key.  Save the private key to #{account}.pem when configuring knife for access to the Chef server.
 
-You can configure knife by cloning the <a href="https://github.com/andrewwyatt/knifecfg">knifectl</a> project on Github.
+You can configure knife by cloning the knifectl project (https://github.com/andrewwyatt/knifecfg) on Github.
 
 Thank you,
 Chef Account Management

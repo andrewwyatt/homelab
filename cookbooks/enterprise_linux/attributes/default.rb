@@ -228,9 +228,8 @@ default['linux']['hosts']                                       = { }
 
 default['linux']['dns_search']                                  = 'lab.fewt.com fewt.com'
 default['linux']['dns_options']                                 = 'timeout:1'
-default['linux']['dns_resolvers']                               = { 'ns1' => '10.100.100.224',
-                                                                    'ns2' => '8.8.8.8',
-                                                                    'ns3' => '8.8.4.4' }
+default['linux']['dns_resolvers']                               = { 'ns1' => '8.8.8.8',
+                                                                    'ns2' => '8.8.4.4' }
 
 default['linux']['limits']['default']                            = { 'hard_core'  => '* hard core 0',
                                                                      'soft_core'  => '* soft core 0',
@@ -274,6 +273,10 @@ default['linux']['ntp_servers'] 	                               = { 'ntp1' => 's
 default['linux']['ntp_restrictions']                             = { }
 
 default['linux']['ntp_options']                                  = { 'tinker0' => 'tinker panic 0' }
+
+default['linux']['dns']['mechanism']                             = 'zonomi'
+default['linux']['dns']['zonomi_url']                            = 'https://zonomi.com/app/dns/dyndns.jsp'
+default['linux']['dns']['zonomi_ttl']                            = '60'
 
 default['linux']['authentication']['mechanism']                  = 'jumpcloud'
 default['linux']['authgroup']['users']                           = 'domain-users'

@@ -11,12 +11,12 @@ This repository contains a set of cookbooks that I use to manage my home lab.  T
 * Provisioning and managing RPM building and hosting servers.
 * Provisioning and managing CentOS mirror servers.
 * Integrating server and Chef authentication with JumpCloud for access and authorization
+* Integrates with Zonomi for DNS
 * Hardening managed servers to be nearly CIS 1 compliant.
 * Configuring and enforcing desired state
 * Replicate environments, databags, roles, and cookbooks.
 
 **WARNING:** *These cookbooks should not be used for production without additional modification.*
-
 
 ## License
 
@@ -79,7 +79,8 @@ The cookbooks in this project do not have default recipes, and that is by design
 Building a test lab with Chef is simplified using these cookbooks.  They require the following configuration.
 
 * An ESXi host
-* An account set up at JumpCloud (See below)
+* An account set up at JumpCloud (see below)
+* An account set up with Zonomi (see below)
 * Build the system definitions listed at the bottom of the README manually, or by using the kickstart data in the ks directory
 
 ## Operating System Support
@@ -87,9 +88,6 @@ Building a test lab with Chef is simplified using these cookbooks.  They require
 The code to provision the home lab supports the following enterprise Linux distributions.  
 
 * CentOS 7
-* CentOS 6 (deprecated)
-
-It is untested on other RPM based distributions, and is completely incompatible with non-RPM based Linux distributions.  CentOS 6 support still exists in the sources, but it is no longer used and may be removed in the future.
 
 ## Lab Server System Requirements (Minimum)
 
@@ -232,12 +230,10 @@ In order to provision a Chef server we need to ensure a few things.  The Chef se
 22. The role for the Chef server should be the servers FQDN with the periods changed to underbars.
 
     * Ex. cdc0001.{DOMAIN} -> cdc0001_lab_fewt_com
-    * Add the lab\_management::lab\_build to the role.
+    * Add the lab\_management::chef\_server recipe to the role.
 
 23. Apply the role to the Chef server.
-24. Run chef-client on the Chef server.
-25. Remove the lab\_management::lab\_build role and add the lab\_management::chef\_server recipe to the role.
-26. Run chef-client on the Chef server to complete provisioning.
+24. Run chef-client on the Chef server to complete provisioning.
 
 The Chef server should now be managing itself, run Chef client again to verify.
 
@@ -285,6 +281,7 @@ This bag contains the basic credentials necessary to configure servers in the en
       "sasl_passwd": "{SASL PASSWORD}",
       "jumpcloud_api": "{JumpCloud API key}",
       "jumpcloud_connect": "{JumpCloud Connect key}",
+      "zonomi_api": {Zonomi API key}",
       "automate_token": "{AUTOMATE TOKEN}"
     }
 
@@ -320,6 +317,10 @@ This is the API key for accessing the JumpCloud API.
 #### jumpcloud\_connect
 
 This is the connect key used for adding hosts to JumpCloud.
+
+#### zonomi\_api
+
+This is the API key used to connect to Zonomi for DNS record management.
 
 #### ad\_bind\_account
 
@@ -400,6 +401,10 @@ The gpgid variable is used by the builder recipe to track the keys.
 
 Prior to configuring the provisioners, set the local repository attribute to disabled.  Once everything is configured, and chef client has been run on all nodes successfully it is OK to turn this back on.
 
+## Zonomi Configuration
+
+Create an account for your lab domain at Zonomi.  The API key to add to the encrypted data bag can be found on the [DNS API help](https://zonomi.com/app/dns/dyndns.jsp) page.
+
 ## JumpCloud Configuration
 
 Create an account for domain at JumpCloud.  You will need the following to configure the cookbook:
@@ -440,7 +445,7 @@ Systems will auto provision to the profile set by default.  If you would like to
 
 ### Chef Master Server
 
-* **Roles:** enterprise\_linux, lab\_chef\_server
+* **Roles:** lab\_chef\_server
 * **CNAME:** chef.{DOMAIN}
 
         cobbler system add --name cdc0001.{DOMAIN} --hostname cdc0001.{DOMAIN} \
@@ -449,7 +454,7 @@ Systems will auto provision to the profile set by default.  If you would like to
 
 ### OS Mirror Server
 
-* **Roles:** enterprise\_linux, lab\_mirror\_builder
+* **Roles:** lab\_mirror\_builder
 * **CNAME:** mirror.{DOMAIN}
 
         cobbler system add --name cdc0002.{DOMAIN} --hostname cdc0002.{DOMAIN} \
@@ -458,7 +463,7 @@ Systems will auto provision to the profile set by default.  If you would like to
 
 ### EL7 RPM Build Server
 
-* **Roles:** enterprise\_linux, lab\_package\_builder
+* **Roles:** lab\_package\_builder
 * **CNAME:** build7.{DOMAIN}
 
         cobbler system add --name cdc0003.{DOMAIN} --hostname cdc0003.{DOMAIN} \
@@ -467,7 +472,7 @@ Systems will auto provision to the profile set by default.  If you would like to
 
 ### OS Provisioning Server
 
-* **Roles:** enterprise\_linux, lab\_node\_builder
+* **Roles:** lab\_node\_builder
 * **CNAME:** deploy.{DOMAIN}
 
         cobbler system add --name cdc0004.{DOMAIN} --hostname cdc0004.{DOMAIN} \

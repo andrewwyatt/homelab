@@ -67,11 +67,18 @@ rm ${HOSTLIST}.lock
 for ((i=1;i<${MAXHOSTS};i++)) {
   SEQ=$(printf "%04d\n" $i)
   HOSTNAME="${PREFIX}${SEQ}.${DOMAIN}"
-  ### Test to see if the name is in DNS, if not it's available
+  ### Test to see if the name is in DNS
   curl -v telnet://${HOSTNAME}/80 --max-time 2 --connect-timeout 2 2>&1 | grep resolve 2>&1 >/dev/null
   if [ ! $? = 0 ]
   then
     $DEBUG && echo "Name ${HOSTNAME} exists in DNS"
+    continue
+  fi
+  ### Test to see if the hostname is in Chef
+  CHEF_NODE=$(knife node show ${HOSTNAME} -k /etc/chef/client.pem -u `hostname -f` -c /etc/chef/client.rb 2>/dev/null)
+  if [ $? = 0 ]
+  then
+    $DEBUG && echo "Name ${HOSTNAME} exists in Chef"
     continue
   fi
   ### Test to see if it has been assigned

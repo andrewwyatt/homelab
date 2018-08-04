@@ -39,12 +39,6 @@ do
   done
   if [ ! ${FOUND} = 1 ]
   then
-    ### Is it persistent (has a cname)
-    PERSISTENCE=$(cobbler system dumpvars --name ${CBNODE} | grep cnames_ | awk '{print $3}')
-    if [[ ${PERSISTENCE} =~ ${CBNODE} ]]
-    then
-      break
-    fi
     ### Is it being provisioned?
     INSTALLING_TEST=$(cobbler system dumpvars --name ${CBNODE} 2>/dev/null | grep netboot_enabled | awk '{print $3}')
     if [[ ! ${INSTALLING_TEST} =~ True ]]

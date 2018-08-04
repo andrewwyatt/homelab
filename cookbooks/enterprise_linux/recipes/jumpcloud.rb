@@ -78,6 +78,7 @@ ruby_block 'Get the systemKey' do
     lattrs = Hash[*lattrs.collect{|h| h.to_a}.flatten]
     node.run_state['systemKey'] = lattrs['systemKey']
   end
+  sensitive node['linux']['runtime']['sensitivity']
 end
 
 execute "Ensuring #{node['fqdn']} is assigned to the appropriate system group." do
