@@ -48,7 +48,7 @@ execute 'install_agent' do
 end
 
 execute 'Wait for agent configuration to arrive.' do
-  command 'while [ 1 ]; do if [[ "$(cat /opt/jc/jcagent.conf)" =~ systemKey ]]; then break; fi; sleep 1; done'
+  command 'while [ 1 ]; do if [[ "$(cat /opt/jc/jcagent.conf 2>/dev/null)" =~ systemKey ]]; then break; fi; sleep 1; done'
   sensitive node['linux']['runtime']['sensitivity']
   not_if { File.exists? "/opt/jc/jcagent.conf" }
 end
