@@ -288,6 +288,27 @@ default['linux']['jumpcloud']['server_groupid']                  = ''
 
 default['linux']['sudoers']['properties']                        = { 'administrators' => "%#{node['linux']['authgroup']['administrators']}	ALL=(ALL) NOPASSWD: ALL" }
 
+default['linux']['monit']['enabled']                             = true
+default['linux']['monit']['alert_critical']                      = "#A72B2B"
+default['linux']['monit']['alert_succeeded']                     = "#26C521"
+default['linux']['monit']['slack_emoji']                         = ":hammer_and_wrench:"
+
+default['linux']['monit']['filesystems']                         = { 'root' => { 'label' => 'root',
+                                                                                 'path'  => '/',
+                                                                                 'threshold' => '80%' },
+                                                                     'boot' => { 'label' => 'boot',
+                                                                                 'path'  => '/boot',
+                                                                                 'threshold' => '80%' },
+                                                                     'home' => { 'label' => 'home',
+                                                                                 'path'  => '/home',
+                                                                                 'threshold' => '80%' },
+                                                                     'var'  => { 'label' => 'var',
+                                                                                 'path'  => '/var',
+                                                                                 'threshold' => '80%' },
+                                                                     'tmp'  => { 'label' => 'tmp',
+                                                                                 'path'  => '/tmp',
+                                                                                 'threshold' => '80%' } }
+
 default['linux']['openssh']['Protocol']                          = "2"
 default['linux']['openssh']['Port']                              = "22"
 default['linux']['openssh']['SyslogFacility']                    = "AUTHPRIV"

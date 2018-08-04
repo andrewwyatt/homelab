@@ -1,0 +1,32 @@
+#!/bin/bash
+
+<%= node['linux']['chef']['file_header'] %>
+
+HOST=$(hostname -f)
+
+if [[ $MONIT_EVENT =~ succeeded ]]
+then
+  COLOR="<%= node['linux']['monit']['alert_succeeded'] %>"
+  TEXT="Alert on ${HOST} resolved (@here)"
+else
+  COLOR="<%= node['linux']['monit']['alert_critical'] %>"
+  TEXT="Critical alert on ${HOST} (@here)"
+fi
+
+PAYLOAD="{
+      \"username\": \"System Notification\",
+      \"channel\": \"<%= node['linux']['slack_channel'] %>\",
+      \"icon_emoji\": \"<%= node['linux']['monit']['slack_emoji'] %>\",
+      \"text\": \"$TEXT\",
+      \"attachments\": [{
+        \"color\": \"$COLOR\",
+        \"mrkdwn_in\": [\"text\"],
+        \"fields\": [
+          { \"title\": \"Date:\", \"value\": \"$MONIT_DATE\", \"short\": true },
+          { \"title\": \"Host:\", \"value\": \"$MONIT_HOST\", \"short\": true },
+          { \"title\": \"Alert:\", \"value\": \"$MONIT_DESCRIPTION\", \"short\": false }
+        ]
+    }]
+}"
+
+curl -s -X POST --data-urlencode "payload=$PAYLOAD" "https://hooks.slack.com/services/<%= node['linux']['api_path'] %>"
