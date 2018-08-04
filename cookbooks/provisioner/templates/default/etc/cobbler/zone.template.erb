@@ -1,10 +1,10 @@
 \$TTL 300
 @                       IN      SOA     $cobbler_server. <%= node['provisioner']['domain'] %>. (
-                                        $serial   ; Serial
-                                        600         ; Refresh
+                                        $serial      ; Serial
+                                        600          ; Refresh
                                         1800         ; Retry
                                         604800       ; Expire
-                                        300          ; TTL
+                                        60           ; TTL
                                         )
 
                         IN      NS      $cobbler_server.
