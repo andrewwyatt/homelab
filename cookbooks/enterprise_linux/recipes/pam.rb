@@ -46,4 +46,5 @@ template '/etc/security/pwquality.conf' do
   group 'root'
   mode '0644'
   action :create
+  sensitive node['linux']['runtime']['sensitivity']
 end
