@@ -99,7 +99,7 @@ default['chef']['bootstrap_delay']               = 30
 default['chef']['bootstrap_user']                = 'admin'
 default['chef']['bootstrap_root']                = '/node/'
 
-default['chef']['cert_domain']                   = 'lab.fewt.com'                    
+default['chef']['cert_domain']                   = 'lab.fewt.com'
 default['chef']['ad_bind_account']               = 'chef_authenticator'
 
 ### Chef server bits
@@ -108,7 +108,7 @@ default['chef']['organizations']                 = { 'lab'        => { 'short_na
                                                                        'full_name'           => 'lab.fewt.com',
                                                                        'validator'           => 'lab-validator',
                                                                        'environment'         => 'lab',
-                                                                       'run_list'            => 'lab_management::standard_node',
+                                                                       'run_list'            => 'lab_management::standard_server',
                                                                        'admin_user'          => { 'username'   => 'admin',
                                                                                                   'first_name' => 'Systems',
                                                                                                   'last_name'  => 'Administrator',
