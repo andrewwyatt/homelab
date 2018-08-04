@@ -57,6 +57,11 @@ The cookbooks in this project do not have default recipes, and that is by design
     Node Name: cdc0004.{DOMAIN}
     Function: Deploys and configures Cobbler to automatically build managed servers.
 
+### lab_management::combined\_server
+
+    Node Name: any
+    Function: Combines the mirror, package, and node roles into one.
+
 ### lab_management::move\_node\_to\_{SERVER}
 
     Node Name: Any
