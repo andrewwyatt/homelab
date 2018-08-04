@@ -107,13 +107,36 @@ execute 'chef-nginx-restart' do
 end
 
 ###
+### If there's a chef config that already exists, but Chef is down, kill it.
+###
+
+file "/etc/opscode/chef-server.rb" do
+  action :delete
+  only_if { node['chef']['manage_chef'] == true }
+  not_if { ::File.exists?("/etc/opscode/chef-server-running.json") }
+end
+
+###
+### If this is a new installation, run Chef Server reconfigure to prepare it for
+### use.  If there's an existing configuration before we do, move it temporarily.
+###
+
+bash "Chef Server has never been configured, configuring Chef Server." do
+  code <<-EOF
+    chef-server-ctl reconfigure
+  EOF
+  not_if { ::File.exists?("/etc/opscode/chef-server-running.json") }
+  sensitive node['chef']['runtime']['sensitivity']
+end
+
+###
 ### Create the /etc/opscode directory if it doesn't exist, manage it if it does.
 ###
 
 directory '/etc/opscode' do
   owner 'root'
   group 'root'
-  mode 0700
+  mode 0750
   action :create
 end
 
@@ -168,29 +191,6 @@ file "/etc/opscode/#{node['fqdn']}.pem" do
   action :create
   notifies :run, 'execute[chef-nginx-restart]', :immediately
   only_if { selfsigned == false }
-end
-
-###
-### If there's a chef config that already exists, but Chef is down, kill it.
-###
-
-file "/etc/opscode/chef-server.rb" do
-  action :delete
-  only_if { node['chef']['manage_chef'] == true }
-  not_if { ::File.exists?("/etc/opscode/chef-server-running.json") }
-end
-
-###
-### If this is a new installation, run Chef Server reconfigure to prepare it for
-### use.  If there's an existing configuration before we do, move it temporarily.
-###
-
-bash "Chef Server has never been configured, configuring Chef Server." do
-  code <<-EOF
-    chef-server-ctl reconfigure
-  EOF
-  not_if { ::File.exists?("/etc/opscode/chef-server-running.json") }
-  sensitive node['chef']['runtime']['sensitivity']
 end
 
 notification = "Adding the LDAP password."

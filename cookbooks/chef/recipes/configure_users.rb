@@ -92,7 +92,7 @@ node['chef']['organizations'].each do | org_name , organization |
             authorized_users[mattrs['username']][org_name]['lastname'] = mattrs['lastname']
             authorized_users[mattrs['username']][org_name]['email'] = mattrs['email']
             authorized_users[mattrs['username']][org_name]['type'] = 'JumpCloud'
-            if chef_group == 'admins'
+            if chef_group =~ /admin/
                 authorized_users[mattrs['username']][org_name]['access'] = 'admin'
               else
                 authorized_users[mattrs['username']][org_name]['access'] = 'user'
@@ -193,12 +193,13 @@ EOF
       else
         add_to_org = true
       end
-      if attributes['account'] == 'admin'
+      puts attributes.to_s
+      if attributes['access'] == 'admin'
         admin = '--admin'
       end
       execute "Adding #{attributes['firstname']} #{attributes['lastname']} to the #{org} org." do
         command "chef-server-ctl org-user-add #{org} #{account} #{admin}; \
-                 notify \"#{node['fqdn']}\" \"#{node['chef']['slack_channel']}\" \"#{node['chef']['emoji']}\" \"#{node['chef']['api_path']}\" \"#{account} has been granted #{attributes['account']} access to the #{org}\""
+                 notify \"#{node['fqdn']}\" \"#{node['chef']['slack_channel']}\" \"#{node['chef']['emoji']}\" \"#{node['chef']['api_path']}\" \"#{account} has been granted #{attributes['access']} access to the #{org}\""
         action :run
         sensitive node['chef']['runtime']['sensitivity']
         only_if { add_to_org == true }
