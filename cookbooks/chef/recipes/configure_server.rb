@@ -102,6 +102,17 @@ execute 'chef-reconfigure' do
 end
 
 ###
+### Create the /etc/opscode directory if it doesn't exist, manage it if it does.
+###
+
+directory '/etc/opscode' do
+  owner 'root'
+  group 'root'
+  mode 0700
+  action :create
+end
+
+###
 ### This directory is used to stage the encrypted package that we'll use later for bootstrapping
 ###
 
@@ -129,6 +140,30 @@ bash "Chef Server has never been configured, configuring Chef Server." do
   EOF
   not_if { ::File.exists?("/etc/opscode/chef-server-running.json") }
   sensitive node['chef']['runtime']['sensitivity']
+end
+
+notification = "Adding the LDAP password."
+bash notification do
+  code <<-EOF
+    chef-server-ctl set-secret ldap bind_password '#{passwords['ad_bind_account']}'
+  EOF
+  sensitive node['chef']['runtime']['sensitivity']
+  only_if { ::File.exists?("/etc/opscode/chef-server-running.json") }
+  only_if { (defined?(passwords['ad_bind_account'])).nil? == false }
+  not_if { `grep \'bind_password\' /etc/opscode/chef-server-running.json 2>/dev/null`.include?(passwords['ad_bind_account'])}
+  notifies :run, 'execute[chef-reconfigure]', :immediately
+end
+
+notification = "Adding the Automate authentication token."
+bash notification do
+  code <<-EOF
+    chef-server-ctl set-secret data_collector token '#{passwords['automate_token']}'
+  EOF
+  sensitive node['chef']['runtime']['sensitivity']
+  only_if { ::File.exists?("/etc/opscode/chef-server-running.json") }
+  only_if { (defined?(passwords['automate_token'])).nil? == false }
+  not_if { `grep \'#{passwords['automate_token']}\' /etc/opscode/chef-server-running.json 2>/dev/null`.include?(passwords['automate_token']) }
+  notifies :run, 'execute[chef-reconfigure]', :immediately
 end
 
 ###
@@ -175,31 +210,6 @@ node['chef']['organizations'].each do |key,org|
       only_if { ::File.exists?("/usr/bin/chef-server-ctl") }
     end
   end
-end
-
-notification = "Adding the LDAP password."
-bash notification do
-  code <<-EOF
-    chef-server-ctl set-secret ldap bind_password '#{passwords['ad_bind_account']}'
-  EOF
-  sensitive node['chef']['runtime']['sensitivity']
-  notifies :run, 'execute[chef-reconfigure]', :immediately
-  only_if { (defined?(passwords[ad_bind_account])).nil? == false }
-  only_if { ::File.exists?("/etc/opscode/chef-server-running.json") }
-  not_if { `grep bind_password /etc/opscode/chef-server-running.json 2>/dev/null`.include?(passwords[ad_bind_account])}
-end
-
-
-notification = "Adding the Automate authentication token."
-bash notification do
-  code <<-EOF
-    chef-server-ctl set-secret data_collector token '#{passwords['automate_token']}'
-  EOF
-  sensitive node['chef']['runtime']['sensitivity']
-  only_if { ::File.exists?("/etc/opscode/chef-server-running.json") }
-  only_if { (defined?(passwords['automate_token'])).nil? == false }
-  not_if { `grep \'#{passwords['automate_token']}\' /etc/opscode/chef-server-running.json 2>/dev/null`.include?(passwords['automate_token']) }
-  notifies :run, 'execute[chef-reconfigure]', :immediately
 end
 
 ###
