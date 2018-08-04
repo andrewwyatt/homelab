@@ -42,40 +42,27 @@ The cookbooks in this project do not have default recipes, and that is by design
     Node Name: cdc0001.{DOMAIN}
     Function: Provisions a managed Chef server.
 
-### lab_management::mirror\_server
+### lab_management::provisioning\_server
 
     Node Name: cdc0002.{DOMAIN}
     Function: Mirrors CentOS and local builders.
+              Builds and signs source and binary RPMs.
+              Deploys and configures Cobbler to automatically build managed servers.
 
-### lab_management::package\_builder
-
-    Node name: cdc0003.{DOMAIN}
-    Function: Builds and signs source and binary RPMs.
-
-### lab_management::node\_builder
-
-    Node Name: cdc0004.{DOMAIN}
-    Function: Deploys and configures Cobbler to automatically build managed servers.
-
-### lab_management::combined\_server
-
-    Node Name: any
-    Function: Combines the mirror, package, and node roles into one.
-
-### lab_management::move\_node\_to\_{SERVER}
+### lab_management::migrate\_self\_to\_{SERVER}
 
     Node Name: Any
     Function: Migrates a server from one Chef instance to another.
 
-### lab_management::rebuild\_server
+### lab_management::rebuild\_self
 
     Node Name: Any
-    Function: Destroy and rebuild the node that the recipe is assigned.
+    Function: Destroy and rebuild the node that the recipe is assigned on the next Chef check-in.
 
-### lab_management::decom\_server
+### lab_management::decommission\_self
 
     Node Name: Any
-    Function: Destroy and shutdown the node that the recipe is assigned.
+    Function: Destroy and shutdown the node that the recipe is assigned on the next Chef check-in.
 
 **Note:** *The lab management recipes have a specific inheritance order making it necessary to remove the lab_management::standard\_server recipe from your node roles when using them due to conflicts.  These recipes already include the standard_server recipe.*
 
@@ -101,28 +88,14 @@ The code to provision the home lab supports the following enterprise Linux distr
 * 4 vCPU
 * 4GB vRAM
 * 30GB OS
-* 60GB /var/opt
-* 20GB /opt
+* 70GB /var (or /var/opt)
 
-### Package build servers
-
-* 2 vCPU
-* 2GB vRAM
-* 30GB OS
-
-### Mirror servers
+### Provisioning servers
 
 * 2 vCPU
 * 2GB vRAM
 * 30GB OS
-* 100GB /var/www
-
-### OS deployment servers
-
-* 2 vCPU
-* 2GB vRAM
-* 30GB OS
-* 10GB /var/www
+* 100GB /var (or /var/www)
 
 ## Configuring the first Chef server instance (Master)
 
@@ -451,35 +424,16 @@ Systems will auto provision to the profile set by default.  If you would like to
 ### Chef Master Server
 
 * **Roles:** lab\_chef\_server
-* **CNAME:** chef.{DOMAIN}
+* **CNAMES:** chef.{DOMAIN}
 
         cobbler system add --name cdc0001.{DOMAIN} --hostname cdc0001.{DOMAIN} \
-                           --profile CentOS-7-x86_64 --interface eth0          \
+                           --profile CentOS-7-x86_64 --interface ens192        \
                            --mac-address {MAC_ADDRESS}
 
-### OS Mirror Server
+### Provisioning Server
 
-* **Roles:** lab\_mirror\_builder
-* **CNAME:** mirror.{DOMAIN}
+* **CNAMES:** mirror.{DOMAIN}, build7.{DOMAIN}, deploy.{DOMAIN}
 
         cobbler system add --name cdc0002.{DOMAIN} --hostname cdc0002.{DOMAIN} \
-                           --profile CentOS-7-x86_64 --interface eth0          \
-                           --mac-address {MAC_ADDRESS}
-
-### EL7 RPM Build Server
-
-* **Roles:** lab\_package\_builder
-* **CNAME:** build7.{DOMAIN}
-
-        cobbler system add --name cdc0003.{DOMAIN} --hostname cdc0003.{DOMAIN} \
-                           --profile CentOS-7-x86_64 --interface eth0          \
-                           --mac-address {MAC_ADDRESS}
-
-### OS Provisioning Server
-
-* **Roles:** lab\_node\_builder
-* **CNAME:** deploy.{DOMAIN}
-
-        cobbler system add --name cdc0004.{DOMAIN} --hostname cdc0004.{DOMAIN} \
-                           --profile CentOS-7-x86_64 --interface eth0          \
+                           --profile CentOS-7-x86_64 --interface ens192        \
                            --mac-address {MAC_ADDRESS}

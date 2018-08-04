@@ -23,11 +23,7 @@ node.default['linux']['firewall']['ports']['443/tcp'] = true
 node.default['linux']['sysctl']['kernel.shmmax']      = '17179869184'
 node.default['linux']['sysctl']['kernel.shmall']      = '4194304'
 
-include_recipe 'lab_management::standard_node'
-
-###
-### Needs to be refactored.
-###
+include_recipe 'lab_management::standard_server'
 
 include_recipe 'chef::configure_server'
 include_recipe 'chef::configure_manage'
