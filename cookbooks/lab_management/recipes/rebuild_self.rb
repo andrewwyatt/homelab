@@ -17,6 +17,18 @@
 ### limitations under the License.
 ###
 
+###
+### This recipe will decommission any server that it has been assigned.
+###
+### The following actions occur on the very next check in:
+###
+### Removes self from JumpCloud
+### Removes self from Zonomi
+### Removes self from Chef
+### Removes partition table
+### Reboot (the node will pxe boot and reprovision)
+###
+
 node.default['linux']['decom']['final_task']   = 'shutdown -r now'
 node.default['linux']['decom']['decom_notice'] = 'You want me to rebuild myself?  Really?  Oh, alright!'
 

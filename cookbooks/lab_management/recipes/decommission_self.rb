@@ -18,4 +18,17 @@
 ### limitations under the License.
 ###
 
+###
+### This recipe will decommission any server that it has been assigned.
+###
+### The following actions occur on the very next check in:
+###
+### Removes self from JumpCloud
+### Removes self from Zonomi
+### Removes self from Chef
+### Removes partition table
+### Shutdown self
+###
+
+include_recipe 'lab_management::standard_server'
 include_recipe 'enterprise_linux::decom'

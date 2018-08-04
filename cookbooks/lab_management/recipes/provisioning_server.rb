@@ -22,6 +22,8 @@
 ### into a single VM.
 ###
 
+node.default['linux']['mounts']['var']['mount_options']  = 'defaults,nosuid,nodev'
+
 ###
 ### Packaging and mirroring ports
 ###
@@ -43,7 +45,7 @@ node.default['linux']['firewall']['ports']['69/udp']      = true
 node.default['linux']['firewall']['ports']['443/tcp']     = true
 node.default['linux']['firewall']['ports']['4011/udp']    = true
 
-include_recipe 'lab_management::standard_node'
+include_recipe 'lab_management::standard_server'
 
 include_recipe 'provisioner::replicator'
 include_recipe 'provisioner::packager'
