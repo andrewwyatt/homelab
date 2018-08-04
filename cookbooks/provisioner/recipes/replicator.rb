@@ -140,7 +140,7 @@ template "/etc/rsyncd.conf" do
 end
 
 template "/etc/rsyncd.d/replicator.conf" do
-  source "etc/rsyncd.conf.erb"
+  source "etc/rsyncd.d/template.conf.erb"
   owner "root"
   group "bin"
   mode "0644"
@@ -182,11 +182,10 @@ service "httpd" do
 end
 
 ###
-###  Tag myself to identify my function, and my cname
+###  Tag myself to identify my function
 ###
 
 tag('mirror')
-tag(node['provisioner']['cnames'][node['fqdn']])
 
 ### Send a notification that this system is now an upstream mirror
 notification = 'FYI.. I am now configured as an upstream mirror.'

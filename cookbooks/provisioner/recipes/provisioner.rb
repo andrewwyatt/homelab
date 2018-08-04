@@ -128,7 +128,6 @@ template '/etc/cobbler/settings' do
   variables({
     :password   => passwords['cobbler']
   })
-  notifies :restart, "service[cobblerd]", :immediate
 end
 
 template '/etc/cobbler/pxe/pxedefault.template' do
@@ -142,7 +141,6 @@ template '/etc/cobbler/pxe/pxedefault.template' do
   variables({
     :root_hash   => passwords['root_hash']
   })
-  notifies :restart, "service[cobblerd]", :immediate
 end
 
 bash "Download the cobbler loaders" do
@@ -368,14 +366,6 @@ bash "Configure the cobbler default profile" do
   not_if { default_system == node['linux']['cobbler']['profile'] }
 end
 
-node['provisioner']['cnames'].each do | server, cname |
-  cname_test=`cobbler system dumpvars --name #{server} 2>/dev/null | grep cnames_ | awk '{print $3}'`
-  execute "Applying cname #{cname }to #{server}." do
-    command "cobbler system edit --name #{server} --cname #{cname}"
-    not_if { cname_test =~ /#{cname}/ }
-  end
-end
-
 bash "Execute Cobbler Sync" do
   code <<-EOF
     cobbler sync
@@ -431,11 +421,10 @@ template "/etc/cron.d/decom-watch" do
 end
 
 ###
-###  Tag myself to identify my function and my cname
+###  Tag myself to identify my function
 ###
 
 tag('provisioner')
-tag(node['provisioner']['cnames'][node['fqdn']])
 
 ### Send a notification that this system is now a provisioner
 notification = 'FYI.. I am now configured as a VM provisioner.'

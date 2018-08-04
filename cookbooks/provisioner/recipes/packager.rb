@@ -437,11 +437,10 @@ service "httpd" do
 end
 
 ###
-###  Tag myself to identify my function and my cname
+###  Tag myself to identify my function
 ###
 
 tag('builder')
-tag(node['provisioner']['cnames'][node['fqdn']])
 
 
 ###

@@ -64,12 +64,6 @@ default['provisioner']['hostname_auth_token']                   = '393f30f15a4a2
 
 default['provisioner']['chef']['default_server']                = 'chef.lab.fewt.com'
 
-###
-### Format host => cname, used for tagging (will be deprecated in the future)
-###
-
-default['provisioner']['cnames']                                = { }
-
 default['provisioner']['subnet']                                = '10.100.100.0'
 default['provisioner']['netmask']                               = '255.255.255.0'
 default['provisioner']['routers']                               = '10.100.100.1'
