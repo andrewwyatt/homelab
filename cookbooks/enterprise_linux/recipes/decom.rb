@@ -82,7 +82,7 @@ end
 
 execute 'Remove my DNS record' do
   command <<-EOF
-    curl -X GET "#{node['linux']['dns']['zonomi_url']}?host=$(hostname -f)&api_key=#{passwords['zonomi_api']}&action=DELETE 2>/dev/null”
+    curl -X GET "#{node['linux']['dns']['zonomi_url']}?host=$(hostname -f)&api_key=#{passwords['zonomi_api']}&action=DELETE" 2>/dev/null
   EOF
   action :run
   sensitive node['linux']['runtime']['sensitivity']
