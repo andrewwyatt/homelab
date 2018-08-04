@@ -101,6 +101,11 @@ execute 'chef-reconfigure' do
   action :nothing
 end
 
+execute 'chef-nginx-restart' do
+  command "chef-server-ctl restart nginx"
+  action :nothing
+end
+
 ###
 ### Create the /etc/opscode directory if it doesn't exist, manage it if it does.
 ###
@@ -122,6 +127,52 @@ directory node['chef']['keys'] do
   mode 0700
   action :create
 end
+
+###
+### Look for a credentials => certificates bag, if it exists, look for the hostname.
+### If it doesn't exist, look for the wildcard cert.  If that doesn't exist, do nothing
+### and Chef will provision a local cert.
+###
+
+certificates = data_bag_item('credentials', 'certificates', IO.read(Chef::Config['encrypted_data_bag_secret']))
+certificate = String.new
+selfsigned = true
+key = String.new
+if certificates["#{node['fqdn']}-crt"].nil? == false && certificates["#{node['fqdn']}-key"].nil? == false
+  certificate = certificates["#{node['fqdn']}-crt"]
+  key = certificates["#{node['fqdn']}-key"]
+  selfsigned = false
+elsif certificates["#{node['chef']['cert_domain']}-crt"].nil? == false && certificates["#{node['chef']['cert_domain']}-key"].nil? == false
+  certificate = certificates["#{node['chef']['cert_domain']}-crt"]
+  key = certificates["#{node['chef']['cert_domain']}-key"]
+  selfsigned = false
+end
+
+file "/etc/opscode/#{node['fqdn']}.crt" do
+  owner 'opscode'
+  group 'opscode'
+  mode 0600
+  content certificate
+  sensitive true
+  action :create
+  notifies :run, 'execute[chef-nginx-restart]', :immediately
+  only_if { selfsigned == false }
+end
+
+file "/etc/opscode/#{node['fqdn']}.pem" do
+  owner 'opscode'
+  group 'opscode'
+  mode 0600
+  content key
+  sensitive true
+  action :create
+  notifies :run, 'execute[chef-nginx-restart]', :immediately
+  only_if { selfsigned == false }
+end
+
+###
+### If there's a chef config that already exists, but Chef is down, kill it.
+###
 
 file "/etc/opscode/chef-server.rb" do
   action :delete
@@ -211,46 +262,6 @@ node['chef']['organizations'].each do |key,org|
       only_if { ::File.exists?("/usr/bin/chef-server-ctl") }
     end
   end
-end
-
-###
-### Look for a credentials => certificates bag, if it exists, look for the hostname.
-### If it doesn't exist, look for the wildcard cert.  If that doesn't exist, do nothing
-### and Chef will provision a local cert.
-###
-
-certificates = data_bag_item('credentials', 'certificates', IO.read(Chef::Config['encrypted_data_bag_secret']))
-certificate = String.new
-selfsigned = true
-key = String.new
-if certificates["#{node['fqdn']}-crt"].nil? == false && certificates["#{node['fqdn']}-key"].nil? == false
-  certificate = certificates["#{node['fqdn']}-crt"]
-  key = certificates["#{node['fqdn']}-key"]
-  selfsigned = false
-elsif certificates["#{node['chef']['cert_domain']}-crt"].nil? == false && certificates["#{node['chef']['cert_domain']}-key"].nil? == false
-  certificate = certificates["#{node['chef']['cert_domain']}-crt"]
-  key = certificates["#{node['chef']['cert_domain']}-key"]
-  selfsigned = false
-end
-
-file "/etc/opscode/#{node['fqdn']}.crt" do
-  owner 'opscode'
-  group 'opscode'
-  mode 0600
-  content certificate
-  sensitive true
-  action :create
-  only_if { selfsigned == false }
-end
-
-file "/etc/opscode/#{node['fqdn']}.pem" do
-  owner 'opscode'
-  group 'opscode'
-  mode 0600
-  content key
-  sensitive true
-  action :create
-  only_if { selfsigned == false }
 end
 
 ###
