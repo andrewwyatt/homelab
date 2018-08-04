@@ -193,7 +193,6 @@ EOF
       else
         add_to_org = true
       end
-      puts attributes.to_s
       if attributes['access'] == 'admin'
         admin = '--admin'
       end
