@@ -221,13 +221,16 @@ end
 
 certificates = data_bag_item('credentials', 'certificates', IO.read(Chef::Config['encrypted_data_bag_secret']))
 certificate = String.new
+selfsigned = true
 key = String.new
 if certificates["#{node['fqdn']}-crt"].nil? == false && certificates["#{node['fqdn']}-key"].nil? == false
   certificate = certificates["#{node['fqdn']}-crt"]
   key = certificates["#{node['fqdn']}-key"]
-elsif certificates["#{node['chef']['runtime']['domain']}-crt"].nil? == false && certificates["#{node['chef']['runtime']['domain']}-key"].nil? == false
-  certificate = certificates["#{node['chef']['runtime']['domain']}-crt"]
-  key = certificates["#{node['chef']['runtime']['domain']}-key"]
+  selfsigned = false
+elsif certificates["#{node['chef']['cert_domain']}-crt"].nil? == false && certificates["#{node['chef']['cert_domain']}-key"].nil? == false
+  certificate = certificates["#{node['chef']['cert_domain']}-crt"]
+  key = certificates["#{node['chef']['cert_domain']}-key"]
+  selfsigned = false
 end
 
 file "/etc/opscode/#{node['fqdn']}.crt" do
@@ -237,7 +240,7 @@ file "/etc/opscode/#{node['fqdn']}.crt" do
   content certificate
   sensitive true
   action :create
-  only_if { (defined?(certificate)).empty? == false }
+  only_if { selfsigned == false }
 end
 
 file "/etc/opscode/#{node['fqdn']}.pem" do
@@ -247,7 +250,7 @@ file "/etc/opscode/#{node['fqdn']}.pem" do
   content key
   sensitive true
   action :create
-  only_if { (defined?(key)).empty? == false }
+  only_if { selfsigned == false }
 end
 
 ###

@@ -99,6 +99,7 @@ default['chef']['bootstrap_delay']               = 30
 default['chef']['bootstrap_user']                = 'admin'
 default['chef']['bootstrap_root']                = '/node/'
 
+default['chef']['cert_domain']                   = 'lab.fewt.com'                    
 default['chef']['ad_bind_account']               = 'chef_authenticator'
 
 ### Chef server bits
