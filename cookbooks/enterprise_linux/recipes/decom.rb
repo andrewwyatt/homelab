@@ -73,7 +73,7 @@ execute "Ensuring #{node['fqdn']} is removed from JumpCloud." do
     curl -X DELETE "#{node['linux']['jumpcloud']['api_url']}/systems/#{node.run_state['systemKey']}" \
          -H 'Accept: application/json'                \
          -H 'Content-Type: application/json'          \
-         -H 'x-api-key: #{passwords['jumpcloud_api']}'
+         -H 'x-api-key: #{passwords['jumpcloud_api']}' 2>/dev/null
     EOF
   }
   sensitive node['linux']['runtime']['sensitivity']
@@ -82,12 +82,11 @@ end
 
 execute 'Remove my DNS record' do
   command <<-EOF
-    curl -X GET "#{node['linux']['dns']['zonomi_url']}?host=$(hostname -f)&api_key=#{passwords['zonomi_api']}&action=DELETE”
+    curl -X GET "#{node['linux']['dns']['zonomi_url']}?host=$(hostname -f)&api_key=#{passwords['zonomi_api']}&action=DELETE 2>/dev/null”
   EOF
   action :run
   sensitive node['linux']['runtime']['sensitivity']
   only_if { node['linux']['dns']['mechanism'] == 'zonomi' }
-  only_if { (`host #{node['fqdn']}`).include?(node['ipaddress']) }
 end
 
 remote_file "#{Chef::Config['file_cache_path']}/#{node['linux']['chef']['bootstrap_user']}.pem.enc" do

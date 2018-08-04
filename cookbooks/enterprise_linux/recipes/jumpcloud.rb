@@ -42,7 +42,7 @@ passwords = data_bag_item('credentials', 'passwords', IO.read(Chef::Config['encr
 ###
 
 execute 'install_agent' do
-  command "curl --tlsv1.2 --silent --show-error --header 'x-connect-key: #{passwords['jumpcloud_connect']}' '#{node['linux']['jumpcloud']['ks_url']}' | bash"
+  command "(curl --tlsv1.2 --silent --show-error --header 'x-connect-key: #{passwords['jumpcloud_connect']}' '#{node['linux']['jumpcloud']['ks_url']}' | bash) && /opt/jc/bin/jcagent start"
   sensitive node['linux']['runtime']['sensitivity']
   not_if { File.exists? "/opt/jc/jcagent.conf" }
 end
