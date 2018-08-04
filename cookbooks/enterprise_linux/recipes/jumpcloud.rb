@@ -44,7 +44,13 @@ passwords = data_bag_item('credentials', 'passwords', IO.read(Chef::Config['encr
 execute 'install_agent' do
   command "curl --tlsv1.2 --silent --show-error --header 'x-connect-key: #{passwords['jumpcloud_connect']}' '#{node['linux']['jumpcloud']['ks_url']}' | bash"
   sensitive node['linux']['runtime']['sensitivity']
-  not_if { File.exists? "/opt/jc/policyConf.json" }
+  not_if { File.exists? "/opt/jc/jcagent.conf" }
+end
+
+execute 'Wait for agent configuration to arrive.' do
+  command 'while [ 1 ]; do if [ -e "/opt/jc/jcagent.conf" ]; then break; fi; sleep 1; done'
+  sensitive node['linux']['runtime']['sensitivity']
+  not_if { File.exists? "/opt/jc/jcagent.conf" }
 end
 
 ###
@@ -60,17 +66,32 @@ if sgmembers.length < 1
   sgmembers = "{}"
 end
 
-lattrs = Hash.new
+ruby_block 'Get the systemKey' do
+  block do
+    localdata = `cat /opt/jc/jcagent.conf 2>/dev/null`
 
-if File.exists?("/opt/jc/jcagent.conf")
-  localdata = `cat /opt/jc/jcagent.conf 2>/dev/null`
+    if localdata.length < 1
+      localdata = "{}"
+    end
 
-  if localdata.length < 1
-    localdata = "{}"
+    lattrs = JSON.parse(localdata)
+    lattrs = Hash[*lattrs.collect{|h| h.to_a}.flatten]
+    node.run_state['systemKey'] = lattrs['systemKey']
   end
+end
 
-  lattrs = JSON.parse(localdata)
-  lattrs = Hash[*lattrs.collect{|h| h.to_a}.flatten]
+###
+### For some reason node.run_state['systemKey'] isn't getting passed into the
+### bash code block.  This works around that for now.
+###
+
+file "#{Chef::Config['file_cache_path']}/systemKey" do
+  owner 'root'
+  group 'root'
+  mode 0640
+  content node.run_state['systemKey']
+  action :create
+  sensitive node['chef']['runtime']['sensitivity']
 end
 
 bash "Ensuring #{node['fqdn']} is assigned to the appropriate system group." do
@@ -79,8 +100,10 @@ bash "Ensuring #{node['fqdn']} is assigned to the appropriate system group." do
          -H 'Accept: application/json'                 \
          -H 'Content-Type: application/json'           \
          -H 'x-api-key: #{passwords['jumpcloud_api']}' \
-         -d '{ "op": "add", "type": "system", "id": "#{lattrs['systemKey']}" }' 2>/dev/null
+         -d '{ "op": "add", "type": "system", "id": "$(cat #{Chef::Config['file_cache_path']}/systemKey)" }' 2>/dev/null
   EOF
+  action :run
   sensitive node['linux']['runtime']['sensitivity']
-  not_if { sgmembers =~ /lattrs['systemKey']/ }
+  not_if { sgmembers =~ /#{node.run_state['systemKey']}/ }
+  only_if { File.exists? "/opt/jc/jcagent.conf" }
 end
