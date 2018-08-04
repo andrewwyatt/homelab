@@ -107,15 +107,6 @@ remote_file "#{Chef::Config['file_cache_path']}/encrypted_data_bag_secret.enc" d
   sensitive node['linux']['runtime']['sensitivity']
 end
 
-remote_file "#{Chef::Config['file_cache_path']}/#{node['linux']['chef']['server']}.crt.enc" do
-  source "https://#{node['linux']['chef']['server']}#{node['linux']['chef']['bootstrap_root']}#{node['linux']['chef']['server']}.crt.enc"
-  owner 'root'
-  group 'root'
-  mode 0600
-  action :create
-  sensitive node['linux']['runtime']['sensitivity']
-end
-
 execute 'Configure data bag secret' do
   command "#{openssl_decrypt} -in #{Chef::Config['file_cache_path']}/encrypted_data_bag_secret.enc -out /etc/chef/encrypted_data_bag_secret"
   action :run
@@ -125,29 +116,12 @@ execute 'Configure data bag secret' do
   not_if { File.exists? "/etc/chef/encrypted_data_bag_secret" }
 end
 
-execute 'Configure SSL certificate' do
-  command "#{openssl_decrypt} -in #{Chef::Config['file_cache_path']}/#{node['linux']['chef']['server']}.crt.enc -out /etc/chef/trusted_certs/#{node['linux']['chef']['server']}.crt"
-  action :run
-  notifies :create, "file[#{Chef::Config[:file_cache_path]}/.#{passfile}]", :before
-  notifies :delete, "file[#{Chef::Config[:file_cache_path]}/.#{passfile}]", :delayed
-  sensitive node['linux']['runtime']['sensitivity']
-  not_if { File.exists? "/etc/chef/trusted_certs/#{node['linux']['chef']['server']}.crt" }
-end
-
 file "/etc/chef/encrypted_data_bag_secret" do
   owner 'root'
   group 'root'
   mode 0600
   sensitive node['linux']['runtime']['sensitivity']
 end
-
-file "/etc/chef/trusted_certs/#{node['linux']['chef']['server']}.crt" do
-  owner 'root'
-  group 'root'
-  mode 0600
-  sensitive node['linux']['runtime']['sensitivity']
-end
-
 
 ###
 ### Chef seems to prefer running the client via cron

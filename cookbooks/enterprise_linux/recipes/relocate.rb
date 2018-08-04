@@ -61,14 +61,14 @@ if (defined?(node['linux']['chef']['new_chef_server'])).nil? == false
     node_role = node['fqdn'].gsub(".", "_")
 
     mychefdata = [ "/clients/#{node['fqdn']}",
-                     "/nodes/#{node['fqdn']}",
-                     "/roles/#{node_role}",
-                     "/acls/clients/#{node['fqdn']}",
-                     "/acls/nodes/#{node['fqdn']}" ]
+                   "/nodes/#{node['fqdn']}",
+                   "/roles/#{node_role}",
+                   "/acls/clients/#{node['fqdn']}",
+                   "/acls/nodes/#{node['fqdn']}" ]
 
     mychefdata.each do |bit|
       execute "Download #{bit}" do
-        command "knife download #{bit} -c /etc/chef/client.rb --chef-repo-path #{Chef::Config[:file_cache_path]}/.chefdata --server-url https://#{current_chef_server}#{node['linux']['chef']['chef_org']}"
+        command "knife download #{bit} -c /etc/chef/client.rb -k /etc/chef/client.pem -u #{node['fqdn']} --chef-repo-path #{Chef::Config[:file_cache_path]}/.chefdata --server-url https://#{current_chef_server}#{node['linux']['chef']['chef_org']}"
         action :run
         sensitive node['linux']['runtime']['sensitivity']
       end
