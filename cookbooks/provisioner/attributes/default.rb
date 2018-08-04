@@ -180,7 +180,7 @@ default['provisioner']['linkname']                              = 'store'
 default['provisioner']['webroot']                               = '/var/www/html'
 default['provisioner']['pubkey']                                = "RPM-GPG-KEY-LAB-#{node['platform_version'][0]}"
 
-default['provisioner']['rsync_excludes']                        = '--exclude "local*" --exclude "drpms/" --exclude "SRPMS/" --exclude "i386/" --exclude "ppc64*" --exclude "aarch64*" --exclude "debug" --exclude "isos"'
+default['provisioner']['rsync_excludes']                        = '--exclude "local*" --exclude "drpms/" --exclude "SRPMS/" --exclude "i386/" --exclude "ppc64*" --exclude "aarch64*" --exclude "debug" --exclude "isos" --exclude "*SHA256"'
 default['provisioner']['retry_delay']                           = '30'
 default['provisioner']['mirrorroot']                            = "#{node['provisioner']['webroot']}/mirrors"
 default['provisioner']['mirrors']                               = { 'centos-7' => { 'name'            => 'centos_7',
