@@ -48,7 +48,7 @@ execute 'install_agent' do
 end
 
 execute 'Wait for agent configuration to arrive.' do
-  command 'while [ 1 ]; do if [ -e "/opt/jc/jcagent.conf" ]; then break; fi; sleep 1; done'
+  command 'while [ 1 ]; do if [[ "$(cat /opt/jc/jcagent.conf)" =~ systemKey ]]; then break; fi; sleep 1; done'
   sensitive node['linux']['runtime']['sensitivity']
   not_if { File.exists? "/opt/jc/jcagent.conf" }
 end
@@ -80,28 +80,15 @@ ruby_block 'Get the systemKey' do
   end
 end
 
-###
-### For some reason node.run_state['systemKey'] isn't getting passed into the
-### bash code block.  This works around that for now.
-###
-
-file "#{Chef::Config['file_cache_path']}/systemKey" do
-  owner 'root'
-  group 'root'
-  mode 0640
-  content node.run_state['systemKey']
-  action :create
-  sensitive node['chef']['runtime']['sensitivity']
-end
-
-bash "Ensuring #{node['fqdn']} is assigned to the appropriate system group." do
-  code <<-EOF
+execute "Ensuring #{node['fqdn']} is assigned to the appropriate system group." do
+  command lazy { <<-EOF
     curl -X POST "#{node['linux']['jumpcloud']['api_url']}/v2/systemgroups/#{node['linux']['jumpcloud']['server_groupid']}/members" \
          -H 'Accept: application/json'                 \
          -H 'Content-Type: application/json'           \
          -H 'x-api-key: #{passwords['jumpcloud_api']}' \
-         -d '{ "op": "add", "type": "system", "id": "$(cat #{Chef::Config['file_cache_path']}/systemKey)" }' 2>/dev/null
-  EOF
+         -d '{ "op": "add", "type": "system", "id": "#{node.run_state['systemKey']}" }' 2>/dev/null
+    EOF
+  }
   action :run
   sensitive node['linux']['runtime']['sensitivity']
   not_if { sgmembers =~ /#{node.run_state['systemKey']}/ }
