@@ -312,4 +312,3 @@ template '/etc/opscode/chef-server.rb' do
 end
 
 tag('chef-server')
-tag(node['chef']['runtime']['environment'])
