@@ -149,8 +149,8 @@ bash notification do
   EOF
   sensitive node['chef']['runtime']['sensitivity']
   only_if { ::File.exists?("/etc/opscode/chef-server-running.json") }
-  only_if { (defined?(passwords['ad_bind_account'])).nil? == false }
-  not_if { `grep \'bind_password\' /etc/opscode/chef-server-running.json 2>/dev/null`.include?(passwords['ad_bind_account'])}
+  not_if { (defined?(passwords['ad_bind_account'])).nil? == true }
+  not_if { `grep \'bind_password\' /etc/opscode/chef-server-running.json 2>/dev/null`.include?(passwords['ad_bind_account'].to_s)}
   notifies :run, 'execute[chef-reconfigure]', :immediately
 end
 
@@ -161,10 +161,11 @@ bash notification do
   EOF
   sensitive node['chef']['runtime']['sensitivity']
   only_if { ::File.exists?("/etc/opscode/chef-server-running.json") }
-  only_if { (defined?(passwords['automate_token'])).nil? == false }
-  not_if { `grep \'#{passwords['automate_token']}\' /etc/opscode/chef-server-running.json 2>/dev/null`.include?(passwords['automate_token']) }
+  not_if { (defined?(passwords['automate_token'])).nil? == true }
+  not_if { `grep \'#{passwords['automate_token']}\' /etc/opscode/chef-server-running.json 2>/dev/null`.include?(passwords['automate_token'].to_s)}
   notifies :run, 'execute[chef-reconfigure]', :immediately
 end
+
 
 ###
 ### Creates the administrative users for each org
