@@ -438,7 +438,7 @@ default['linux']['mounts']                                       = { 'root'    =
                                                                      'var'     => { 'device'         => '/dev/sysvg/lv_var',
                                                                                     'mount_point'     => '/var',
                                                                                     'fs_type'        => 'ext4',
-                                                                                    'mount_options'  => 'defaults,nosuid,nodev,noexec',
+                                                                                    'mount_options'  => 'defaults,nosuid,nodev',
                                                                                     'dump_frequency' => '1',
                                                                                     'fsck_pass_num'  => '2',
                                                                                     'owner'          => 'root',

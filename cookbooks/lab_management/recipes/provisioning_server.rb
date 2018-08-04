@@ -22,8 +22,6 @@
 ### into a single VM.
 ###
 
-node.default['linux']['mounts']['var']['mount_options']  = 'defaults,nosuid,nodev'
-
 ###
 ### Packaging and mirroring ports
 ###
