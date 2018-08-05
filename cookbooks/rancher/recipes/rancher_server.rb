@@ -20,20 +20,6 @@
 node.default['linux']['firewall']['ports']['8080/tcp']    = true
 
 ###
-### Mount the NFS volume
-###
-
-node.default['linux']['mounts']['data']['device']         = 'cdc0003.lab.fewt.com:/exports/data'
-node.default['linux']['mounts']['data']['mount_point']    = '/var/lib/rancher/vm'
-node.default['linux']['mounts']['data']['fs_type']        = 'nfs'
-node.default['linux']['mounts']['data']['mount_options']  = 'defaults'
-node.default['linux']['mounts']['data']['dump_frequency'] = '0'
-node.default['linux']['mounts']['data']['fsck_pass_num']  = '0'
-node.default['linux']['mounts']['data']['owner']          = 'root'
-node.default['linux']['mounts']['data']['group']          = 'root'
-node.default['linux']['mounts']['data']['mode']           = '0755'
-
-###
 ### Prerequisites
 ###
 
@@ -51,7 +37,8 @@ include_recipe 'lab_management::standard_server'
 ### Configuration to become a rancher server (work in progress)
 ###
 
-yum_package [ 'docker' ] do
+yum_package [ 'docker',
+               'docker-compose' ] do
   action :install
 end
 

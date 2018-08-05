@@ -57,22 +57,6 @@ node.default['rancher']['exports']                        = { 'exports' => { 'mo
                                                             }
 
 ###
-### The NFS server is also a client.  This will need to be commented on the first chef-client
-### run, or it'll fail as it's not yet configured.
-###
-
-node.default['linux']['mounts']['data']['device']         = 'cdc0003.lab.fewt.com:/exports/data'
-node.default['linux']['mounts']['data']['mount_point']    = '/var/lib/rancher/vm'
-node.default['linux']['mounts']['data']['fs_type']        = 'nfs'
-node.default['linux']['mounts']['data']['mount_options']  = 'defaults'
-node.default['linux']['mounts']['data']['dump_frequency'] = '0'
-node.default['linux']['mounts']['data']['fsck_pass_num']  = '0'
-node.default['linux']['mounts']['data']['owner']          = 'root'
-node.default['linux']['mounts']['data']['group']          = 'root'
-node.default['linux']['mounts']['data']['mode']           = '0755'
-
-
-###
 ### Inherit the standard server configuration.
 ###
 
