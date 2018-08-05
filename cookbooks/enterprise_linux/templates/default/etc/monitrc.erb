@@ -54,12 +54,12 @@ check network public with interface <%= node['network']['default_interface'] %>
   else if succeeded then
     exec "/bin/monit-slack"
 
-  if download > 50 MB/s then
+  if download > 30 MB/s then
     exec "/bin/monit-slack"
   else if succeeded then
     exec "/bin/monit-slack"
 
-  if total uploaded > 1 GB in last hour then
+  if total uploaded > 10 GB in last hour then
     exec "/bin/monit-slack"
   else if succeeded then
     exec "/bin/monit-slack"
