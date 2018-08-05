@@ -17,6 +17,7 @@
 ### limitations under the License.
 ###
 
+node.default['linux']['firewall']['ports']['8080/tcp']    = true
 
 ###
 ### Mount the NFS volume
@@ -52,4 +53,9 @@ include_recipe 'lab_management::standard_server'
 
 yum_package [ 'docker' ] do
   action :install
+end
+
+service "docker" do
+  supports :status => true, :restart => true
+  action [ :enable, :start ]
 end
