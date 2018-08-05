@@ -10,11 +10,11 @@ then
   TEXT="The alert on ${HOST} has been resolved (<%= node['linux']['monit']['notifies'] %>)"
 else
   COLOR="<%= node['linux']['monit']['alert_critical'] %>"
-  TEXT="Warning: A critical alert has occurred on ${HOST} (<%= node['linux']['monit']['notifies'] %>)"
+  TEXT="Warning: a critical alert has occurred on ${HOST} (<%= node['linux']['monit']['notifies'] %>)"
 fi
 
 PAYLOAD="{
-      \"username\": \"System Notification\",
+      \"username\": \"Infrastructure Alerts\",
       \"channel\": \"<%= node['linux']['slack_channel'] %>\",
       \"icon_emoji\": \"<%= node['linux']['monit']['slack_emoji'] %>\",
       \"text\": \"$TEXT\",

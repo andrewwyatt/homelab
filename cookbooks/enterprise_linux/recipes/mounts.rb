@@ -34,14 +34,20 @@ node['linux']['mounts'].each do |key,mount|
   end
 
   ###
-  ### Manage the directories
+  ### Make and/or manage the directories even when recursive.
   ###
 
-  directory mount['mount_point'] do
-    owner mount['owner']
-    group mount['group']
-    mode mount['mode']
-    action :create
+  elements = mount['mount_point'].split('/')
+  elements.shift()
+  cwd = String.new()
+  elements.each do | element |
+    cwd = cwd + "/" + element
+    directory cwd do
+      owner mount['owner']
+      group mount['group']
+      mode mount['mode']
+      action :create
+    end
   end
 
   execute "Ensure #{mount['mount_point']} is mounted with expected options" do
