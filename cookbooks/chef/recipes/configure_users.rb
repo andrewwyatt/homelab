@@ -66,6 +66,15 @@ node['chef']['organizations'].each do | org_name , organization |
                    -H 'Content-Type: application/json' \
                    -H 'x-api-key: #{passwords['jumpcloud_api']}' 2>/dev/null`
 
+    ###
+    ### If the recipe can't access the JumpCloud, quit so users don't
+    ### get clobbered.
+    ###
+
+    if $?.exitstatus > 0
+      return
+    end
+
     if cudata.length < 1
       cudata = "{}"
     end
@@ -80,6 +89,16 @@ node['chef']['organizations'].each do | org_name , organization |
                           -H 'Accept: application/json' \
                           -H 'Content-Type: application/json' \
                           -H 'x-api-key: #{passwords['jumpcloud_api']}' 2>/dev/null`
+
+            ###
+            ### If the recipe can't access the JumpCloud, quit so users don't
+            ### get clobbered.
+            ###
+
+            if $?.exitstatus > 0
+              return
+            end
+
             if mdata.length < 1
               mdata = "{}"
             end
