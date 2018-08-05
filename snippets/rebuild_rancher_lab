@@ -1,0 +1,8 @@
+#!/bin/bash
+
+for node in cdc0004 cdc0005 cdc0006 cdc0007 cdc0008 cdc0009 cdc0010 cdc0011
+do
+  knife node run_list add ${node}.lab.fewt.com "lab_management::rebuild_self"
+  ssh -ttq ${node}.lab.fewt.com sudo chef-client
+  sleep 10
+done
