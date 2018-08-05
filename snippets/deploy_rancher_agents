@@ -1,0 +1,14 @@
+#!/bin/bash
+
+if [ ! $1 ]
+then
+  echo -n "Enter the Rancher URL from the Add Host screen: "
+  read RANCHER_URL
+else
+  RANCHER_URL=$1
+fi
+
+for node in cdc0004 cdc0005 cdc0006 cdc0007 cdc0008 cdc0009 cdc0010 cdc0011
+do
+  ssh -ttq ${node}.lab.fewt.com sudo docker run --rm --privileged -v /var/run/docker.sock:/var/run/docker.sock -v /var/lib/rancher:/var/lib/rancher rancher/agent:v1.2.11 ${RANCHER_URL}
+done
