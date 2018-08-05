@@ -150,13 +150,13 @@ default['linux']['api_path']                                    = 'APIKEYGOESHER
 ### Sets up the reboot Slack notification.
 ###
 
-default['linux']['boot_notice_emoji']                           = ":all_the_things:"
+default['linux']['boot_notice_emoji']                           = ":running:"
 
 ###
 ### Sets up the health check notification.
 ###
 
-default['linux']['health_check_emoji']                          = ":construction:"
+default['linux']['health_check_emoji']                          = ":stopwatch:"
 
 ###
 ### Sets up the patching notification
