@@ -430,7 +430,7 @@ tag('provisioner')
 notification = 'FYI.. I am now configured as a VM provisioner.'
 bash notification do
   code <<-EOF
-    notify "#{node['fqdn']}" "#{node['linux']['slack_channel']}" "#{node['provisioner']['kickstart_emoji']}" "#{node['linux']['api_path']}" "#{notification}"
+    notify "#{node['linux']['slack_channel']}" "#{node['provisioner']['kickstart_emoji']}" "#{node['linux']['api_path']}" "#{notification}"
     touch /var/.provisioner
   EOF
   only_if { node['linux']['slack_enabled'] == true }

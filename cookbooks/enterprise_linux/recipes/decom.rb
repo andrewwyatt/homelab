@@ -47,7 +47,7 @@ notification=node['linux']['decom']['decom_notice']
 bash "Send decom notice" do
   code <<-EOF
     ### user channel emoji api_key message
-    notify "#{node['fqdn']}" "#{node['linux']['slack_channel']}" "#{node['linux']['emoji']}" "#{node['linux']['api_path']}" "#{notification}"
+    notify "#{node['linux']['slack_channel']}" "#{node['linux']['emoji']}" "#{node['linux']['api_path']}" "#{notification}"
   EOF
   sensitive node['linux']['runtime']['sensitivity']
 end
@@ -109,7 +109,7 @@ end
 notification="Removing my partition table"
 bash "Flushing my partition table" do
   code <<-EOF
-    notify "#{node['fqdn']}" "#{node['linux']['slack_channel']}" "#{node['linux']['emoji']}" "#{node['linux']['api_path']}" "#{notification}"
+    notify "#{node['linux']['slack_channel']}" "#{node['linux']['emoji']}" "#{node['linux']['api_path']}" "#{notification}"
     dd if=/dev/zero of=/dev/sda bs=512 count=1
   EOF
   sensitive node['linux']['runtime']['sensitivity']
@@ -121,7 +121,7 @@ node_role = node['fqdn'].gsub(".", "_")
 notification="Deleting myself from Chef server #{node['linux']['chef']['server']}."
 bash "Remove myself from Chef, and power down." do
   code <<-EOF
-    notify "#{node['fqdn']}" "#{node['linux']['slack_channel']}" "#{node['linux']['emoji']}" "#{node['linux']['api_path']}" "#{notification}"
+    notify "#{node['linux']['slack_channel']}" "#{node['linux']['emoji']}" "#{node['linux']['api_path']}" "#{notification}"
     nohup bash -c '
       while [ true ]
       do

@@ -450,7 +450,7 @@ tag('builder')
 notification = 'FYI.. I am now configured as an RPM builder.'
 bash notification do
   code <<-EOF
-    notify "#{node['fqdn']}" "#{node['linux']['slack_channel']}" "#{node['provisioner']['builder_emoji']}" "#{node['linux']['api_path']}" "#{notification}"
+    notify "#{node['linux']['slack_channel']}" "#{node['provisioner']['builder_emoji']}" "#{node['linux']['api_path']}" "#{notification}"
     touch /var/.builder
   EOF
   not_if { File.exists? '/var/.builder' }
