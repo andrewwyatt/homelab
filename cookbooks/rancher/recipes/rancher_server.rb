@@ -24,7 +24,7 @@ node.default['linux']['firewall']['ports']['8080/tcp']    = true
 ###
 
 node.default['linux']['mounts']['data']['device']         = 'cdc0003.lab.fewt.com:/exports/data'
-node.default['linux']['mounts']['data']['mount_point']    = '/var/lib/rancher/vm-shared'
+node.default['linux']['mounts']['data']['mount_point']    = '/var/lib/rancher/vm'
 node.default['linux']['mounts']['data']['fs_type']        = 'nfs'
 node.default['linux']['mounts']['data']['mount_options']  = 'defaults'
 node.default['linux']['mounts']['data']['dump_frequency'] = '0'
