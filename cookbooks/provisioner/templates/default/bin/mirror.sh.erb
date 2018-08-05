@@ -11,7 +11,7 @@ SLACK_API_PATH=<%= node['provisioner']['api_path'] %>
 function notify() {
   if [ ${SLACK_ENABLED} ]
   then
-    curl -X POST --data-urlencode "payload={\"channel\": \"${SLACK_CHANNEL}\", \"username\": \"${SLACK_USER}\", \"text\": \"$(hostname -f): $1\", \"icon_emoji\": \"${SLACK_EMOJI}\"}" "https://hooks.slack.com/services/${SLACK_API_PATH}" >/dev/null 2>&1
+  /bin/notify "${SLACK_USER}" "${SLACK_CHANNEL}" "${SLACK_CHANNEL}" "${SLACK_API_PATH}" "$1"
   fi
 }
 

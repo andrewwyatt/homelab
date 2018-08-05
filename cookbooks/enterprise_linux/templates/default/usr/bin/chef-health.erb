@@ -15,15 +15,11 @@ LAST_CHECK_MH=$(echo ${CHEF_STATUS} | awk '{print $2}')
 
 ### Slack Integration
 SLACK_ENABLED="<%= node['linux']['slack_enabled'] %>"
-SLACK_USER="<%= node['linux']['health_check_name'] %>"
-SLAK_CHANNEL="<%= node['linux']['slack_channel'] %>"
-SLACK_EMOJI="<%= node['linux']['health_check_emoji'] %>"
-SLACK_API_PATH="<%= node['linux']['api_path'] %>"
 
 function notify() {
   if [ ${SLACK_ENABLED} ]
   then
-    curl -X POST --data-urlencode "payload={\"channel\": \"${SLACK_CHANNEL}\", \"username\": \"${SLACK_USER}\", \"text\": \"$1\", \"icon_emoji\": \"${SLACK_EMOJI}\"}" "https://hooks.slack.com/services/${SLACK_API_PATH}" >/dev/null 2>&1
+    /bin/notify "<%= node['linux']['health_check_name'] %>" "<%= node['linux']['slack_channel'] %>" "<%= node['linux']['health_check_emoji'] %>" "<%= node['linux']['api_path'] %>" "$1"
   fi
   echo $1
 }

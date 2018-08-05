@@ -8,4 +8,21 @@ SLACK_EMOJI="$3"
 SLACK_API_PATH="$4"
 SLACK_MESSAGE="$5"
 
-curl -X POST --data-urlencode "payload={\"channel\": \"${SLACK_CHANNEL}\", \"username\": \"${SLACK_USER}\", \"text\": \"${SLACK_MESSAGE}\", \"icon_emoji\": \"${SLACK_EMOJI}\"}" "https://hooks.slack.com/services/${SLACK_API_PATH}" >/dev/null 2>&1
+HOST=$(hostname -f)
+
+PAYLOAD="{
+      \"username\": \"System Notifications\",
+      \"channel\": \"${SLACK_CHANNEL}\",
+      \"icon_emoji\": \"${SLACK_EMOJI}\",
+      \"attachments\": [{
+        \"color\": \"#4682B4\",
+        \"mrkdwn_in\": [\"text\"],
+        \"fields\": [
+          { \"title\": \"Date:\", \"value\": \"$(date)\", \"short\": true },
+          { \"title\": \"Host:\", \"value\": \"${HOST}\", \"short\": true },
+          { \"title\": \"Notification:\", \"value\": \"${SLACK_MESSAGE}\", \"short\": false }
+        ]
+    }]
+}"
+
+curl -L -s -X POST --data-urlencode "payload=$PAYLOAD" "https://hooks.slack.com/services/${SLACK_API_PATH}" 2>/dev/null
