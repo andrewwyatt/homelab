@@ -288,7 +288,7 @@ default['linux']['monit']['enabled']                             = true
 default['linux']['monit']['alert_critical']                      = "#A72B2B"
 default['linux']['monit']['alert_succeeded']                     = "#26C521"
 default['linux']['monit']['slack_emoji']                         = ":hammer_and_wrench:"
-default['linux']['monit']['notifies']                            = "@channel"
+default['linux']['monit']['notifies']                            = "<!channel>"
 
 default['linux']['monit']['filesystems']                         = { 'root' => { 'label' => 'root',
                                                                                  'path'  => '/',

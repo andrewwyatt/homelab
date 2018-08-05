@@ -7,10 +7,10 @@ HOST=$(hostname -f)
 if [[ $MONIT_EVENT =~ succeeded ]]
 then
   COLOR="<%= node['linux']['monit']['alert_succeeded'] %>"
-  TEXT="Alert on ${HOST} resolved (<%= node['linux']['monit']['notifies'] %>)"
+  TEXT="The alert on ${HOST} has been resolved (<%= node['linux']['monit']['notifies'] %>)"
 else
   COLOR="<%= node['linux']['monit']['alert_critical'] %>"
-  TEXT="Critical alert on ${HOST} (<%= node['linux']['monit']['notifies'] %>)"
+  TEXT="Warning: A critical alert has occurred on ${HOST} (<%= node['linux']['monit']['notifies'] %>)"
 fi
 
 PAYLOAD="{
