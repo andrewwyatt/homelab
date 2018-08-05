@@ -1,5 +1,20 @@
 <%= node['provisioner']['file_header'] %>
 
 function notify() {
-  curl -X POST --data-urlencode "payload={\"channel\": \"<%= node['provisioner']['slack_channel'] %>\", \"username\": \"<%= node['provisioner']['kickstart_name'] %>\", \"text\": \"$1\", \"icon_emoji\": \"<%= node['provisioner']['kickstart_emoji'] %>\"}" "https://hooks.slack.com/services/<%= node['provisioner']['api_path'] %>" >/dev/null 2>&1
+  PAYLOAD="{
+        \"username\": \"Provisioning Notifications\",
+        \"channel\": \"<%= node['provisioner']['slack_channel'] %>\",
+        \"icon_emoji\": \"<%= node['provisioner']['kickstart_emoji'] %>\",
+        \"attachments\": [{
+          \"color\": \"#4682B4\",
+          \"mrkdwn_in\": [\"text\"],
+          \"fields\": [
+            { \"title\": \"Date:\", \"value\": \"$(date)\", \"short\": true },
+            { \"title\": \"Host:\", \"value\": \"${HOST}\", \"short\": true },
+            { \"title\": \"Notification:\", \"value\": \"$1\", \"short\": false }
+          ]
+      }]
+  }"
+
+  curl -L -s -X POST --data-urlencode "payload=$PAYLOAD" "https://hooks.slack.com/services/<%= node['provisioner']['api_path'] %>" >/dev/null 2>&1
 }

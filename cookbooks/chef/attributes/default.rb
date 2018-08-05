@@ -55,10 +55,8 @@ default['chef']['reporting_version']             = '1.8.0'
 default['chef']['slack_enabled']                 = false
 default['chef']['slack_channel']                 = '#homelab'
 default['chef']['api_path']                      = 'APIKEYGOESHERE'
-default['chef']['slack_name']                    = 'Chef_Management'
-default['chef']['slack_emoji']                   = ':chef:'
-default['chef']['bootstrap_name']                = 'Bootstrap'
-default['chef']['bootstrap_emoji']               = ':sunglasses:'
+default['chef']['slack_emoji']                   = ':cooking:'
+default['chef']['bootstrap_emoji']               = ':boot:'
 
 ###
 ### Define sensitivity as an attribute so we can override it when necessary

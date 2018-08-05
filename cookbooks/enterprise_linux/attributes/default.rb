@@ -142,7 +142,6 @@ default['linux']['motd']                                        = ''
 ### The following attributes are necessary to send messages to Slack.
 ###
 default['linux']['slack_enabled']                               = false
-default['linux']['slack_user']                                  = 'Chef'
 default['linux']['slack_channel']                               = '#homelab'
 default['linux']['emoji']                                       = ':construction:'
 default['linux']['api_path']                                    = 'APIKEYGOESHERE'
@@ -151,21 +150,18 @@ default['linux']['api_path']                                    = 'APIKEYGOESHER
 ### Sets up the reboot Slack notification.
 ###
 
-default['linux']['boot_notice_name']                            = node['fqdn']
 default['linux']['boot_notice_emoji']                           = ":all_the_things:"
 
 ###
 ### Sets up the health check notification.
 ###
 
-default['linux']['health_check_name']                           = "Chef_Health"
 default['linux']['health_check_emoji']                          = ":construction:"
 
 ###
 ### Sets up the patching notification
 ###
 
-default['linux']['patch_bot_name']                              = "Patch_Manager"
 default['linux']['patch_emoji']                                 = ":construction:"
 
 ###

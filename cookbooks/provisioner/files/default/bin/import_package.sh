@@ -30,7 +30,7 @@ source ${HOME}/etc/builder.conf
 function notify() {
   if [ ${SLACK_ENABLED} ]
   then
-    /bin/notify "${SLACK_USER}" "${SLACK_CHANNEL}" "${SLACK_CHANNEL}" "${SLACK_API_PATH}" "$1"
+    /bin/notify "${SLACK_CHANNEL}" "${SLACK_CHANNEL}" "${SLACK_API_PATH}" "$1"
   fi
   echo $1
 }

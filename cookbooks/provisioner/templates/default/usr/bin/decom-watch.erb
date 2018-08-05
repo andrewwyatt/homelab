@@ -10,7 +10,6 @@
 <%= node['provisioner']['file_header'] %>
 
 SLACK_ENABLED=<%= node['provisioner']['slack_enabled'] %>
-SLACK_USER=<%= node['provisioner']['kickstart_name'] %>
 SLACK_CHANNEL=<%= node['provisioner']['slack_channel'] %>
 SLACK_EMOJI=<%= node['provisioner']['kickstart_emoji'] %>
 SLACK_API_PATH=<%= node['provisioner']['api_path'] %>
@@ -18,7 +17,7 @@ SLACK_API_PATH=<%= node['provisioner']['api_path'] %>
 function notify() {
   if [ ${SLACK_ENABLED} ]
   then
-    /bin/notify "${SLACK_USER}" "${SLACK_CHANNEL}" "${SLACK_CHANNEL}" "${SLACK_API_PATH}" "$1"
+    /bin/notify "${SLACK_CHANNEL}" "${SLACK_CHANNEL}" "${SLACK_API_PATH}" "$1"
   fi
 }
 

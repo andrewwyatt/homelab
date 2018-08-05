@@ -34,7 +34,6 @@ TIMEOUT=<%= @bootstrap_delay %>
 BOOTSTRAPROOT=<%= @bootstrap_root %>
 
 SLACK_ENABLED=<%= node['chef']['slack_enabled'] %>
-SLACK_USER=<%= node['chef']['bootstrap_name'] %>
 SLACK_CHANNEL=<%= node['chef']['slack_channel'] %>
 SLACK_EMOJI=<%= node['chef']['bootstrap_emoji'] %>
 SLACK_API_PATH=<%= node['chef']['api_path'] %>
@@ -77,7 +76,20 @@ EOF
 function notify() {
   if [ ${SLACK_ENABLED} ]
   then
-    curl -X POST --data-urlencode "payload={\"channel\": \"${SLACK_CHANNEL}\", \"username\": \"${SLACK_USER}\", \"text\": \"$1\", \"icon_emoji\": \"${SLACK_EMOJI}\"}" "https://hooks.slack.com/services/${SLACK_API_PATH}" >/dev/null 2>&1
+    PAYLOAD="{
+          \"username\": \"Provisioning Notifications\",
+          \"channel\": \"${SLACK_CHANNEL}\",
+          \"icon_emoji\": \"${SLACK_EMOJI}\",
+          \"attachments\": [{
+            \"color\": \"#4682B4\",
+            \"mrkdwn_in\": [\"text\"],
+            \"fields\": [
+              { \"title\": \"\", \"value\": \"$1\", \"short\": false }
+            ]
+        }]
+    }"
+
+    curl -L -s -X POST --data-urlencode "payload=$PAYLOAD" "https://hooks.slack.com/services/${SLACK_API_PATH}" 2>/dev/null
   fi
   echo $1
 }

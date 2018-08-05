@@ -13,7 +13,6 @@ DEBUG=<%= node['provisioner']['debug'] %>
 REPOSITORIES=(<% node['provisioner']['repositories'].each do |key,repository| -%><%= repository %> <% end -%>)
 SIGNKEY='<%= @signkey %>'
 SLACK_ENABLED=<%= node['provisioner']['slack_enabled'] %>
-SLACK_USER=<%= node['provisioner']['builder_name'] %>
 SLACK_CHANNEL=<%= node['provisioner']['slack_channel'] %>
 SLACK_EMOJI=<%= node['provisioner']['builder_emoji'] %>
 SLACK_API_PATH=<%= node['provisioner']['api_path'] %>

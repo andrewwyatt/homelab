@@ -10,15 +10,11 @@
 
 ### Slack Integration
 SLACK_ENABLED="<%= node['linux']['slack_enabled'] %>"
-SLACK_USER="<%= node['linux']['boot_notice_name'] %>"
-SLACK_CHANNEL="<%= node['linux']['slack_channel'] %>"
-SLACK_EMOJI="<%= node['linux']['boot_notice_emoji'] %>"
-SLACK_API_PATH="<%= node['linux']['api_path'] %>"
 
 function notify() {
   if [ ${SLACK_ENABLED} ]
   then
-    curl -X POST --data-urlencode "payload={\"channel\": \"${SLACK_CHANNEL}\", \"username\": \"${SLACK_USER}\", \"text\": \"$1\", \"icon_emoji\": \"${SLACK_EMOJI}\"}" "https://hooks.slack.com/services/${SLACK_API_PATH}" >/var/log/notice 2>&1
+    /bin/notify "<%= node['linux']['slack_channel'] %>" "<%= node['linux']['boot_notice_emoji'] %>" "<%= node['linux']['api_path'] %>" "$1"
   fi
 }
 

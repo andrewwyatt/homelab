@@ -29,4 +29,4 @@ PAYLOAD="{
     }]
 }"
 
-curl -L -s -X POST --data-urlencode "payload=$PAYLOAD" "https://hooks.slack.com/services/<%= node['linux']['api_path'] %>" 2>/dev/null
+curl -L -s -X POST --data-urlencode "payload=$PAYLOAD" "https://hooks.slack.com/services/<%= node['linux']['api_path'] %>" >/dev/null 2>&1

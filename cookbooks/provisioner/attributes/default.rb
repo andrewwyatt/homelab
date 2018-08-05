@@ -167,13 +167,10 @@ default['provisioner']['slack_enabled']                         = false
 default['provisioner']['slack_channel']                         = '#homelab'
 default['provisioner']['api_path']                              = 'API KEY GOES HERE'
 
-default['provisioner']['kickstart_name']                        = 'System_Builder'
 default['provisioner']['kickstart_emoji']                       = ':construction_worker:'
 
-default['provisioner']['replicator_name']                       = 'Mirror_Manager'
 default['provisioner']['replicator_emoji']                      = ':building_construction:'
 
-default['provisioner']['builder_name']                          = 'Package_Builder'
 default['provisioner']['builder_emoji']                         = ':building_construction:'
 
 default['provisioner']['linkname']                              = 'store'

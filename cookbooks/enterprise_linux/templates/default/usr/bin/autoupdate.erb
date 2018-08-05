@@ -16,7 +16,7 @@ SLACK_ENABLED="<%= node['linux']['slack_enabled'] %>"
 function notify() {
   if [ ${SLACK_ENABLED} ]
   then
-    /bin/notify "<%= node['linux']['health_check_name'] %>" "<%= node['linux']['slack_channel'] %>" "<%= node['linux']['health_check_emoji'] %>" "<%= node['linux']['api_path'] %>" "$1"
+    /bin/notify "<%= node['linux']['slack_channel'] %>" "<%= node['linux']['patch_emoji'] %>" "<%= node['linux']['api_path'] %>" "$1"
   fi
   echo $1
 }
