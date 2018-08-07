@@ -10,5 +10,5 @@ fi
 
 for node in $(seq -f %04g 4 1 11)
 do
-  ssh -ttq ${node}.lab.fewt.com sudo docker run --rm --privileged -v /var/run/docker.sock:/var/run/docker.sock -v /var/lib/rancher:/var/lib/rancher rancher/agent:v1.2.11 ${RANCHER_URL}
+  ssh -ttq cdc${node}.lab.fewt.com sudo docker run --rm --privileged -v /var/run/docker.sock:/var/run/docker.sock -v /var/lib/rancher:/var/lib/rancher rancher/agent:v1.2.11 "${RANCHER_URL}"
 done
