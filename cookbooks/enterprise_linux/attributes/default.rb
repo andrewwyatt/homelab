@@ -357,6 +357,7 @@ default['linux']['postfix']['smtp_use_tls']                      = 'yes'
 default['linux']['postfix']['smtp_tls_security_level']           = 'encrypt'
 
 default['linux']['firewall']['enable']                           = true
+default['linux']['firewall']['ignoreexisting']                   = false
 default['linux']['firewall']['ports']                            = { }
 default['linux']['firewall']['services']                         = { 'ssh'           => true }
 

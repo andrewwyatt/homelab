@@ -19,6 +19,7 @@
 
 node.default['linux']['firewall']['ports']['8080/tcp']    = true
 node.default['linux']['firewall']['ports']['9345/tcp']    = true
+node.default['linux']['firewall']['ignoreexisting']       = true
 
 ###
 ### Prerequisites

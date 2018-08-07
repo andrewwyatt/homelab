@@ -54,6 +54,7 @@ current_ports.each do | current_port |
     not_if { desired_ports.include?(current_port) }
     only_if { node['linux']['firewall']['enable'] == true }
     only_if { (`systemctl status firewalld`).include?("active") == true }
+    not_if { node['linux']['firewall']['ignoreexisting'] == true }
   end
 end
 
@@ -91,6 +92,7 @@ current_services.each do | current_service |
     not_if { desired_services.include?(current_service) }
     only_if { node['linux']['firewall']['enable'] == true }
     only_if { (`systemctl status firewalld`).include?("active") == true }
+    not_if { node['linux']['firewall']['ignoreexisting'] == true }
   end
 end
 
