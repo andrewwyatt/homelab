@@ -19,7 +19,7 @@
 
 node.default['linux']['firewall']['ports']['8080/tcp']    = true
 node.default['linux']['firewall']['ports']['9345/tcp']    = true
-node.default['linux']['firewall']['ports']['500/udp']    = true
+node.default['linux']['firewall']['ports']['500/udp']     = true
 node.default['linux']['firewall']['ports']['4500/udp']    = true
 node.default['linux']['firewall']['ignoreexisting']       = true
 node.default['linux']['sysctl']['net.ipv4.conf.all.forwarding'] = "1"

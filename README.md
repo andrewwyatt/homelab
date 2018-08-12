@@ -4,17 +4,14 @@
 
 This repository contains a set of cookbooks that I use to manage my home lab.  They provide a suite of capabilities that allow systems to automatically provision and also be destroyed and replaced very quickly allowing me to rapidly deploy and test new software and technologies.
 
-### This project enables
-
-* Configuring Chef server in a single instance or downstream replica configuration.
-* PXE deployment servers (just create a VM and turn it on)
-* Provisioning and managing RPM building and hosting servers.
-* Provisioning and managing CentOS mirror servers.
-* Integrating server and Chef authentication with JumpCloud for access and authorization
-* Integrates with Zonomi for DNS
-* Hardening managed servers to be nearly CIS 1 compliant.
-* Configuring and enforcing desired state
-* Replicate environments, databags, roles, and cookbooks.
+* Configures Chef server in a single instance or downstream replica configuration.
+* Implements PXE deployment services (just create a VM and turn it on).
+* Provisions and manages RPM building and hosting services.
+* Provisions and manages CentOS mirror servers.
+* Integrates server and Chef authentication with JumpCloud for access and authorization, and with Zonomi for DNS.
+* Hardens managed servers, and maintains the hardening specification.
+* Notifies a slack channel of critical and non-critical events.
+* Configures and enforces desired state.
 
 **WARNING:** *These cookbooks should not be used for production without additional modification.*
 
