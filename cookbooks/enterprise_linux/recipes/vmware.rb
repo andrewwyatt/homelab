@@ -25,13 +25,13 @@ if ::File.exists?("/usr/sbin/dmidecode")
   product_name = `dmidecode -s system-product-name`
 end
 
-if product_name =~ /VMware/i
-  yum_package [ 'open-vm-tools' ] do
-    action :install
-  end
+yum_package [ 'open-vm-tools' ] do
+  action :install
+  only_if { product_name =~ /VMware/i }
+end
 
-  service "vmtoolsd" do
-    supports :status => true, :restart => true
-    action [ :enable, :start ]
-  end
+service "vmtoolsd" do
+  supports :status => true, :restart => true
+  action [ :enable, :start ]
+  only_if { product_name =~ /VMware/i }
 end
