@@ -78,8 +78,8 @@ default['chef']['file_header']                   = node['linux']['chef']['file_h
 ### knife search 'tags:chef-server AND tags:master' -i 2>/dev/null
 ###
 
-default['chef']['master_tag']                    = "master"
-default['chef']['worker_tag']                    = "worker"
+default['chef']['master_tag']                    = 'master'
+default['chef']['worker_tag']                    = 'worker'
 
 ###
 ### Configure various metadata about Chef software, and where to find it.
@@ -126,7 +126,7 @@ default['chef']['organizations']                 = { 'lab'        => { 'short_na
 ### This is the directory where the admin and validation keys will be stored on the Chef server.
 ###
 
-default['chef']['keys']                           = "/etc/opscode/keys"
+default['chef']['keys']                           = '/etc/opscode/keys'
 
 ###
 ### This will configure the cookbook to mirror whichever Chef server the node is
@@ -152,25 +152,21 @@ default['chef']['sync_host']                      = ''
 ### enabled, any changes to the Chef server attributes will cause a reconfigure.
 ###
 
-default['chef']['manage_chef']                = true
+default['chef']['manage_chef']                    = true
 
 ###
 ### This hash should be used to define additional attributes that don't fall into any other catagories above.  This would
 ### include attributes added to Chef to correct bugs, or provide service optimizations.
 ###
 
-default['chef']['server_attributes']             = { }
-
-### Disabled, Automate license has expired.
-# 'data_collector' => { 'root_url' => 'https://automate.lab.fewt.com/data-collector/v0/' },
-# 'profiles'       => { 'root_url' => "https://automate.lab.fewt.com" }
+default['chef']['server_attributes']              = { }
 
 ###
 ### Manage the Chef Manage configuration file.  This is default true. When
 ### enabled, any changes to the Chef Manage attributes will cause a reconfigure.
 ###
 
-default['chef']['manage_manage']         = true
-default['chef']['manage_attributes']             = { 'org_creation_enabled' => 'org_creation_enabled false',
-                                                     'disable_sign_up'      => 'disable_sign_up true'
-                                                   }
+default['chef']['manage_manage']                  = true
+default['chef']['manage_attributes']              = { 'org_creation_enabled' => 'org_creation_enabled false',
+                                                      'disable_sign_up'      => 'disable_sign_up true'
+                                                    }
