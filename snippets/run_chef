@@ -1,0 +1,6 @@
+#!/bin/bash
+
+for node in $(seq -f %04g 1 1 11)
+do
+  ssh -ttq cdc${node}.lab.fewt.com 'sudo /usr/bin/chef-client'
+done

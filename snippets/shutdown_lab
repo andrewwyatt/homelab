@@ -1,0 +1,6 @@
+#!/bin/bash
+
+for node in $(seq -f %04g 4 1 11)
+do
+  ssh -ttq cdc${node}.lab.fewt.com 'nohup sudo /sbin/shutdown -h now >/dev/null 2>&1 & exit'
+done
