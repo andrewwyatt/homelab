@@ -198,7 +198,7 @@ yum_package [ 'git' ] do
 end
 
 execute 'Cloning the ACME shell script from github' do
-  command 'git clone https://github.com/Neilpang/acme.sh.git'
+  command "git clone #{node['chef']['ssl']['acme_giturl']}"
   cwd Chef::Config['file_cache_path']
   action :run
   sensitive node['chef']['runtime']['sensitivity']
