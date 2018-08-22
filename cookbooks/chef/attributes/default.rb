@@ -97,8 +97,17 @@ default['chef']['bootstrap_delay']               = 30
 default['chef']['bootstrap_user']                = 'admin'
 default['chef']['bootstrap_root']                = '/node/'
 
-default['chef']['cert_domain']                   = 'lab.fewt.com'
-default['chef']['ad_bind_account']               = 'chef_authenticator'
+###
+### Use the ACME shell script to provision the certificate (also requires zonomi DNS)
+###
+
+default['chef']['ssl']['use_acme']               = true
+default['chef']['ssl']['renewal_day']            = '7'
+
+default['chef']['ssl']['hostnames']              = { 'hostname' => node['fqdn'],
+                                                     'cname'    => 'chef.lab.fewt.com' }
+
+default['chef']['auth_user']                     = 'chef_authenticator'
 
 ### Chef server bits
 default['chef']['default_organization']          = 'lab'

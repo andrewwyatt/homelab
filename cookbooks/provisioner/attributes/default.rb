@@ -62,7 +62,7 @@ default['provisioner']['max_num_hosts']                         = '9999'
 default['provisioner']['name_gen_reset']                        = '900'
 default['provisioner']['hostname_auth_token']                   = '393f30f15a4a24d4f7385faf38543036e2687bb813b8627ac8ca9fcfa20650c0'
 
-default['provisioner']['chef']['default_server']                = 'chef.lab.fewt.com'
+default['provisioner']['chef']['default_server']                = 'cdc0001.lab.fewt.com'
 
 default['provisioner']['subnet']                                = '10.100.100.0'
 default['provisioner']['netmask']                               = '255.255.255.0'

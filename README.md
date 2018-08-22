@@ -8,7 +8,7 @@ This repository contains a set of cookbooks that I use to manage my home lab.  T
 * Implements PXE deployment services (just create a VM and turn it on).
 * Provisions and manages RPM building and hosting services.
 * Provisions and manages CentOS mirror servers.
-* Integrates server and Chef authentication with JumpCloud for access and authorization, and with Zonomi for DNS.
+* Integrates server and Chef authentication with JumpCloud for access and authorization, with Zonomi for DNS, and with Let's Encrypt for SSL.
 * Hardens managed servers, and maintains the hardening specification.
 * Notifies a slack channel of critical and non-critical events.
 * Configures and enforces desired state.
@@ -297,7 +297,7 @@ This is the connect key used for adding hosts to JumpCloud.
 
 This is the API key used to connect to Zonomi for DNS record management.
 
-#### ad\_bind\_account
+#### auth\_user
 
 This entry contains the password for the Chef service account used for authentication to Chef manage.
 

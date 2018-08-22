@@ -152,56 +152,82 @@ directory node['chef']['keys'] do
 end
 
 ###
-### Look for a credentials => certificates bag, if it exists, look for the hostname.
-### If it doesn't exist, look for the wildcard cert.  If that doesn't exist, do nothing
-### and Chef will provision a local cert.
+### Use ACME to generate a certificate if using Zonomi.
 ###
 
-certificates = data_bag_item('credentials', 'certificates', IO.read(Chef::Config['encrypted_data_bag_secret']))
-certificate = String.new
-selfsigned = true
-key = String.new
-if certificates["#{node['fqdn']}-crt"].nil? == false && certificates["#{node['fqdn']}-key"].nil? == false
-  certificate = certificates["#{node['fqdn']}-crt"]
-  key = certificates["#{node['fqdn']}-key"]
-  selfsigned = false
-elsif certificates["#{node['chef']['cert_domain']}-crt"].nil? == false && certificates["#{node['chef']['cert_domain']}-key"].nil? == false
-  certificate = certificates["#{node['chef']['cert_domain']}-crt"]
-  key = certificates["#{node['chef']['cert_domain']}-key"]
-  selfsigned = false
+###
+### Configure the Chef server to use the SSL certificates from Let's Encrypt
+###
+
+if node['linux']['dns']['mechanism'] == 'zonomi' && node['chef']['ssl']['use_acme'] == true
+  node.default['chef']['server_attributes']['nginx']['ssl_certificate'] = "/etc/opscode/#{node['fqdn']}.crt"
+  node.default['chef']['server_attributes']['nginx']['ssl_certificate_key'] = "/etc/opscode/#{node['fqdn']}.pem"
 end
 
-file "/etc/opscode/#{node['fqdn']}.crt" do
-  owner 'opscode'
-  group 'opscode'
-  mode 0644
-  content certificate
-  sensitive true
-  action :create
-  notifies :run, 'execute[chef-nginx-restart]', :immediately
-  only_if { selfsigned == false }
+###
+### Does my certificate exist, or is it within the renewal window?
+###
+
+currentdate = Date.today.to_time.to_i
+
+if File.exists?("/etc/opscode/#{node['fqdn']}.crt")
+  certexpiration = `date -d "$(openssl x509 -enddate -noout -in #{node['chef']['server_attributes']['nginx']['ssl_certificate']} | sed -e 's#notAfter=##')" '+%s'`
+else
+  certexpiration = currentdate
 end
 
-file "/etc/opscode/#{node['fqdn']}.pem" do
-  owner 'opscode'
-  group 'opscode'
-  mode 0600
-  content key
-  sensitive true
-  action :create
-  notifies :run, 'execute[chef-nginx-restart]', :immediately
-  only_if { selfsigned == false }
+certdaysleft = (certexpiration.to_i - currentdate.to_i)
+if certdaysleft < node['chef']['ssl']['renewal_day'].to_i
+  renew_now = true
+end
+
+###
+### Deconstruct the names to pass to acme.sh
+###
+
+certnames = String.new
+node['chef']['ssl']['hostnames'].each do | type,value |
+   certnames = certnames + "-d " + value + " "
+end
+
+yum_package [ 'git' ] do
+  action :install
+  only_if { node['linux']['dns']['mechanism'] == 'zonomi' }
+  only_if { node['chef']['ssl']['use_acme'] == true }
+  only_if { renew_now == true }
+end
+
+execute 'Cloning the ACME shell script from github' do
+  command 'git clone https://github.com/Neilpang/acme.sh.git'
+  cwd Chef::Config['file_cache_path']
+  action :run
+  sensitive node['chef']['runtime']['sensitivity']
+  not_if { Dir.exists?("#{Chef::Config['file_cache_path']}/acme.sh")}
+  only_if { node['linux']['dns']['mechanism'] == 'zonomi' }
+  only_if { node['chef']['ssl']['use_acme'] == true }
+  only_if { renew_now == true }
+end
+
+execute 'Creating or renewing certificate' do
+  command "ZM_Key=\"#{passwords['zonomi_api']}\" bash acme.sh --force --issue --dns dns_zonomi #{certnames} --fullchain-file /etc/opscode/#{node['fqdn']}.crt --key-file /etc/opscode/#{node['fqdn']}.pem && rm -rf /tmp/acme"
+  cwd "#{Chef::Config['file_cache_path']}/acme.sh"
+  action :run
+  sensitive node['chef']['runtime']['sensitivity']
+  notifies :run, 'execute[chef-reconfigure]', :immediately
+  only_if { node['linux']['dns']['mechanism'] == 'zonomi' }
+  only_if { node['chef']['ssl']['use_acme'] == true }
+  only_if { renew_now == true }
 end
 
 notification = "Adding the LDAP password."
 bash notification do
   code <<-EOF
-    chef-server-ctl set-secret ldap bind_password '#{passwords['ad_bind_account']}'
+    chef-server-ctl set-secret ldap bind_password '#{passwords['auth_user']}'
   EOF
   sensitive node['chef']['runtime']['sensitivity']
   only_if { ::File.exists?("/etc/opscode/chef-server-running.json") }
-  not_if { (defined?(passwords['ad_bind_account'])).nil? == true }
-  not_if { `grep \'bind_password\' /etc/opscode/chef-server-running.json 2>/dev/null`.include?(passwords['ad_bind_account'].to_s)}
+  not_if { (defined?(passwords['auth_user'])).nil? == true }
+  not_if { `grep \'bind_password\' /etc/opscode/chef-server-running.json 2>/dev/null`.include?(passwords['auth_user'].to_s)}
   notifies :run, 'execute[chef-reconfigure]', :immediately
 end
 
