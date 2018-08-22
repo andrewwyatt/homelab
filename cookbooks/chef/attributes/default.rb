@@ -103,6 +103,7 @@ default['chef']['bootstrap_root']                = '/node/'
 
 default['chef']['ssl']['use_acme']               = true
 default['chef']['ssl']['renewal_day']            = '7'
+default['chef']['ssl']['acme_giturl']            = 'https://github.com/Neilpang/acme.sh.git'
 
 default['chef']['ssl']['hostnames']              = { 'hostname' => node['fqdn'],
                                                      'cname'    => 'chef.lab.fewt.com' }
