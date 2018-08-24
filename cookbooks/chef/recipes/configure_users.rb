@@ -76,7 +76,7 @@ node['chef']['organizations'].each do | org_name , organization |
     end
 
     if cudata.length < 1
-      cudata = "{}"
+      return
     end
 
     cuattrs = Hash.new
@@ -100,7 +100,7 @@ node['chef']['organizations'].each do | org_name , organization |
             end
 
             if mdata.length < 1
-              mdata = "{}"
+              return
             end
             mattrs = Hash.new
             mattrs = JSON.parse(mdata)
@@ -197,7 +197,7 @@ EOF
       association = String.new
       json=`chef-server-ctl user-show #{account} -l -F json 2>/dev/null ||:`
       if json.length < 1
-        json = "{}"
+        return
       end
       account_attributes=JSON.parse(json)
       add_to_org = false
