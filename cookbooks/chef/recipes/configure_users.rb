@@ -76,7 +76,7 @@ node['chef']['organizations'].each do | org_name , organization |
     end
 
     if cudata.length < 1
-      cudata = "{}"
+      return
     end
 
     cuattrs = Hash.new
@@ -100,7 +100,7 @@ node['chef']['organizations'].each do | org_name , organization |
             end
 
             if mdata.length < 1
-              mdata = "{}"
+              return
             end
             mattrs = Hash.new
             mattrs = JSON.parse(mdata)
