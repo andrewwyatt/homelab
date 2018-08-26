@@ -1,6 +1,6 @@
 #!/bin/bash
 
-for node in $(seq -f %04g 4 1 11)
+for node in $(seq -f %04g 4 1 20)
 do
   knife role run_list clear cdc${node}_lab_fewt_com
   knife role run_list add cdc${node}_lab_fewt_com "recipe[rancher::rancher_server]"

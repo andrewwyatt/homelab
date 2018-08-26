@@ -1,6 +1,6 @@
 #!/bin/bash
 
-for node in $(seq -f %04g 4 1 13)
+for node in $(seq -f %04g 4 1 20)
 do
   knife node run_list remove cdc${node}.lab.fewt.com "role[cdc${node}_lab_fewt_com]"
   knife node run_list add cdc${node}.lab.fewt.com "lab_management::decommission_self"
