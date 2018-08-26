@@ -190,6 +190,7 @@ EOF
       sensitive node['chef']['runtime']['sensitivity']
       not_if { existing_account == true }
     end
+
     ###
     ### Ensure the user is a member of the appropriate orgs.
     ###
@@ -201,7 +202,8 @@ EOF
       end
       account_attributes=JSON.parse(json)
       add_to_org = false
-      if account_attributes['organizations'].is_a?(Array)
+
+      if account_attributes['organizations'].is_a?(Array) && account_attributes['organizations'].length > 0
         account_attributes['organizations'].each do | value |
           unless org == value
             add_to_org = true
@@ -212,9 +214,11 @@ EOF
       else
         add_to_org = true
       end
+
       if attributes['access'] == 'admin'
         admin = '--admin'
       end
+
       execute "Adding #{attributes['firstname']} #{attributes['lastname']} to the #{org} org." do
         command "chef-server-ctl org-user-add #{org} #{account} #{admin}; \
                  notify \"#{node['chef']['slack_channel']}\" \"#{node['chef']['emoji']}\" \"#{node['chef']['api_path']}\" \"#{account} has been granted #{attributes['access']} access to the #{org}\""

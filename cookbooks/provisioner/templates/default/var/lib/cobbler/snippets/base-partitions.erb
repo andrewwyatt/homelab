@@ -2,20 +2,21 @@
 
 zerombr
 clearpart --all
-part /boot --asprimary --fstype ext4 --ondisk=/dev/sda --size=300
+part /boot --asprimary --fstype ext4 --ondisk=/dev/sda --size=500
 part pv.3 --asprimary --size=100 --ondisk=/dev/sda --grow
 volgroup sysvg --pesize=32768 pv.3
 
-### / 		5GB
-### /var	5GB
-### /home	2GB
-### /tmp	3GB
-### swap	4GB
-### Total Size:	20GB
+### /boot 500MB
+### / 		3GB
+### /var	1GB
+### /home	1GB
+### /tmp	1GB
+### swap	2GB
+### Total Size:	8.5GB
 
 ### Removed: nodev,nosuid,noexec for mock - need to fix that
-logvol / --fstype ext4 --name=lv_root --vgname=sysvg --size=5000
-logvol /var --fstype ext4 --name=lv_var --vgname=sysvg --size=5000 --fsoptions=defaults,nosuid,nodev,noexec
-logvol /home --fstype ext4 --name=lv_home --vgname=sysvg --size=2000 --fsoptions=defaults,nosuid,nodev,noexec
-logvol /tmp --fstype ext4 --name=lv_tmp --vgname=sysvg --size=3000 --fsoptions=defaults,nosuid,nodev,noexec
-logvol swap --fstype swap --name=lv_swap --vgname=sysvg --size=4000
+logvol / --fstype ext4 --name=lv_root --vgname=sysvg --size=3000
+logvol /var --fstype ext4 --name=lv_var --vgname=sysvg --size=1000 --fsoptions=defaults,nosuid,nodev,noexec
+logvol /home --fstype ext4 --name=lv_home --vgname=sysvg --size=1000 --fsoptions=defaults,nosuid,nodev,noexec
+logvol /tmp --fstype ext4 --name=lv_tmp --vgname=sysvg --size=1000 --fsoptions=defaults,nosuid,nodev,noexec
+logvol swap --fstype swap --name=lv_swap --vgname=sysvg --size=2000

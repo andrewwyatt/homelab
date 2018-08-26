@@ -84,15 +84,21 @@ The code to provision the home lab supports the following enterprise Linux distr
 
 * 4 vCPU
 * 4GB vRAM
-* 30GB OS
+* 10GB OS
 * 70GB /var (or /var/opt)
 
 ### Provisioning servers
 
 * 2 vCPU
 * 2GB vRAM
-* 30GB OS
+* 10GB OS
 * 100GB /var (or /var/www)
+
+### General lab servers (minimum)
+
+* 1 vCPU
+* 2GB vRAM
+* 10GB OS
 
 ## Configuring the first Chef server instance (Master)
 
