@@ -34,6 +34,7 @@ file "#{Chef::Config[:file_cache_path]}/.#{passfile}" do
   group 'root'
   mode 0600
   content passwords['bootstrap_passphrase']
+  backup false
   sensitive true
   action :nothing
 end
