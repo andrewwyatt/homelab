@@ -27,6 +27,14 @@ template "/bin/monit-slack" do
   only_if { node['linux']['monit']['enabled'] == true }
 end
 
+###
+### Get a list of nodes from Chef, use the list for ping monitors.
+###
+
+ping_nodes = Array.new
+ping_nodes = `knife node list -k /etc/chef/client.pem -c /etc/chef/client.rb`.split("\n")
+ping_nodes.delete(node['fqdn'])
+
 template "/etc/monitrc" do
   source "etc/monitrc.erb"
   owner "root"
@@ -36,6 +44,9 @@ template "/etc/monitrc" do
   sensitive node['linux']['runtime']['sensitivity']
   notifies :restart, 'service[monit]', :immediately
   only_if { node['linux']['monit']['enabled'] == true }
+  variables ({
+    :ping_nodes => ping_nodes
+    })
 end
 
 yum_package 'monit' do

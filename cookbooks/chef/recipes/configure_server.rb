@@ -197,10 +197,10 @@ yum_package [ 'git' ] do
   only_if { renew_now == true }
 end
 
-execute 'Cloning the ACME shell script from github' do
-  command "git clone #{node['chef']['ssl']['acme_giturl']}"
-  cwd Chef::Config['file_cache_path']
-  action :run
+git "#{Chef::Config[:file_cache_path]}/acme.sh" do
+  repository node['chef']['ssl']['acme_giturl']
+  reference 'master'
+  action :sync
   sensitive node['chef']['runtime']['sensitivity']
   not_if { Dir.exists?("#{Chef::Config['file_cache_path']}/acme.sh")}
   only_if { node['linux']['dns']['mechanism'] == 'zonomi' }

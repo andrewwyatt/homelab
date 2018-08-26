@@ -67,3 +67,12 @@ check network public with interface <%= node['network']['default_interface'] %>
 <%= "  exec \"/bin/monit-slack\" "%>
 
 <% end %>
+
+<% @ping_nodes.each do | node | %>
+<%= "check host #{node} with address #{node}" %>
+<%= "if failed ping count 2 with timeout 1 seconds then" %>
+<%= "  exec \"/bin/monit-slack to #{node}\"" %>
+<%= "else if succeeded then" %>
+<%= "  exec \"/bin/monit-slack to #{node}\" "%>
+
+<% end %>
