@@ -31,9 +31,29 @@ end
 ### Get a list of nodes from Chef, use the list for ping monitors.
 ###
 
-ping_nodes = Array.new
-ping_nodes = `knife node list -k /etc/chef/client.pem -c /etc/chef/client.rb`.split("\n")
-ping_nodes.delete(node['fqdn'])
+node_list = Array.new
+node_list = `knife node list -k /etc/chef/client.pem -c /etc/chef/client.rb`.split("\n")
+node_list.sort
+
+###
+### We should only ping the node before me, and the node after me in the array of nodes.
+###
+
+node_location = node_list.find_index(node['fqdn'])
+
+previous_node = node_location - 1
+if previous_node < 0
+  previous_node = node_list.length
+  previous_node = previous_node - 1
+end
+
+next_node = node_location + 1
+if next_node >= node_list.length
+  next_node = 0
+end
+
+ping_nodes = [ node_list[previous_node],
+               node_list[next_node] ]
 
 template "/etc/monitrc" do
   source "etc/monitrc.erb"
