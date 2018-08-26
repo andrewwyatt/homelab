@@ -74,11 +74,9 @@ yum_package 'monit' do
 end
 
 service 'monit' do
-  action [:enable, :start]
-  only_if { node['linux']['monit']['enabled'] == true }
-end
-
-service 'monit' do
-  action [:disable, :stop]
-  only_if { node['linux']['monit']['enabled'] == false }
+  if node['linux']['monit']['enabled'] == false
+    action [:disable, :stop]
+  elsif node['linux']['monit']['enabled'] == true
+    action [:enable, :start]
+  end
 end

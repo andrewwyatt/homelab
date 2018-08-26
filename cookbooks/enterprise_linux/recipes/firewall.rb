@@ -26,13 +26,11 @@ service 'iptables' do
 end
 
 service 'firewalld' do
-  action [:enable, :start]
-  only_if { node['linux']['firewall']['enable'] == true }
-end
-
-service 'firewalld' do
-  action [:disable, :stop]
-  only_if { node['linux']['firewall']['enable'] == false }
+  if node['linux']['firewall']['enable'] == true
+    action [:enable, :start]
+  elsif node['linux']['firewall']['enable'] == false
+    action [:disable, :stop]
+  end
 end
 
 ###
