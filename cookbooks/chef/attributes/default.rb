@@ -56,7 +56,7 @@ default['chef']['slack_enabled']                 = false
 default['chef']['slack_channel']                 = '#homelab'
 default['chef']['api_path']                      = 'APIKEYGOESHERE'
 default['chef']['slack_emoji']                   = ':cooking:'
-default['chef']['bootstrap_emoji']               = ':boot:'
+default['chef']['bootstrap_emoji']               = ':floppy_disk:'
 
 ###
 ### Define sensitivity as an attribute so we can override it when necessary
