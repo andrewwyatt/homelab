@@ -99,6 +99,7 @@ The code to provision the home lab supports the following enterprise Linux distr
 The first Chef instance will need to be provisioned manually.  The steps below will set up the initial instance of Chef server, and once the Chef Server cookbook is applied the server will begin managing itself.
 
 ### First generate keys for Chef (Optional)
+This is an optional step to set up the SSL certificates for Chef.  You may skip it if you want to use self signed certificates, or you are using Zonomi for DNS and have the Chef cookbook configured to use ACME/Let's Encrypt. The Chef server cookbook will provision the certificates from Let's Encrypt or the Chef server will provision self signed certs on first run.
 
 1. Generate an SSL certificate if required for Chef from LetsEncrypt or your certificate authority of choice. Wildcard certs are preferred.
 2. Create the /etc/opscode directory.
@@ -304,35 +305,6 @@ This entry contains the password for the Chef service account used for authentic
 #### automate_token
 
 This defines the automate token used to authenticate Chef clients and server to an Automate instance.
-
-### Credentials / certificates
-
-Only necessary if using genuine host or wildcard certificates.
-
-    {
-      "id": "certificates",
-      "{FQDN}-crt": "Certificate data for HOST",
-      "{FQDN}-key": "Private key data for HOST certificate",
-      "{DOMAIN}-crt": "Certificate data for DOMAIN (Wildcard)",
-      "{DOMAIN}-key": "Private key data for DOMAIN certificate"
-    }
-
-#### {FQDN}-crt
-
-If you're using a signed host certicate, this item should contain the content of that certificate.
-
-#### {FQDN}-key
-
-If you're using a signed host certicate, this item should contain the content of that certificate's private key.
-
-
-#### {DOMAIN}-crt
-
-If you're using a signed wildcard certicate, this item should contain the content of that certificate.
-
-#### {DOMAIN}-key
-
-If you're using a signed wildcard certicate, this item should contain the content of that certificate's private key.
 
 ### Credentials / {PROVISIONER\_USER}
 
