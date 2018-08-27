@@ -175,7 +175,7 @@ default['linux']['chef_health']                                 = "00 * * * * ro
 ### By default all servers in this environment are configured to patch themselves weekly.
 ###
 
-default['linux']['autoupdate']                                  = "00 00 * * 1 root /usr/bin/autoupdate --reboot >/dev/null 2>&1"
+default['linux']['autoupdate']                                  = "00 00 * * 1 root sleep $(( $RANDOM \\%300 ));/usr/bin/autoupdate --reboot >/dev/null 2>&1"
 
 ###
 ### The decom recipe also supports rebuilding, this attribute shouldn't normally be changed
