@@ -2,13 +2,25 @@
 
 if [ ! $1 ]
 then
-  echo -n "Enter the Rancher URL from the Add Host screen: "
-  read RANCHER_URL
+  echo -n "Enter the Rancher Token: "
+  read RANCHER_TOKEN
 else
-  RANCHER_URL=$1
+  RANCHER_TOKEN=$1
 fi
 
-for node in $(seq -f %04g 4 1 20)
+if [ ! $2 ]
+then
+  echo -n "Enter the CA Checksum: "
+  read RANCHER_CA
+else
+  RANCHER_CA=$2
+fi
+
+for node in $(seq -f %04g 5 1 8)
 do
-  ssh -ttq cdc${node}.lab.fewt.com sudo docker run --rm --privileged -v /var/run/docker.sock:/var/run/docker.sock -v /var/lib/rancher:/var/lib/rancher rancher/agent:v1.2.11 "${RANCHER_URL}"
+  ssh -ttq cdc${node}.lab.fewt.com <<EOF
+    sudo lvextend -rL +10G /dev/sysvg/lv_var
+    sudo docker run -d --privileged --restart=unless-stopped --net=host -v /etc/kubernetes:/etc/kubernetes -v /var/run:/var/run rancher/rancher-agent:v2.0.8 --server https://cdc0004.lab.fewt.com --token "${RANCHER_TOKEN}" --ca-checksum "${RANCHER_CA}" --worker
+EOF
 done
+

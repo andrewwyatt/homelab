@@ -17,10 +17,15 @@
 ### limitations under the License.
 ###
 
-node.default['linux']['firewall']['ports']['8080/tcp']    = true
-node.default['linux']['firewall']['ports']['9345/tcp']    = true
-node.default['linux']['firewall']['ports']['500/udp']     = true
-node.default['linux']['firewall']['ports']['4500/udp']    = true
+node.default['linux']['firewall']['ports']['443/tcp']     = true
+node.default['linux']['firewall']['ports']['2376/tcp']    = true
+node.default['linux']['firewall']['ports']['6443/tcp']    = true
+node.default['linux']['firewall']['ports']['2379/tcp']    = true
+node.default['linux']['firewall']['ports']['2380/tcp']    = true
+node.default['linux']['firewall']['ports']['8472/udp']    = true
+node.default['linux']['firewall']['ports']['9099/tcp']    = true
+node.default['linux']['firewall']['ports']['10250/tcp']   = true
+
 node.default['linux']['firewall']['ignoreexisting']       = true
 node.default['linux']['sysctl']['net.ipv4.conf.all.forwarding'] = "1"
 
