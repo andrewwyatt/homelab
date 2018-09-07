@@ -26,7 +26,7 @@ passwords = data_bag_item('credentials', 'passwords', IO.read(Chef::Config['encr
 
 execute 'Configure my DNS record' do
   command <<-EOF
-    curl -X GET "#{node['linux']['dns']['zonomi_url']}?host=$(hostname -f)&api_key=#{passwords['zonomi_api']}&value=#{node['ipaddress']}&ttl=#{node['linux']['dns']['zonomi_ttl']}&action=SET"
+    curl -X GET "#{node['linux']['dns']['zonomi_url']}?host=#{node['fqdn']}&api_key=#{passwords['zonomi_api']}&value=#{node['ipaddress']}&ttl=#{node['linux']['dns']['zonomi_ttl']}&action=SET"
   EOF
   action :run
   sensitive node['linux']['runtime']['sensitivity']
