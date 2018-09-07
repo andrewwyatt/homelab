@@ -66,7 +66,7 @@ include_recipe 'lab_management::standard_server'
 ### Install and configure the NFS server.
 ###
 
-tag('nfs-server')
+tag('nfs')
 
 yum_package [ 'nfs-utils' ] do
   action :install

@@ -57,3 +57,6 @@ service "docker" do
   supports :status => true, :restart => true
   action [ :enable, :start ]
 end
+
+tag('docker')
+tag('rancher')
