@@ -5,7 +5,7 @@ check process docker with pidfile /run/docker.pid
     exec "/bin/monit-slack \$MONIT_DESCRIPTION (docker)"
   else if succeeded then
     exec "/bin/monit-slack \$MONIT_DESCRIPTION (docker)"
-  if does not exist for 3 cycles then
+  if does not exist for 10 cycles then
     exec "/usr/bin/systemctl start docker"
   if does not exist then
     exec "/bin/monit-slack The docker process has failed or is currently stopped."

@@ -17,6 +17,13 @@
 ### limitations under the License.
 ###
 
+###
+### Encrypted passwords are stored in the credentials > passwords encrypted
+### data bag.
+###
+
+passwords = data_bag_item('credentials', 'passwords', IO.read(Chef::Config['encrypted_data_bag_secret']))
+
 template "/bin/monit-slack" do
   source "usr/bin/monit-slack.erb"
   owner "root"
@@ -73,6 +80,9 @@ template "/etc/monitrc" do
   sensitive node['linux']['runtime']['sensitivity']
   notifies :restart, 'service[monit]', :delayed
   only_if { node['linux']['monit']['enabled'] == true }
+  variables ({
+    :password => passwords['monit_password']
+    })
 end
 
 template "/etc/monit.d/host" do

@@ -2,14 +2,13 @@
 
 include /etc/monit.d/*
 
-set daemon  30
-set log syslog
+set daemon  <%= node['linux']['monit']['interval'] %>
 
 set eventqueue
    basedir /var/monit
-   slots 100
+   slots <%= node['linux']['monit']['slots'] %>
 
-set httpd port 2812 and
-    use address localhost
+set httpd port <%= node['linux']['monit']['http']['listen_port'] %> and
+    use address <%= node['linux']['monit']['http']['listen_address'] %>
     allow localhost
-    allow admin:hello_from_localhost
+    allow <%= node['linux']['monit']['http']['user'] %>:<%= @password %>

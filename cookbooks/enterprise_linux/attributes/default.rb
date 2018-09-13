@@ -289,6 +289,13 @@ default['linux']['monit']['alert_critical']                      = "#A72B2B"
 default['linux']['monit']['alert_succeeded']                     = "#26C521"
 default['linux']['monit']['slack_emoji']                         = ":hammer_and_wrench:"
 default['linux']['monit']['notifies']                            = "<!channel>"
+default['linux']['monit']['interval']                            = "30"
+default['linux']['monit']['log']                                 = "syslog"
+default['linux']['monit']['slots']                               = "100"
+default['linux']['monit']['http']['user']                        = "admin"
+default['linux']['monit']['http']['listen_address']              = "localhost"
+default['linux']['monit']['http']['listen_port']                 = "2812"
+
 
 default['linux']['monit']['filesystems']                         = { 'root' => { 'label' => 'root',
                                                                                  'path'  => '/',
