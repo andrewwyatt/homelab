@@ -1,0 +1,10 @@
+<%= node['linux']['chef']['file_header'] %>
+
+<% @node['linux']['monit']['filesystems'].each do | name, fsattrs| %>
+<%= "check filesystem #{fsattrs['label']} with path #{fsattrs['path']}" %>
+<%= "if space usage > #{fsattrs['threshold']} then" %>
+<%= "  exec \"/bin/monit-slack\"" %>
+<%= "else if succeeded then" %>
+<%= "  exec \"/bin/monit-slack\" "%>
+
+<% end %>

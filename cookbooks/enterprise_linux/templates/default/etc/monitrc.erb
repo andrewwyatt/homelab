@@ -1,5 +1,7 @@
 <%= node['linux']['chef']['file_header'] %>
 
+include /etc/monit.d/*
+
 set daemon  30
 set log syslog
 
@@ -11,68 +13,3 @@ set httpd port 2812 and
     use address localhost
     allow localhost
     allow admin:hello_from_localhost
-
-check system $HOST
-  if loadavg (1min) > 4 then
-    exec "/bin/monit-slack"
-  else if succeeded then
-    exec "/bin/monit-slack"
-
-  if loadavg (5min) > 2 then
-    exec "/bin/monit-slack"
-  else if succeeded then
-    exec "/bin/monit-slack"
-
-  if cpu usage > 95% for 10 cycles then
-    exec "/bin/monit-slack"
-  else if succeeded then
-    exec "/bin/monit-slack"
-
-  if memory usage > 75% then
-    exec "/bin/monit-slack"
-  else if succeeded then
-    exec "/bin/monit-slack"
-
-  if swap usage > 25% then
-    exec "/bin/monit-slack"
-  else if succeeded then
-    exec "/bin/monit-slack"
-
-check network public with interface <%= node['network']['default_interface'] %>
-  if failed link then
-    exec "/bin/monit-slack"
-  else if succeeded then
-    exec "/bin/monit-slack"
-
-  if changed link then
-    exec "/bin/monit-slack"
-  else if succeeded then
-    exec "/bin/monit-slack"
-
-  if saturation > 90% then
-    exec "/bin/monit-slack"
-  else if succeeded then
-    exec "/bin/monit-slack"
-
-  if total uploaded > 5 GB in last hour then
-    exec "/bin/monit-slack"
-  else if succeeded then
-    exec "/bin/monit-slack"
-
-<% @node['linux']['monit']['filesystems'].each do | name, fsattrs| %>
-<%= "check filesystem #{fsattrs['label']} with path #{fsattrs['path']}" %>
-<%= "if space usage > #{fsattrs['threshold']} then" %>
-<%= "  exec \"/bin/monit-slack\"" %>
-<%= "else if succeeded then" %>
-<%= "  exec \"/bin/monit-slack\" "%>
-
-<% end %>
-
-<% @ping_nodes.each do | node | %>
-<%= "check host #{node} with address #{node}" %>
-<%= "if failed ping count 2 with timeout 1 seconds then" %>
-<%= "  exec \"/bin/monit-slack to #{node}\"" %>
-<%= "else if succeeded then" %>
-<%= "  exec \"/bin/monit-slack to #{node}\" "%>
-
-<% end %>

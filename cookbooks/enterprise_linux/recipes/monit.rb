@@ -27,6 +27,15 @@ template "/bin/monit-slack" do
   only_if { node['linux']['monit']['enabled'] == true }
 end
 
+directory '/etc/monit.d' do
+  owner "root"
+  group "root"
+  mode 0700
+  action :create
+  sensitive node['linux']['runtime']['sensitivity']
+  only_if { node['linux']['monit']['enabled'] == true }
+end
+
 ###
 ### Get a list of nodes from Chef, use the list for ping monitors.
 ###
@@ -59,10 +68,54 @@ template "/etc/monitrc" do
   source "etc/monitrc.erb"
   owner "root"
   group "root"
-  mode 0700
+  mode 0600
   action :create
   sensitive node['linux']['runtime']['sensitivity']
-  notifies :restart, 'service[monit]', :immediately
+  notifies :restart, 'service[monit]', :delayed
+  only_if { node['linux']['monit']['enabled'] == true }
+end
+
+template "/etc/monit.d/host" do
+  source "etc/monit.d/host.erb"
+  owner "root"
+  group "root"
+  mode 0600
+  action :create
+  sensitive node['linux']['runtime']['sensitivity']
+  notifies :restart, 'service[monit]', :delayed
+  only_if { node['linux']['monit']['enabled'] == true }
+end
+
+template "/etc/monit.d/network" do
+  source "etc/monit.d/network.erb"
+  owner "root"
+  group "root"
+  mode 0600
+  action :create
+  sensitive node['linux']['runtime']['sensitivity']
+  notifies :restart, 'service[monit]', :delayed
+  only_if { node['linux']['monit']['enabled'] == true }
+end
+
+template "/etc/monit.d/filesystems" do
+  source "etc/monit.d/filesystems.erb"
+  owner "root"
+  group "root"
+  mode 0600
+  action :create
+  sensitive node['linux']['runtime']['sensitivity']
+  notifies :restart, 'service[monit]', :delayed
+  only_if { node['linux']['monit']['enabled'] == true }
+end
+
+template "/etc/monit.d/ping" do
+  source "etc/monit.d/ping.erb"
+  owner "root"
+  group "root"
+  mode 0600
+  action :create
+  sensitive node['linux']['runtime']['sensitivity']
+  notifies :restart, 'service[monit]', :delayed
   only_if { node['linux']['monit']['enabled'] == true }
   variables ({
     :ping_nodes => ping_nodes

@@ -1,0 +1,22 @@
+<%= node['linux']['chef']['file_header'] %>
+
+check network public with interface <%= node['network']['default_interface'] %>
+  if failed link then
+    exec "/bin/monit-slack"
+  else if succeeded then
+    exec "/bin/monit-slack"
+
+  if changed link then
+    exec "/bin/monit-slack"
+  else if succeeded then
+    exec "/bin/monit-slack"
+
+  if saturation > 90% then
+    exec "/bin/monit-slack"
+  else if succeeded then
+    exec "/bin/monit-slack"
+
+  if total uploaded > 5 GB in last hour then
+    exec "/bin/monit-slack"
+  else if succeeded then
+    exec "/bin/monit-slack"

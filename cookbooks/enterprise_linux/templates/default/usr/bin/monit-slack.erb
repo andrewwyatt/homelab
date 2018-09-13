@@ -4,7 +4,14 @@
 
 HOST=$(hostname -f)
 
-if [[ $MONIT_EVENT =~ succeeded ]]
+if [ "${*}" ]
+then
+  MONIT_MESSAGE=${*}
+else
+  MONIT_MESSAGE=${MONIT_DESCRIPTION}
+fi
+
+if [[ ${MONIT_EVENT} =~ succeeded ]] || [[ ${MONIT_EVENT} =~ 'Does exist' ]]
 then
   COLOR="<%= node['linux']['monit']['alert_succeeded'] %>"
   TEXT="The alert on ${HOST} has been resolved (<%= node['linux']['monit']['notifies'] %>)"
@@ -17,14 +24,14 @@ PAYLOAD="{
       \"username\": \"Infrastructure Alerts\",
       \"channel\": \"<%= node['linux']['slack_channel'] %>\",
       \"icon_emoji\": \"<%= node['linux']['monit']['slack_emoji'] %>\",
-      \"text\": \"$TEXT\",
+      \"text\": \"${TEXT}\",
       \"attachments\": [{
-        \"color\": \"$COLOR\",
+        \"color\": \"${COLOR}\",
         \"mrkdwn_in\": [\"text\"],
         \"fields\": [
-          { \"title\": \"Date:\", \"value\": \"$MONIT_DATE\", \"short\": true },
-          { \"title\": \"Host:\", \"value\": \"$MONIT_HOST\", \"short\": true },
-          { \"title\": \"Alert:\", \"value\": \"$MONIT_DESCRIPTION ${*}\", \"short\": false }
+          { \"title\": \"Date:\", \"value\": \"${MONIT_DATE}\", \"short\": true },
+          { \"title\": \"Host:\", \"value\": \"${MONIT_HOST}\", \"short\": true },
+          { \"title\": \"Alert:\", \"value\": \"${MONIT_MESSAGE}\", \"short\": false }
         ]
     }]
 }"

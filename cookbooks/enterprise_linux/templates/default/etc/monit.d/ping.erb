@@ -1,0 +1,10 @@
+<%= node['linux']['chef']['file_header'] %>
+
+<% @ping_nodes.each do | node | %>
+<%= "check host #{node} with address #{node}" %>
+<%= "if failed ping count 2 with timeout 1 seconds then" %>
+<%= "  exec \"/bin/monit-slack Ping test failed to #{node}\"" %>
+<%= "else if succeeded then" %>
+<%= "  exec \"/bin/monit-slack Ping test succeeded to #{node}\" "%>
+
+<% end %>

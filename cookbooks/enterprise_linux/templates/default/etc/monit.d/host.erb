@@ -1,0 +1,27 @@
+<%= node['linux']['chef']['file_header'] %>
+
+check system $HOST
+  if loadavg (1min) > 4 then
+    exec "/bin/monit-slack"
+  else if succeeded then
+    exec "/bin/monit-slack"
+
+  if loadavg (5min) > 2 then
+    exec "/bin/monit-slack"
+  else if succeeded then
+    exec "/bin/monit-slack"
+
+  if cpu usage > 95% for 10 cycles then
+    exec "/bin/monit-slack"
+  else if succeeded then
+    exec "/bin/monit-slack"
+
+  if memory usage > 75% then
+    exec "/bin/monit-slack"
+  else if succeeded then
+    exec "/bin/monit-slack"
+
+  if swap usage > 25% then
+    exec "/bin/monit-slack"
+  else if succeeded then
+    exec "/bin/monit-slack"
