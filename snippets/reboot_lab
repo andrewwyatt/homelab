@@ -2,5 +2,5 @@
 
 for node in $(seq -f %04g 4 1 8)
 do
-  ssh -ttq cdc${node}.lab.fewt.com 'nohup sudo /usr/bin/systemctl reboot >/dev/null 2>&1 & exit'
+  ssh -ttq cdc${node}.lab.fewt.com 'sudo /sbin/reboot'
 done

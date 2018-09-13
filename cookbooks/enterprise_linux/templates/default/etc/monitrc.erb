@@ -11,4 +11,4 @@ set eventqueue
 set httpd port <%= node['linux']['monit']['http']['listen_port'] %> and
     use address <%= node['linux']['monit']['http']['listen_address'] %>
     allow localhost
-    allow <%= node['linux']['monit']['http']['user'] %>:<%= @password %>
+    allow <%= node['linux']['monit']['http']['user'] %>:'<%= @password %>'
