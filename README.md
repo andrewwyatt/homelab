@@ -253,18 +253,19 @@ To consume the Chef cookbooks under this project, multiple data bags must be cre
 
 ### Credentials / passwords
 
-This bag contains the basic credentials necessary to configure servers in the environment with Chef.
+This bag contains the basic credentials necessary to configure servers in the environment with Chef.  Passwords should be a minimum of 16 characters, mixed case letters, numbers, and symbols.
 
     {
       "id": "passwords",
-      "bootstrap_passphrase": "{RANDOM PASSPHRASE}",
-      "root_hash": "{ROOT HASH}",
-      "grub2_hash": "GRUB2_PASSWORD={GRUB2 HASH}",
-      "sasl_passwd": "{SASL PASSWORD}",
+      "bootstrap_passphrase": "{Random Passphrase}",
+      "root_hash": "{Root Hash}",
+      "grub2_hash": "GRUB2_PASSWORD={GRUB2 Hash}",
+      "sasl_passwd": "{SASL Password}",
       "jumpcloud_api": "{JumpCloud API key}",
       "jumpcloud_connect": "{JumpCloud Connect key}",
+      "monit_password": "{Random monit password)",
       "zonomi_api": {Zonomi API key}",
-      "automate_token": "{AUTOMATE TOKEN}"
+      "automate_token": "{Automate Token}"
     }
 
 #### bootstrap\_passphrase
@@ -299,6 +300,10 @@ This is the API key for accessing the JumpCloud API.
 #### jumpcloud\_connect
 
 This is the connect key used for adding hosts to JumpCloud.
+
+#### monit\_password
+
+This is the password for the monit service http admin account.
 
 #### zonomi\_api
 
