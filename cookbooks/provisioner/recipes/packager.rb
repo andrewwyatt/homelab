@@ -28,6 +28,7 @@ yum_package [
               'rsync',
               'createrepo',
               'httpd',
+              'mod_security',
               'expect' ] do
   action :install
 end
@@ -300,7 +301,7 @@ end
 template "/etc/cron.d/builder" do
   source "etc/cron.d/builder.erb"
   owner "root"
-  group "bin"
+  group "root"
   mode "0644"
   action :create
   sensitive node['provisioner']['runtime']['sensitivity']

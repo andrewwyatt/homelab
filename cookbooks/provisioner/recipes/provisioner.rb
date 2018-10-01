@@ -20,6 +20,7 @@
 require 'fileutils'
 
 yum_package [ 'httpd',
+              'mod_security',
               'dhcp',
               'bind',
               'xinetd',
@@ -414,7 +415,7 @@ end
 template "/etc/cron.d/decom-watch" do
   source "etc/cron.d/decom-watch.erb"
   owner "root"
-  group "bin"
+  group "root"
   mode "0644"
   action :create
   sensitive node['provisioner']['runtime']['sensitivity']

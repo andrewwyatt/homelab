@@ -19,7 +19,8 @@
 
 yum_package [ 'rsync',
               'xinetd',
-              'httpd' ] do
+              'httpd',
+              'mod_security' ] do
   action :install
 end
 
@@ -69,7 +70,7 @@ node['provisioner']['mirrors'].each do | mirror, mirror_data |
   template "/etc/cron.d/mirror_#{mirror_data['name']}" do
     source "etc/cron.d/mirror.erb"
     owner "root"
-    group "bin"
+    group "root"
     mode "0644"
     action :create
     sensitive node['provisioner']['runtime']['sensitivity']
