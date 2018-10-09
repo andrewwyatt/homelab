@@ -7,3 +7,13 @@ skip-test=FIRE-4513
 ### The lab is an internal isolated network, no need to move the sshd port.
 ###
 skip-test=SSH-7408:Port
+
+###
+### SSH Agent forwarding is low risk in this environment.
+###
+skip-test=SSH-7408:AllowAgentForwarding
+
+###
+### The deployment services break when mod_evasive is enabled.
+###
+skip-test=HTTP-6640
