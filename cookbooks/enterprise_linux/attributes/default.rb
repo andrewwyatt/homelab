@@ -60,7 +60,7 @@ default['linux']['timezone']                                     = "America/New_
 ###
 
 default['linux']['chef']['install_branch']                       = 'stable'
-default['linux']['chef']['client_version']                       = '14.3.37'
+default['linux']['chef']['client_version']                       = '14.5.33'
 default['linux']['chef']['install_via_url']                      = false
 default['linux']['chef']['client_url']                           = "https://packages.chef.io/files/#{node['linux']['chef']['install_branch']}/chef/#{node['linux']['chef']['client_version']}/el/#{node['platform_version'][0]}/"
 
