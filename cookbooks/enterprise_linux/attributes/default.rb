@@ -60,7 +60,7 @@ default['linux']['timezone']                                     = "America/New_
 ###
 
 default['linux']['chef']['install_branch']                       = 'stable'
-default['linux']['chef']['client_version']                       = '14.5.33'
+default['linux']['chef']['client_version']                       = '14.7.17'
 default['linux']['chef']['install_via_url']                      = false
 default['linux']['chef']['client_url']                           = "https://packages.chef.io/files/#{node['linux']['chef']['install_branch']}/chef/#{node['linux']['chef']['client_version']}/el/#{node['platform_version'][0]}/"
 
@@ -85,7 +85,7 @@ default['linux']['chef']['cache_type']                           = "BasicFile"
 default['linux']['chef']['cache_options']                        = "\#{ENV['HOME']}/.chef/checksums"
 default['linux']['chef']['cookbook_path']                        = "\#{current_dir}/../cookbooks"
 
-default['linux']['chef_client_cron']                             = "00,30 * * * * root sleep $(( $RANDOM \\%300 )); chef-client >/var/log/chef-client.log 2>&1"
+default['linux']['chef_client_cron']                             = "00,30 * * * * root sleep $(( $RANDOM %300 )); chef-client >/var/log/chef-client.log 2>&1"
 
 default['linux']['chef']['conf_dir']                             = "/etc/chef"
 default['linux']['chef']['run_path']                             = "/var/run/chef"
@@ -175,7 +175,7 @@ default['linux']['chef_health']                                 = "00 * * * * ro
 ### By default all servers in this environment are configured to patch themselves weekly.
 ###
 
-default['linux']['autoupdate']                                  = "00 00 * * 1 root sleep $(( $RANDOM \\%300 ));/usr/bin/autoupdate --reboot >/dev/null 2>&1"
+default['linux']['autoupdate']                                  = "00 00 * * 1 root sleep $(( $RANDOM %300 ));/usr/bin/autoupdate --reboot >/dev/null 2>&1"
 
 ###
 ### The decom recipe also supports rebuilding, this attribute shouldn't normally be changed
