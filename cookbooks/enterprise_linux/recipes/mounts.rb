@@ -51,7 +51,7 @@ node['linux']['mounts'].each do |key,mount|
   end
 
   execute "Ensure #{mount['mount_point']} is mounted with expected options" do
-    command "mount -o remount #{mount['mount_point']}"
+    command "/usr/bin/mount -o remount #{mount['mount_point']}"
     action :run
     only_if "grep \" #{mount['mount_point']} \" /proc/mounts"
   end
@@ -59,12 +59,12 @@ node['linux']['mounts'].each do |key,mount|
 end
 
 execute "Ensure mounts are mounted" do
-  command 'mount -a'
+  command '/usr/bin/mount -a'
   action :run
 end
 
 execute "Ensuring swap is enabled" do
-  command 'swapon -a'
+  command '/usr/sbin/swapon -a'
   action :run
   ### Only if guards here...
 end
