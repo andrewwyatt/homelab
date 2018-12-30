@@ -22,7 +22,7 @@ yum_package [ 'dmidecode' ] do
 end
 
 if ::File.exists?("/usr/sbin/dmidecode")
-  product_name = `dmidecode -s system-product-name`
+  product_name = `/usr/sbin/dmidecode -s system-product-name`
 end
 
 yum_package [ 'open-vm-tools' ] do

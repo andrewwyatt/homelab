@@ -7,5 +7,5 @@ long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
 version          '0.5.3'
 chef_version     '>= 12.1' if respond_to?(:chef_version)
 supports         'redhat'
-source_url       'https://github.com/andrewwyatt/tilde-slash-lab'
-issues_url       'https://github.com/andrewwyatt/tilde-slash-lab/issues'
+source_url       'https://github.com/andrewwyatt/homelab'
+issues_url       'https://github.com/andrewwyatt/homelab/issues'

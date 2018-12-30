@@ -1,3 +1,7 @@
 <%= node['provisioner']['file_header'] %>
+
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin
+
 <%= node['provisioner']['watch_schedule'] %> root su - <%= node['provisioner']['user'] %> <%= node['provisioner']['path'] %>/bin/watch_uploads.sh
 <%= node['provisioner']['watch_schedule'] %> root su - <%= node['provisioner']['user'] %> <%= node['provisioner']['path'] %>/bin/watch_repos.sh

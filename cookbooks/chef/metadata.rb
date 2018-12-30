@@ -8,5 +8,5 @@ version '0.2.2'
 chef_version '>= 12.1' if respond_to?(:chef_version)
 depends 'enterprise_linux'
 supports 'redhat'
-source_url 'https://github.com/andrewwyatt/tilde-slash-lab'
-issues_url 'https://github.com/andrewwyatt/tilde-slash-lab/issues'
+source_url 'https://github.com/andrewwyatt/homelab'
+issues_url 'https://github.com/andrewwyatt/homelab/issues'

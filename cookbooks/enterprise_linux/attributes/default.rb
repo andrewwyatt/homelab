@@ -85,7 +85,7 @@ default['linux']['chef']['cache_type']                           = "BasicFile"
 default['linux']['chef']['cache_options']                        = "\#{ENV['HOME']}/.chef/checksums"
 default['linux']['chef']['cookbook_path']                        = "\#{current_dir}/../cookbooks"
 
-default['linux']['chef_client_cron']                             = "00,30 * * * * root sleep $(( $RANDOM %300 )); chef-client >/var/log/chef-client.log 2>&1"
+default['linux']['chef_client_cron']                             = "00,30 * * * * root /usr/bin/sleep $(( $RANDOM %300 )); chef-client >/var/log/chef-client.log 2>&1"
 
 default['linux']['chef']['conf_dir']                             = "/etc/chef"
 default['linux']['chef']['run_path']                             = "/var/run/chef"
@@ -169,13 +169,13 @@ default['linux']['patch_emoji']                                 = ":construction
 ### if it is not checking in properly it will attempt to self heal and warn if unable.
 ###
 
-default['linux']['chef_health']                                 = "00 * * * * root /usr/bin/chef-health >/dev/null 2>&1"
+default['linux']['chef_health']                                 = "00 * * * * root /usr/bin/sleep $(( $RANDOM %300 ));/usr/bin/chef-health >/var/log/chef-health.log 2>&1"
 
 ###
 ### By default all servers in this environment are configured to patch themselves weekly.
 ###
 
-default['linux']['autoupdate']                                  = "00 00 * * 1 root sleep $(( $RANDOM %300 ));/usr/bin/autoupdate --reboot >/dev/null 2>&1"
+default['linux']['autoupdate']                                  = "00 00 * * 1 root /usr/bin/sleep $(( $RANDOM %300 ));/usr/bin/autoupdate --reboot >/var/log/autoupdate.log 2>&1"
 
 ###
 ### The decom recipe also supports rebuilding, this attribute shouldn't normally be changed
