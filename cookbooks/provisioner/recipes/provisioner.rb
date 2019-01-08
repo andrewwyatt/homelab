@@ -146,6 +146,7 @@ end
 
 bash "Download the cobbler loaders" do
   code <<-EOF
+    (systemctl status cobblerd | grep "Active: active" >/dev/null 2>&1) || systemctl start cobblerd
     cobbler get-loaders
   EOF
   sensitive node['provisioner']['runtime']['sensitivity']

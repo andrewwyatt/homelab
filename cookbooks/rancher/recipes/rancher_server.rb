@@ -27,8 +27,6 @@ node.default['linux']['firewall']['ports']['9099/tcp']    = true
 node.default['linux']['firewall']['ports']['10250/tcp']   = true
 
 node.default['linux']['firewall']['ignoreexisting']       = true
-node.default['linux']['sysctl']['net.ipv4.conf.all.forwarding'] = "1"
-
 
 ###
 ### Prerequisites
@@ -43,43 +41,6 @@ end
 ###
 
 include_recipe 'lab_management::standard_server'
+include_recipe 'lab_management::docker_server'
 
-###
-### Configuration to become a rancher server (work in progress)
-###
-
-yum_package [ 'docker',
-              'docker-compose' ] do
-  action :install
-end
-
-service "docker" do
-  supports :status => true, :restart => true
-  action [ :enable, :start ]
-end
-
-template "/etc/monit.d/docker" do
-  source "etc/monit.d/docker.erb"
-  owner "root"
-  group "root"
-  mode 0600
-  action :create
-  sensitive node['linux']['runtime']['sensitivity']
-  notifies :restart, 'service[monit]', :immediately
-  only_if { node['linux']['monit']['enabled'] == true }
-end
-
-yum_package 'monit' do
-  action :install
-end
-
-service 'monit' do
-  if node['linux']['monit']['enabled'] == false
-    action [:disable, :stop]
-  elsif node['linux']['monit']['enabled'] == true
-    action [:enable, :start]
-  end
-end
-
-tag('docker')
 tag('rancher')

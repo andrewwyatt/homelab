@@ -1,6 +1,13 @@
 #!/bin/bash
+[ ${CHEF_ENV} ] || CHEF_ENV='chef.lab.fewt.com'
 
-for node in $(seq -f %04g 4 1 8)
+for NODE in $(knife node list)
 do
-  ssh -ttq cdc${node}.lab.fewt.com 'sudo /sbin/reboot'
+  ping -c 1 -t 2 ${NODE} >/dev/null 2>&1
+  if [ ! $? = 0 ]
+  then
+    echo "Unavailable: ${NODE}"
+    continue
+  fi
+  ssh -ttq ${NODE} 'sudo /sbin/reboot'
 done
