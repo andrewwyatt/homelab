@@ -1,5 +1,5 @@
 <%= node['linux']['chef']['file_header'] %>
 
-<% node['rancher']['exports'].each do |key,attributes| -%>
+<% node['nfs']['exports'].each do |key,attributes| -%>
 <%= "#{attributes['mount_point']}   #{attributes['hosts']}(#{attributes['options']})" %>
 <% end -%>

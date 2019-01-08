@@ -50,7 +50,7 @@ node.default['linux']['mounts']['data']['owner']          = 'root'
 node.default['linux']['mounts']['data']['group']          = 'root'
 node.default['linux']['mounts']['data']['mode']           = '0755'
 
-node.default['rancher']['exports']                        = { 'exports' => { 'mount_point' => '/exports/data',
+node.default['nfs']['exports']                            = { 'exports' => { 'mount_point' => '/exports/data',
                                                                              'hosts'       => '10.100.100.0/24',
                                                                              'options'     => 'rw,sync,no_root_squash,no_subtree_check'
                                                                            }
