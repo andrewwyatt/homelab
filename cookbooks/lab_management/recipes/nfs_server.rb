@@ -40,7 +40,11 @@ node.default['linux']['firewall']['ports']['2049/udp']    = true
 ### # mkfs.ext4 /dev/nfsvg/lv_nfs
 ###
 
-node.default['linux']['mounts']['data']['device']         = '/dev/nfsvg/lv_nfs'
+###
+### NFS is in the sys volume group in this configuration.
+###
+
+node.default['linux']['mounts']['data']['device']         = '/dev/sysvg/lv_nfs'
 node.default['linux']['mounts']['data']['mount_point']    = '/exports/data'
 node.default['linux']['mounts']['data']['fs_type']        = 'ext4'
 node.default['linux']['mounts']['data']['mount_options']  = 'defaults'
