@@ -21,7 +21,7 @@ else
   RANCHER_CA=$2
 fi
 
-for node in $(seq -f %04g 4 1 8)
+for node in $(seq -f %04g 5 1 8)
 do
   ssh -ttq cdc${node}.lab.fewt.com <<EOF
     sudo lvextend -rL +10G /dev/sysvg/lv_var
