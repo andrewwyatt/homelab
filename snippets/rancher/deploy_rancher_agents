@@ -1,5 +1,10 @@
 #!/bin/bash
 
+###
+### The Rancher Token and CA Checksum can be found in the Rancher console
+### when creating a new cluster.
+###
+
 if [ ! $1 ]
 then
   echo -n "Enter the Rancher Token: "
@@ -16,24 +21,11 @@ else
   RANCHER_CA=$2
 fi
 
-###
-### cdc0004 will be the etc and controlplane node.
-###
-
-ssh -ttq cdc0004.lab.fewt.com <<EOF
-  sudo lvextend -rL +10G /dev/sysvg/lv_var
-  sudo docker run -d --privileged --restart=unless-stopped --net=host -v /etc/kubernetes:/etc/kubernetes -v /var/run:/var/run rancher/rancher-agent:v2.0.8 --server https://cdc0004.lab.fewt.com --token "${RANCHER_TOKEN}" --ca-checksum "${RANCHER_CA}" --etcd --controlplane
-  exit
-EOF
-
-###
-### The rest of the nodes are workers.
-###
-for node in $(seq -f %04g 5 1 8)
+for node in $(seq -f %04g 4 1 8)
 do
   ssh -ttq cdc${node}.lab.fewt.com <<EOF
     sudo lvextend -rL +10G /dev/sysvg/lv_var
-    sudo docker run -d --privileged --restart=unless-stopped --net=host -v /etc/kubernetes:/etc/kubernetes -v /var/run:/var/run rancher/rancher-agent:v2.0.8 --server https://cdc0004.lab.fewt.com --token "${RANCHER_TOKEN}" --ca-checksum "${RANCHER_CA}" --worker
+    sudo docker run -d --privileged --restart=unless-stopped --net=host -v /etc/kubernetes:/etc/kubernetes -v /var/run:/var/run rancher/rancher-agent:v2.0.8 --server https://cdc0004.lab.fewt.com --token "${RANCHER_TOKEN}" --ca-checksum "${RANCHER_CA}" --etcd --controlplane --worker
     exit
 EOF
 done

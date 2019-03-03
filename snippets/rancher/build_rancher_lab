@@ -1,0 +1,29 @@
+#!/bin/bash
+
+###
+### This wrapper will perform all of the steps to generate a working
+### rancher lab.
+###
+
+###
+### Apply the Rancher Chef configurations
+###
+./configure_rancher_lab
+
+###
+### Deploy the Rancher server services
+###
+./deploy_rancher_server
+
+
+cat <<EOF
+
+Go to the Rancher console, and generate a new custom cluster.  The token and ca checksum can be found in the command line at the end of the wizard, these are needed for the next steps.
+
+EOF
+read -n1 -r -p "Press space to continue..." key
+
+###
+### Deploy Rancher agents
+###
+./deploy_rancher_agents
