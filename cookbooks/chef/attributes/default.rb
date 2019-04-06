@@ -42,8 +42,8 @@ default['chef']['install_reporting']              = false
 ### Chef software versions to be deployed or upgraded by this cookbook.
 ###
 
-default['chef']['client_version']                = '14.8.12'
-default['chef']['server_version']                = '12.18.14'
+default['chef']['client_version']                = '14.11.21'
+default['chef']['server_version']                = '12.19.31'
 default['chef']['manage_version']                = '2.5.16'
 default['chef']['reporting_version']             = '1.8.0'
 
