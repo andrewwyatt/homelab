@@ -1,5 +1,5 @@
 ###
-### Cookbook:: lab_management
+### Cookbook:: provisioned_services
 ### Recipe:: docker
 ###
 ### Copyright 2013-2019, Andrew Wyatt
@@ -17,13 +17,16 @@
 ### limitations under the License.
 ###
 
-node.default['linux']['sysctl']['net.ipv4.conf.all.forwarding'] = "1"
+node.from_file(run_context.resolve_attribute("provisioned_services", "secrets"))
+node.from_file(run_context.resolve_attribute("enterprise_linux", "default"))
+
+node.force_default['linux']['sysctl']['net.ipv4.conf.all.forwarding'] = "1"
 
 ###
 ### Inherit the standard server configuration.
 ###
 
-include_recipe 'lab_management::standard_server'
+include_recipe 'provisioned_services::standard_server'
 
 ###
 ### Configuration to become a rancher server (work in progress)

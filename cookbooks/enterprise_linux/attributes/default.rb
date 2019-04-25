@@ -37,15 +37,16 @@ default['linux']['runtime']['sensitivity']                      = true
 ### Defines the organization that Chef Client will use for connections.
 ###
 
-default['linux']['organization']                                = "lab.fewt.com"
-default['linux']['org_abbreviation']                            = "lab"
+### Defined in secrets.rb
+# default['linux']['organization']                                = "lab.fewt.com"
+# default['linux']['org_abbreviation']                            = "lab"
 
 ###
 ### This defines the cname for the local deployment node, as well as the default profile for new servers.
 ### Inherited by the provisioner cookbook.
 ###
 
-default['linux']['cobbler']['server']                            = 'deploy.lab.fewt.com'
+default['linux']['cobbler']['server']                            = "deploy.#{node['linux']['domain_name']}"
 default['linux']['cobbler']['profile']                           = 'CentOS-7-x86_64'
 
 ###
@@ -69,8 +70,10 @@ default['linux']['chef']['client_url']                           = "https://pack
 ### to operate in this organization.
 ###
 
-default['linux']['chef']['org_cert']                             = "lab-validator"
-default['linux']['chef']['default_environment']                  = "lab"
+default['linux']['chef']['chef_org']                             = "/organizations/#{node['linux']['org_abbreviation']}"
+default['linux']['chef']['org_cert']                             = "#{node['linux']['org_abbreviation']}-validator"
+default['linux']['chef']['default_environment']                  = node['linux']['org_abbreviation']
+
 default['linux']['chef']['primary_role']                         = "enterprise_linux"
 default['linux']['chef']['bootstrap_delay']                      = "30"
 default['linux']['chef']['bootstrap_user']                       = "admin"
@@ -80,7 +83,6 @@ default['linux']['chef']['current_dir']                          = "File.dirname
 default['linux']['chef']['log_level']                            = ":info"
 default['linux']['chef']['log_location']                         = "STDOUT"
 default['linux']['chef']['ohai_plugin_path']                     = "/etc/chef/ohai/plugins"
-default['linux']['chef']['chef_org']                             = "/organizations/lab"
 default['linux']['chef']['cache_type']                           = "BasicFile"
 default['linux']['chef']['cache_options']                        = "\#{ENV['HOME']}/.chef/checksums"
 default['linux']['chef']['cookbook_path']                        = "\#{current_dir}/../cookbooks"
@@ -141,10 +143,10 @@ default['linux']['motd']                                        = ''
 ###
 ### The following attributes are necessary to send messages to Slack.
 ###
-default['linux']['slack_enabled']                               = false
-default['linux']['slack_channel']                               = '#homelab'
-default['linux']['emoji']                                       = ':construction:'
-default['linux']['api_path']                                    = 'APIKEYGOESHERE'
+### default['linux']['slack_enabled']                               = false
+### default['linux']['slack_channel']                               = '#homelab'
+### default['linux']['emoji']                                       = ':construction:'
+### default['linux']['api_path']                                    = 'APIKEYGOESHERE'
 
 ###
 ### Sets up the reboot Slack notification.
@@ -196,7 +198,7 @@ default['linux']['decom']['decom_notice']                        = 'WHAT? I am b
 ### that is also consumed by the provisioning cookbook.
 ###
 
-default['linux']['disable_root']                                = false
+default['linux']['disable_root']                                = true
 
 default['linux']['login']['lock_inactive_users']                = true
 default['linux']['login']['inactive_user_lock_days']            = "30"
@@ -222,7 +224,7 @@ default['linux']['shells']                                      = { 'bash' => '/
 default['linux']['cronallow']                                   = { }
 default['linux']['hosts']                                       = { }
 
-default['linux']['dns_search']                                  = 'lab.fewt.com fewt.com'
+default['linux']['dns_search']                                  = "#{node['linux']['domain_name']} #{node['linux']['domain_root']}"
 default['linux']['dns_options']                                 = 'timeout:1'
 default['linux']['dns_resolvers']                               = { 'ns1' => '8.8.8.8',
                                                                     'ns2' => '8.8.4.4' }
@@ -543,7 +545,8 @@ default['linux']['mounts']                                       = { 'root'    =
                                                                                   }
                                                                    }
 
-default['linux']['yum']['local_mirror']                          = 'mirror.lab.fewt.com'
+default['linux']['yum']['local_mirror']                          = "mirror.#{node['linux']['domain_name']}"
+
 
 default['linux']['yum']['package_mirrors']['CentOS_7_x86_64']    = { 'base'    => {  'name'             => 'CentOS-$releasever - Base',
                                                                                      'baseurl'          => "http://#{node['linux']['yum']['local_mirror']}/mirrors/centos/7/os/x86_64",
@@ -566,9 +569,9 @@ default['linux']['yum']['package_mirrors']['CentOS_7_x86_64']    = { 'base'    =
                                                                                      'enabled'          => '1',
                                                                                      'gpgkey'           => "http://#{node['linux']['yum']['local_mirror']}/mirrors/epel/RPM-GPG-KEY-EPEL-7" } }
 
-default['linux']['yum']['local_repositories']                    = { 'stable'  => {  'name'             => 'Home Lab Stable Repository',
+default['linux']['yum']['local_repositories']                    = { 'stable'  => {  'name'             => 'Stable Repository',
                                                                                      'baseurl'          => "http://#{node['linux']['yum']['local_mirror']}/mirrors/local/#{node['platform_version'][0]}/STABLE/RPMS",
                                                                                      'gpgcheck'         => '1',
                                                                                      'enabled'          => '1',
-                                                                                     'gpgkey'           => "http://#{node['linux']['yum']['local_mirror']}/mirrors/local/RPM-GPG-KEY-LAB-#{node['platform_version'][0]}",
+                                                                                     'gpgkey'           => "http://#{node['linux']['yum']['local_mirror']}/mirrors/local/RPM-GPG-KEY-LOCAL-#{node['platform_version'][0]}",
                                                                                      'metadata_expire'  => '300' } }

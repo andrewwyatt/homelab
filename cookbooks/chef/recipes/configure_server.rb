@@ -251,24 +251,22 @@ end
 ###
 
 node['chef']['organizations'].each do |key,org|
-  chef_admin_user_test = `chef-server-ctl user-list 2>/dev/null | grep #{org['admin_user']['username']}`
-  unless chef_admin_user_test =~ /#{org['admin_user']['username']}/
-    notification = "Creating the #{org['short_name']} admin account."
-    password = ""
-    passchars='!#%^:,./?1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
-    length=(16+rand(16))
-    (0..length).each do
-       paschar=passchars[(rand(passchars.length)-1)]
-       password << paschar
-    end
-    bash notification do
-      code <<-EOF
-        chef-server-ctl user-create #{org['admin_user']['username']} #{org['admin_user']['first_name']} #{org['admin_user']['last_name']} #{org['admin_user']['email']} #{password} -f #{node['chef']['keys']}/#{org['admin_user']['username']}.pem
-      EOF
-      only_if { ::File.exists?("/etc/opscode/chef-server-running.json") }
-      only_if { ::File.exists?("/usr/bin/chef-server-ctl") }
-      sensitive node['chef']['runtime']['sensitivity']
-    end
+  notification = "Creating the #{org['short_name']} admin account."
+  password = ""
+  passchars='!#%^:,./?1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+  length=(16+rand(16))
+  (0..length).each do
+     paschar=passchars[(rand(passchars.length)-1)]
+     password << paschar
+  end
+  bash notification do #~FC022
+    code <<-EOF
+      chef-server-ctl user-create #{org['admin_user']['username']} #{org['admin_user']['first_name']} #{org['admin_user']['last_name']} #{org['admin_user']['email']} #{password} -f #{node['chef']['keys']}/#{org['admin_user']['username']}.pem
+    EOF
+    only_if { ::File.exists?("/etc/opscode/chef-server-running.json") }
+    only_if { ::File.exists?("/usr/bin/chef-server-ctl") }
+    not_if "chef-server-ctl user-list 2>/dev/null | grep #{org['admin_user']['username']} >/dev/null 2>&1"
+    sensitive node['chef']['runtime']['sensitivity']
   end
 end
 
@@ -290,6 +288,66 @@ node['chef']['organizations'].each do |key,org|
     end
   end
 end
+
+###
+### Create the environments if they doesn't exist.
+###
+
+node['chef']['organizations'].each do |key,org|
+  notification="Creating the #{org['environment']} environment."
+  template "#{Chef::Config['file_cache_path']}/#{node['fqdn']}.rb" do
+    source 'chef/client.rb.erb'
+    owner 'root'
+    group 'root'
+    mode 0700
+    sensitive node['chef']['runtime']['sensitivity']
+    action :create
+    variables({
+      chef_server:         node['fqdn'],
+      chef_org:            org['environment']
+    })
+  end
+  execute "Fetching my local certificate" do
+    command "knife ssl fetch -c #{Chef::Config['file_cache_path']}/#{node['fqdn']}.rb 2>/dev/null"
+    action :run
+    sensitive node['chef']['runtime']['sensitivity']
+  end
+  bash notification do #~FC022
+    code <<-EOF
+      cat <<EOC >#{Chef::Config['file_cache_path']}/#{org['environment']}.json
+      {
+        "name": "#{org['environment']}",
+        "description": "This environment was created by Chef.",
+        "cookbook_versions": {
+
+        },
+        "json_class": "Chef::Environment",
+        "chef_type": "environment",
+        "default_attributes": {
+
+        },
+        "override_attributes": {
+
+        }
+      }
+EOC
+      knife environment from file #{Chef::Config['file_cache_path']}/#{org['environment']}.json -c #{Chef::Config['file_cache_path']}/#{node['fqdn']}.rb -u pivotal -k /etc/opscode/pivotal.pem
+    EOF
+    sensitive node['chef']['runtime']['sensitivity']
+    only_if { ::File.exists?("/etc/opscode/chef-server-running.json") }
+    only_if { ::File.exists?("/usr/bin/chef-server-ctl") }
+    not_if "knife environment show #{org['environment']} -c #{Chef::Config['file_cache_path']}/#{node['fqdn']}.rb -u pivotal -k /etc/opscode/pivotal.pem >/dev/null 2>&1"
+  end
+  cleanup = [ "#{Chef::Config['file_cache_path']}/#{org['environment']}.json",
+               "#{Chef::Config['file_cache_path']}/#{node['fqdn']}.rb" ]
+
+  cleanup.each do | cfile |
+    file cfile do
+      action :delete
+    end
+  end
+end
+
 
 ###
 ### If enabled, generate a Chef Server configuration based on attributes we've defined for our

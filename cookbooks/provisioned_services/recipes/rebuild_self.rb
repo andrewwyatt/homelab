@@ -1,7 +1,6 @@
 ###
-### Cookbook:: lab_management
-### Recipe:: decom_server
-###
+### Cookbook:: provisioned_services
+### Recipe:: rebuild_server
 ###
 ### Copyright 2013-2018, Andrew Wyatt
 ###
@@ -18,6 +17,9 @@
 ### limitations under the License.
 ###
 
+node.from_file(run_context.resolve_attribute("provisioned_services", "secrets"))
+node.from_file(run_context.resolve_attribute("enterprise_linux", "default"))
+
 ###
 ### This recipe will decommission any server that it has been assigned.
 ###
@@ -27,8 +29,10 @@
 ### Removes self from Zonomi
 ### Removes self from Chef
 ### Removes partition table
-### Shutdown self
+### Reboot (the node will pxe boot and reprovision)
 ###
 
-include_recipe 'lab_management::standard_server'
+node.default['linux']['decom']['final_task']   = 'shutdown -r now'
+node.default['linux']['decom']['decom_notice'] = 'You want me to rebuild myself?  Really?  Oh, alright!'
+
 include_recipe 'enterprise_linux::decom'

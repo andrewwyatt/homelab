@@ -105,8 +105,14 @@ node['chef']['organizations'].each do | org_name , organization |
             mattrs = Hash.new
             mattrs = JSON.parse(mdata)
 
-            authorized_users[mattrs['username']] = Hash.new
-            authorized_users[mattrs['username']][org_name] = Hash.new
+            unless authorized_users[mattrs['username']].is_a?(Hash)
+              authorized_users[mattrs['username']] = Hash.new
+            end
+
+            unless authorized_users[mattrs['username']][org_name].is_a?(Hash)
+              authorized_users[mattrs['username']][org_name] = Hash.new
+            end
+
             authorized_users[mattrs['username']][org_name]['firstname'] = mattrs['firstname']
             authorized_users[mattrs['username']][org_name]['lastname'] = mattrs['lastname']
             authorized_users[mattrs['username']][org_name]['email'] = mattrs['email']
@@ -203,15 +209,7 @@ EOF
       account_attributes=JSON.parse(json)
       add_to_org = false
 
-      if account_attributes['organizations'].is_a?(Array) && account_attributes['organizations'].length > 0
-        account_attributes['organizations'].each do | value |
-          unless org == value
-            add_to_org = true
-          else
-            add_to_org = false
-          end
-        end
-      else
+      unless account_attributes['organizations'].is_a?(Array) && account_attributes['organizations'].include?(org)
         add_to_org = true
       end
 

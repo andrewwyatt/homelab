@@ -1,4 +1,4 @@
-name 'lab_management'
+name 'provisioned_services'
 maintainer 'Andrew Wyatt'
 maintainer_email 'andrew@fuduntu.org'
 license 'Apache-2.0'
@@ -12,3 +12,4 @@ depends 'provisioner'
 supports 'redhat'
 source_url 'https://github.com/andrewwyatt/homelab'
 issues_url 'https://github.com/andrewwyatt/homelab/issues'
+provisioned_services

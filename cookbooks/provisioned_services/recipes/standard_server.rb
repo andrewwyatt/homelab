@@ -1,5 +1,5 @@
 ###
-### Cookbook Name:: lab_management
+### Cookbook Name:: provisioned_services
 ### Recipe:: standard_node
 ###
 ### Copyright 2013-2018, Andrew Wyatt
@@ -16,6 +16,9 @@
 ### See the License for the specific language governing permissions and
 ### limitations under the License.
 ###
+
+node.from_file(run_context.resolve_attribute("provisioned_services", "secrets"))
+node.from_file(run_context.resolve_attribute("enterprise_linux", "default"))
 
 ###
 ### This is the definition of a standard managed node.

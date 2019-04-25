@@ -1,5 +1,5 @@
 ###
-### Cookbook:: lab_management
+### Cookbook:: provisioned_services
 ### Recipe:: nfs_server
 ###
 ### Copyright 2013-2018, Andrew Wyatt
@@ -17,16 +17,19 @@
 ### limitations under the License.
 ###
 
+node.from_file(run_context.resolve_attribute("provisioned_services", "secrets"))
+node.from_file(run_context.resolve_attribute("enterprise_linux", "default"))
+
 ###
 ### NFS servers need NFS ports.
 ###
 
-node.default['linux']['firewall']['services']['nfs']      = true
-node.default['linux']['firewall']['services']['rpc-bind'] = true
-node.default['linux']['firewall']['services']['mountd']   = true
+node.force_default['linux']['firewall']['services']['nfs']      = true
+node.force_default['linux']['firewall']['services']['rpc-bind'] = true
+node.force_default['linux']['firewall']['services']['mountd']   = true
 
-node.default['linux']['firewall']['ports']['2049/tcp']    = true
-node.default['linux']['firewall']['ports']['2049/udp']    = true
+node.force_default['linux']['firewall']['ports']['2049/tcp']    = true
+node.force_default['linux']['firewall']['ports']['2049/udp']    = true
 
 ###
 ### Mount the NFS volume
@@ -64,7 +67,7 @@ node.default['nfs']['exports']                            = { 'exports' => { 'mo
 ### Inherit the standard server configuration.
 ###
 
-include_recipe 'lab_management::standard_server'
+include_recipe 'provisioned_services::standard_server'
 
 ###
 ### Install and configure the NFS server.

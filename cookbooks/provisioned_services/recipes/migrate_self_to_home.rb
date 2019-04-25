@@ -1,6 +1,6 @@
 ###
-### Cookbook:: lab_management
-### Recipe:: rebuild_server
+### Cookbook:: provisioned_services
+### Recipe:: move_node_to_{SERVER}
 ###
 ### Copyright 2013-2018, Andrew Wyatt
 ###
@@ -17,19 +17,6 @@
 ### limitations under the License.
 ###
 
-###
-### This recipe will decommission any server that it has been assigned.
-###
-### The following actions occur on the very next check in:
-###
-### Removes self from JumpCloud
-### Removes self from Zonomi
-### Removes self from Chef
-### Removes partition table
-### Reboot (the node will pxe boot and reprovision)
-###
+node.default['linux']['chef']['new_chef_server'] = 'cpc0001.home.fewt.com'
 
-node.default['linux']['decom']['final_task']   = 'shutdown -r now'
-node.default['linux']['decom']['decom_notice'] = 'You want me to rebuild myself?  Really?  Oh, alright!'
-
-include_recipe 'enterprise_linux::decom'
+include_recipe 'enterprise_linux::relocate'

@@ -40,7 +40,7 @@ end
 ### Inherit the standard server configuration.
 ###
 
-include_recipe 'lab_management::standard_server'
-include_recipe 'lab_management::docker_server'
+include_recipe 'provisioned_services::standard_server'
+include_recipe 'provisioned_services::docker_server'
 
 tag('rancher')

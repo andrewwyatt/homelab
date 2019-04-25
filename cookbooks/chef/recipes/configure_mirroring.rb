@@ -112,6 +112,7 @@ unless node['chef']['sync_host'] == node['fqdn']
           owner 'root'
           group 'root'
           mode 0700
+          sensitive node['chef']['runtime']['sensitivity']
           action :create
           variables({
             mirror_root:         node['chef']['mirror_root'],
@@ -122,15 +123,18 @@ unless node['chef']['sync_host'] == node['fqdn']
         execute "Fetching certificates from #{host}" do
           command "knife ssl fetch -c #{node['chef']['mirror_root']}/#{node['chef']['sync_host']}/#{org['short_name']}/#{host}.rb 2>/dev/null"
           action :run
+          sensitive node['chef']['runtime']['sensitivity']
         end
       end
 
       node['chef']['mirror'].each do | dataset |
         execute "Fetching data from #{node['chef']['sync_host']}" do
           command "knife download /#{dataset} --chef-repo-path #{node['chef']['mirror_root']}/#{node['chef']['sync_host']}/#{org['short_name']}/data -c #{node['chef']['mirror_root']}/#{node['chef']['sync_host']}/#{org['short_name']}/#{node['chef']['sync_host']}.rb"
+          sensitive node['chef']['runtime']['sensitivity']
         end
         execute "Uploading data to #{node['fqdn']}" do
           command "knife upload /#{dataset} --chef-repo-path #{node['chef']['mirror_root']}/#{node['chef']['sync_host']}/#{org['short_name']}/data -c #{node['chef']['mirror_root']}/#{node['chef']['sync_host']}/#{org['short_name']}/#{node['fqdn']}.rb -k /etc/opscode/pivotal.pem"
+          sensitive node['chef']['runtime']['sensitivity']
         end
       end
 

@@ -6,7 +6,7 @@ description 'Deploys Rancher to the environment'
 long_description 'Deploys Rancher to the environment'
 version '0.0.1'
 chef_version '>= 12.14' if respond_to?(:chef_version)
-depends 'lab_management'
+depends 'provisioned_services'
 supports 'redhat'
 source_url 'https://github.com/andrewwyatt/homelab'
 issues_url 'https://github.com/andrewwyatt/homelab/issues'

@@ -1,5 +1,5 @@
 ###
-### Cookbook:: lab_management
+### Cookbook:: provisioned_services
 ### Recipe:: chef_server
 ###
 ### Copyright 2013-2018, Andrew Wyatt
@@ -17,13 +17,17 @@
 ### limitations under the License.
 ###
 
-node.default['linux']['firewall']['ports']['80/tcp']  = true
-node.default['linux']['firewall']['ports']['443/tcp'] = true
+node.from_file(run_context.resolve_attribute("provisioned_services", "secrets"))
+node.from_file(run_context.resolve_attribute("enterprise_linux", "default"))
+node.from_file(run_context.resolve_attribute("chef", "default"))
 
-node.default['linux']['sysctl']['kernel.shmmax']      = '17179869184'
-node.default['linux']['sysctl']['kernel.shmall']      = '4194304'
+node.force_default['linux']['firewall']['ports']['80/tcp']  = true
+node.force_default['linux']['firewall']['ports']['443/tcp'] = true
 
-include_recipe 'lab_management::standard_server'
+node.force_default['linux']['sysctl']['kernel.shmmax']      = '17179869184'
+node.force_default['linux']['sysctl']['kernel.shmall']      = '4194304'
+
+include_recipe 'provisioned_services::standard_server'
 
 include_recipe 'chef::configure_server'
 include_recipe 'chef::configure_manage'

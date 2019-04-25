@@ -1,6 +1,7 @@
 ###
-### Cookbook:: lab_management
-### Recipe:: move_node_to_{SERVER}
+### Cookbook:: provisioned_services
+### Recipe:: decom_server
+###
 ###
 ### Copyright 2013-2018, Andrew Wyatt
 ###
@@ -17,6 +18,20 @@
 ### limitations under the License.
 ###
 
-node.default['linux']['chef']['new_chef_server'] = 'cdc0005.lab.fewt.com'
+node.from_file(run_context.resolve_attribute("provisioned_services", "secrets"))
+node.from_file(run_context.resolve_attribute("enterprise_linux", "default"))
 
-include_recipe 'enterprise_linux::relocate'
+###
+### This recipe will decommission any server that it has been assigned.
+###
+### The following actions occur on the very next check in:
+###
+### Removes self from JumpCloud
+### Removes self from Zonomi
+### Removes self from Chef
+### Removes partition table
+### Shutdown self
+###
+
+include_recipe 'provisioned_services::standard_server'
+include_recipe 'enterprise_linux::decom'

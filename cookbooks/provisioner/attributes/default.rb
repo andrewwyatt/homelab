@@ -55,18 +55,18 @@ default['provisioner']['file_header']                          = node['linux']['
 ### Use CNAMES for functions if desired (cobbler, packages, provisioner, chef, etc).
 ###
 
-default['provisioner']['hostname_prefix']                       = 'cdc'
-default['provisioner']['domain']                                = 'lab.fewt.com'
+#default['provisioner']['hostname_prefix']                       = 'cdc'
+#default['provisioner']['domain']                                = 'lab.fewt.com'
 default['provisioner']['name_gen_path']                         = '/var/www/names'
 default['provisioner']['max_num_hosts']                         = '9999'
 default['provisioner']['name_gen_reset']                        = '900'
 default['provisioner']['hostname_auth_token']                   = 'AUTH TOKEN GOES HERE'
 
-default['provisioner']['chef']['default_server']                = 'chef.lab.fewt.com'
+default['provisioner']['chef']['default_server']                = "#{node['provisioner']['hostname_prefix']}0001.#{node['provisioner']['domain']}"
 
-default['provisioner']['mirror_host']                           = 'mirror.lab.fewt.com'
-default['provisioner']['deployment_host']                       = 'deploy.lab.fewt.com'
-default['provisioner']['builder_host']                          = 'build7.lab.fewt.com'
+default['provisioner']['mirror_host']                           = "mirror.#{node['provisioner']['domain']}"
+default['provisioner']['deployment_host']                       = "deploy.#{node['provisioner']['domain']}"
+default['provisioner']['builder_host']                          = "build7.#{node['provisioner']['domain']}"
 
 default['provisioner']['subnet']                                = '10.100.100.0'
 default['provisioner']['netmask']                               = '255.255.255.0'
@@ -138,7 +138,7 @@ default['provisioner']['cobbler']['profiles']                    = { 'CentOS-7-x
                                                                                             'enable-menu'         => 'True',
                                                                                             'kickstart'           => '/var/lib/cobbler/kickstarts/CentOS-7-x86_64',
                                                                                             'name-servers'        => '10.100.100.10',
-                                                                                            'name-servers-search' => 'lab.fewt.com' }}
+                                                                                            'name-servers-search' => "#{node['provisioner']['domain']}" }}
 
 default['provisioner']['cobbler']['systems']                     = { 'default' => { 'name'            => 'default',
                                                                                     'profile'         => node['provisioner']['cobbler']['default_profile'],
@@ -205,7 +205,7 @@ default['provisioner']['mirrors']                               = { 'centos-7' =
                                                                     'local-7'  => { 'name'            => 'local_7',
                                                                                     'url'             => "rsync://#{node['provisioner']['builder_host']}/store/7/",
                                                                                     'gpg_key_url'     => "http://#{node['provisioner']['builder_host']}/store/",
-                                                                                    'gpg_key_name'    => "RPM-GPG-KEY-LAB-7",
+                                                                                    'gpg_key_name'    => "RPM-GPG-KEY-LOCAL-7",
                                                                                     'gpg_key_path'    => "#{node['provisioner']['mirrorroot']}/local/",
                                                                                     'mirror_path'     => "#{node['provisioner']['mirrorroot']}/local/7/",
                                                                                     'mirror_schedule' => '*/5 * * * *',
