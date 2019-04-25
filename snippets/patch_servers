@@ -1,5 +1,8 @@
 #!/bin/bash
-[ ${CHEF_ENV} ] || CHEF_ENV='chef.lab.fewt.com'
+
+source secrets.sh
+
+[ ${CHEF_ENV} ] || CHEF_ENV="${HNPREFIX}001.${DOMAIN}"
 
 for NODE in $(knife node list)
 do

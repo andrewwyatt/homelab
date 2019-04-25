@@ -2,7 +2,7 @@
 
 for node in $(seq -f %04g 4 1 8)
 do
-  knife node run_list remove cdc${node}.lab.fewt.com "role[cdc${node}_lab_fewt_com]"
-  knife node run_list add cdc${node}.lab.fewt.com "lab_management::rebuild_self"
-  ssh -ttq cdc${node}.lab.fewt.com sudo chef-client
+  knife node run_list remove ${HNPREFIX}${node}.${DOMAIN} "role[${HNPREFIX}${node}_${RLSUFFIX}]"
+  knife node run_list add ${HNPREFIX}${node}.${DOMAIN} "lab_management::rebuild_self"
+  ssh -ttq ${HNPREFIX}${node}.${DOMAIN} sudo chef-client
 done

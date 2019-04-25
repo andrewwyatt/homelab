@@ -8,7 +8,7 @@
 ### Rancher 2.0
 ###
 
-ssh -ttq cdc0004.lab.fewt.com <<EOF
+ssh -ttq ${HNPREFIX}0004.${DOMAIN} <<EOF
   WD=`pwd`
   sudo lvextend -rL +10G /dev/sysvg/lv_var
   sudo docker run -d --restart=unless-stopped -p 80:80 -p 443:443 rancher/rancher
