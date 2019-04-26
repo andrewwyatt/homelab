@@ -28,12 +28,6 @@ node.normal['linux']['firewall']['services']['samba']    = true
 node.normal['linux']['firewall']['services']['mdns']     = true
 
 ###
-### The encrypted payload password is stored in credentials -> passwords
-###
-
-passwords = data_bag_item('credentials', 'passwords', IO.read(Chef::Config['encrypted_data_bag_secret']))
-
-###
 ### Mount the SMB volume
 ###
 ### Note: The SMB volume was created as a 1.8TB volume using two vDisks in RAID 1.
@@ -46,15 +40,21 @@ passwords = data_bag_item('credentials', 'passwords', IO.read(Chef::Config['encr
 ### # mkfs.ext4 /dev/smbvg/lv_smb
 ###
 
-node.default['linux']['mounts']['data']['device']         = '/dev/smbvg/lv_smb'
-node.default['linux']['mounts']['data']['mount_point']    = '/data'
-node.default['linux']['mounts']['data']['fs_type']        = 'ext4'
-node.default['linux']['mounts']['data']['mount_options']  = 'defaults'
-node.default['linux']['mounts']['data']['dump_frequency'] = '1'
-node.default['linux']['mounts']['data']['fsck_pass_num']  = '2'
-node.default['linux']['mounts']['data']['owner']          = 'root'
-node.default['linux']['mounts']['data']['group']          = 'root'
-node.default['linux']['mounts']['data']['mode']           = '0755'
+node.normal['linux']['mounts']['data']['device']         = '/dev/smbvg/lv_smb'
+node.normal['linux']['mounts']['data']['mount_point']    = '/data'
+node.normal['linux']['mounts']['data']['fs_type']        = 'ext4'
+node.normal['linux']['mounts']['data']['mount_options']  = 'defaults'
+node.normal['linux']['mounts']['data']['dump_frequency'] = '1'
+node.normal['linux']['mounts']['data']['fsck_pass_num']  = '2'
+node.normal['linux']['mounts']['data']['owner']          = 'root'
+node.normal['linux']['mounts']['data']['group']          = 'root'
+node.normal['linux']['mounts']['data']['mode']           = '0755'
+
+###
+### The encrypted payload password is stored in credentials -> passwords
+###
+
+passwords = data_bag_item('credentials', 'passwords', IO.read(Chef::Config['encrypted_data_bag_secret']))
 
 ###
 ### Inherit the standard server configuration.
