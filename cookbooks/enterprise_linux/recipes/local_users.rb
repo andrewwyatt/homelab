@@ -27,37 +27,32 @@
 
 passwords = data_bag_item('credentials', 'passwords', IO.read(Chef::Config['encrypted_data_bag_secret']))
 
-
 ###
 ### Disable Root User - Force use of sudo.  If enabled, use the password hash stored in the data bag.
 ###
 
-root_action = String.new
-root_shell = String.new
-root_hash = String.new
-if node['linux']['disable_root'] == false
-  root_action = "unlock"
-  root_shell = "/bin/bash"
-  root_hash = passwords['root_hash']
-else
-  root_action = "lock"
-  root_shell = "/sbin/nologin"
-  root_hash = "!"
+user "root" do
+  uid 0
+  gid 0
+  shell "/sbin/nologin"
+  home "/root"
+  comment "root"
+  password "!"
+  manage_home false
+  action :lock
+  only_if { node['linux']['disable_root'] == true }
 end
 
 user "root" do
   uid 0
   gid 0
-  shell root_shell
+  shell "/bin/bash"
   home "/root"
   comment "root"
-  password root_hash
+  password passwords['root_hash']
   manage_home false
   action :modify
-end
-
-user "root" do
-  action root_action
+  only_if { node['linux']['disable_root'] == false }
 end
 
 bash "Ensure local account controls are applied" do
