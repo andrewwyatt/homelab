@@ -42,7 +42,7 @@ passwords = data_bag_item('credentials', 'passwords', IO.read(Chef::Config['encr
 ### # mdadm --create --verbose /dev/md0 --level=1 --raid-devices=2 /dev/sdb1 /dev/sdc1
 ### # pvcreate /dev/md0
 ### # vgcreate smbvg /dev/md0
-### # lvcreate -n lv_smb -l 445612 smbvg
+### # lvcreate -n lv_smb -l 465631 smbvg
 ### # mkfs.ext4 /dev/smbvg/lv_smb
 ###
 
@@ -93,7 +93,7 @@ execute 'Configure Samba Authentication Password' do
   command "smbpasswd -w #{passwords['samba_passwd']}"
   #sensitive node['linux']['runtime']['sensitivity']
   action :run
-  notifies :run, 'service[smb]', :delayed
+  notifies :restart, 'service[smb]', :delayed
   not_if "strings /var/lib/samba/private/secrets.tdb 2>/dev/null | grep #{passwords['samba_passwd']} >/dev/null 2>&1"
 end
 
