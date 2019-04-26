@@ -21,34 +21,27 @@ node.from_file(run_context.resolve_attribute("provisioned_services", "secrets"))
 node.from_file(run_context.resolve_attribute("enterprise_linux", "default"))
 
 ###
-### NFS servers need NFS ports.
+### Configure to be a Samba Server
 ###
 
-node.normal['linux']['firewall']['services']['nfs']      = true
-node.normal['linux']['firewall']['services']['rpc-bind'] = true
-node.normal['linux']['firewall']['services']['mountd']   = true
-
-node.normal['linux']['firewall']['ports']['2049/tcp']    = true
-node.normal['linux']['firewall']['ports']['2049/udp']    = true
+node.normal['linux']['firewall']['services']['samba']    = true
+node.normal['linux']['firewall']['services']['mdns']     = true
 
 ###
-### Mount the NFS volume
+### Mount the SMB volume
 ###
-### Note: The NFS volume was created as a 1.7TB volume using two vDisks in RAID 1.
+### Note: The SMB volume was created as a 1.8TB volume using two vDisks in RAID 1.
 ###
-### # mdadm --create --verbose /dev/md0 --level=1 --raid-devices=2 /dev/sdb /dev/sdc
+### # fdisk /dev/sdb and /dev/sdc, type fd
+### # mdadm --create --verbose /dev/md0 --level=1 --raid-devices=2 /dev/sdb1 /dev/sdc1
 ### # pvcreate /dev/md0
-### # vgcreate nfsvg /dev/md0
-### # lvcreate -n lv_nfs -l 445612 nfsvg
-### # mkfs.ext4 /dev/nfsvg/lv_nfs
+### # vgcreate smbvg /dev/md0
+### # lvcreate -n lv_smb -l 445612 smbvg
+### # mkfs.ext4 /dev/smbvg/lv_smb
 ###
 
-###
-### NFS is in the sys volume group in this configuration.
-###
-
-node.default['linux']['mounts']['data']['device']         = '/dev/sysvg/lv_nfs'
-node.default['linux']['mounts']['data']['mount_point']    = '/exports/data'
+node.default['linux']['mounts']['data']['device']         = '/dev/smbvg/lv_smb'
+node.default['linux']['mounts']['data']['mount_point']    = '/data'
 node.default['linux']['mounts']['data']['fs_type']        = 'ext4'
 node.default['linux']['mounts']['data']['mount_options']  = 'defaults'
 node.default['linux']['mounts']['data']['dump_frequency'] = '1'
@@ -57,12 +50,6 @@ node.default['linux']['mounts']['data']['owner']          = 'root'
 node.default['linux']['mounts']['data']['group']          = 'root'
 node.default['linux']['mounts']['data']['mode']           = '0755'
 
-node.default['nfs']['exports']                            = { 'exports' => { 'mount_point' => '/exports/data',
-                                                                             'hosts'       => '10.100.100.0/24',
-                                                                             'options'     => 'rw,sync,no_root_squash,no_subtree_check'
-                                                                           }
-                                                            }
-
 ###
 ### Inherit the standard server configuration.
 ###
@@ -70,30 +57,43 @@ node.default['nfs']['exports']                            = { 'exports' => { 'mo
 include_recipe 'provisioned_services::standard_server'
 
 ###
-### Install and configure the NFS server.
+### Install and configure the Samba server.
 ###
 
-tag('nfs')
+tag('smb')
 
-yum_package [ 'nfs-utils' ] do
+yum_package [ 'samba',
+              'avahi' ] do
   action :install
 end
 
-template '/etc/exports' do
-  source 'etc/exports.erb'
+template '/etc/samba/smb.conf' do
+  source 'etc/samba/smb.conf.erb'
   owner 'root'
   group 'root'
   mode '0755'
   action :create
-  notifies :run, "execute[exportfs]", :delayed
 end
 
-execute 'exportfs' do
-  command 'exportfs -a'
-  action :nothing
+template '/etc/avahi/services/timemachine.service do
+  source 'etc/avahi/services/timemachine.service.erb'
+  owner 'root'
+  group 'root'
+  mode '0755'
+  action :create
 end
 
-service "nfs-server" do
+service "smb" do
+  supports :status => true, :restart => true
+  action [ :enable, :start ]
+end
+
+service "nmb" do
+  supports :status => true, :restart => true
+  action [ :enable, :start ]
+end
+
+service "avahi" do
   supports :status => true, :restart => true
   action [ :enable, :start ]
 end

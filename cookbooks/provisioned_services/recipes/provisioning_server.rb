@@ -30,36 +30,36 @@ node.from_file(run_context.resolve_attribute("provisioner", "default"))
 ### Packaging and mirroring ports
 ###
 
-node.force_default['linux']['firewall']['services']['rsyncd']   = true
-node.force_default['linux']['firewall']['ports']['80/tcp']      = true
-node.force_default['linux']['firewall']['ports']['443/tcp']     = true
+node.normal['linux']['firewall']['services']['rsyncd']   = true
+node.normal['linux']['firewall']['ports']['80/tcp']      = true
+node.normal['linux']['firewall']['ports']['443/tcp']     = true
 
 ###
 ### OS provisioning ports
 ###
 
-node.force_default['linux']['firewall']['services']['dhcp' ]    = true
-node.force_default['linux']['firewall']['ports']['80/tcp']      = true
-node.force_default['linux']['firewall']['ports']['53/tcp']      = true
-node.force_default['linux']['firewall']['ports']['53/udp']      = true
-node.force_default['linux']['firewall']['ports']['69/tcp']      = true
-node.force_default['linux']['firewall']['ports']['69/udp']      = true
-node.force_default['linux']['firewall']['ports']['443/tcp']     = true
-node.force_default['linux']['firewall']['ports']['4011/udp']    = true
+node.normal['linux']['firewall']['services']['dhcp' ]    = true
+node.normal['linux']['firewall']['ports']['80/tcp']      = true
+node.normal['linux']['firewall']['ports']['53/tcp']      = true
+node.normal['linux']['firewall']['ports']['53/udp']      = true
+node.normal['linux']['firewall']['ports']['69/tcp']      = true
+node.normal['linux']['firewall']['ports']['69/udp']      = true
+node.normal['linux']['firewall']['ports']['443/tcp']     = true
+node.normal['linux']['firewall']['ports']['4011/udp']    = true
 
 ###
 ### Package storage
 ###
 
-node.force_default['linux']['mounts']['data']['device']         = '/dev/wwwvg/lv_www'
-node.force_default['linux']['mounts']['data']['mount_point']    = '/var/www'
-node.force_default['linux']['mounts']['data']['fs_type']        = 'ext4'
-node.force_default['linux']['mounts']['data']['mount_options']  = 'defaults,nosuid,nodev'
-node.force_default['linux']['mounts']['data']['dump_frequency'] = '1'
-node.force_default['linux']['mounts']['data']['fsck_pass_num']  = '2'
-node.force_default['linux']['mounts']['data']['owner']          = 'root'
-node.force_default['linux']['mounts']['data']['group']          = 'root'
-node.force_default['linux']['mounts']['data']['mode']           = '0755'
+node.normal['linux']['mounts']['data']['device']         = '/dev/wwwvg/lv_www'
+node.normal['linux']['mounts']['data']['mount_point']    = '/var/www'
+node.normal['linux']['mounts']['data']['fs_type']        = 'ext4'
+node.normal['linux']['mounts']['data']['mount_options']  = 'defaults,nosuid,nodev'
+node.normal['linux']['mounts']['data']['dump_frequency'] = '1'
+node.normal['linux']['mounts']['data']['fsck_pass_num']  = '2'
+node.normal['linux']['mounts']['data']['owner']          = 'root'
+node.normal['linux']['mounts']['data']['group']          = 'root'
+node.normal['linux']['mounts']['data']['mode']           = '0755'
 
 include_recipe 'provisioned_services::standard_server'
 

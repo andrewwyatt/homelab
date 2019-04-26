@@ -32,7 +32,7 @@ node.from_file(run_context.resolve_attribute("enterprise_linux", "default"))
 ### Reboot (the node will pxe boot and reprovision)
 ###
 
-node.default['linux']['decom']['final_task']   = 'shutdown -r now'
-node.default['linux']['decom']['decom_notice'] = 'You want me to rebuild myself?  Really?  Oh, alright!'
+node.normal['linux']['decom']['final_task']   = 'shutdown -r now'
+node.normal['linux']['decom']['decom_notice'] = 'You want me to rebuild myself?  Really?  Oh, alright!'
 
 include_recipe 'enterprise_linux::decom'

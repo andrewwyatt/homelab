@@ -20,7 +20,7 @@
 node.from_file(run_context.resolve_attribute("provisioned_services", "secrets"))
 node.from_file(run_context.resolve_attribute("enterprise_linux", "default"))
 
-node.force_default['linux']['sysctl']['net.ipv4.conf.all.forwarding'] = "1"
+node.normal['linux']['sysctl']['net.ipv4.conf.all.forwarding'] = "1"
 
 ###
 ### Inherit the standard server configuration.

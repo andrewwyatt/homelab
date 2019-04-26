@@ -138,7 +138,7 @@ default['provisioner']['cobbler']['profiles']                    = { 'CentOS-7-x
                                                                                             'enable-menu'         => 'True',
                                                                                             'kickstart'           => '/var/lib/cobbler/kickstarts/CentOS-7-x86_64',
                                                                                             'name-servers'        => '10.100.100.10',
-                                                                                            'name-servers-search' => "#{node['provisioner']['domain']}" }}
+                                                                                            'name-servers-search' => node['provisioner']['domain'] }}
 
 default['provisioner']['cobbler']['systems']                     = { 'default' => { 'name'            => 'default',
                                                                                     'profile'         => node['provisioner']['cobbler']['default_profile'],

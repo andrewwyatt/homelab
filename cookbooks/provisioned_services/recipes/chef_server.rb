@@ -21,11 +21,11 @@ node.from_file(run_context.resolve_attribute("provisioned_services", "secrets"))
 node.from_file(run_context.resolve_attribute("enterprise_linux", "default"))
 node.from_file(run_context.resolve_attribute("chef", "default"))
 
-node.force_default['linux']['firewall']['ports']['80/tcp']  = true
-node.force_default['linux']['firewall']['ports']['443/tcp'] = true
+node.normal['linux']['firewall']['ports']['80/tcp']  = true
+node.normal['linux']['firewall']['ports']['443/tcp'] = true
 
-node.force_default['linux']['sysctl']['kernel.shmmax']      = '17179869184'
-node.force_default['linux']['sysctl']['kernel.shmall']      = '4194304'
+node.normal['linux']['sysctl']['kernel.shmmax']      = '17179869184'
+node.normal['linux']['sysctl']['kernel.shmall']      = '4194304'
 
 include_recipe 'provisioned_services::standard_server'
 
