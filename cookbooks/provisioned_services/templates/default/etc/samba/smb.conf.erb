@@ -27,7 +27,7 @@
     vfs objects = catia fruit streams_xattr
     fruit:aapl = yes
     fruit:time machine = no
-    root preexec = bash -c '[[ -d /data/shared ]] || mkdir -m 0770 /data/shared && chown root:<%= node['samba']['server_attributes']['ldap']['users'] %> /data/shared'
+    root preexec = bash -c '[[ -d /data/shared ]] || mkdir -pm 0770 /data/shared && chown root:<%= node['samba']['server_attributes']['ldap']['users'] %> /data/shared'
     allow groups @<%= node['samba']['server_attributes']['ldap']['tmusers'] %>
 
 [TimeMachine]
@@ -41,6 +41,6 @@
     vfs objects = catia fruit streams_xattr
     fruit:aapl = yes
     fruit:time machine = yes
-    root preexec = bash -c '[[ -d /data/timemachine/%m ]] || mkdir -m 0700 /data/timemachine/%m && chown %U:%U /data/timemachine/%m'
+    root preexec = bash -c '[[ -d /data/timemachine/%m ]] || mkdir -pm 0700 /data/timemachine/%m && chown %U:%U /data/timemachine/%m'
     valid users = %U
     allow groups @<%= node['samba']['server_attributes']['ldap']['users'] %>
