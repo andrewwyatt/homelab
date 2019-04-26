@@ -53,4 +53,3 @@ node.default['chef']['server_attributes']['ldap']['login_attribute']     = 'uid'
 node.default['chef']['server_attributes']['nginx']['ssl_certificate']     = "/etc/opscode/#{node['fqdn']}.crt"
 node.default['chef']['server_attributes']['nginx']['ssl_certificate_key'] = "/etc/opscode/#{node['fqdn']}.pem"
 node.default['chef']['server_attributes']['nginx']['ssl_protocols']       = 'TLSv1.1 TLSv1.2'
-node.default['chef']['server_attributes']['license']['nodes']             = '100'
