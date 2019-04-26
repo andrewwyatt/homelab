@@ -28,6 +28,12 @@ node.normal['linux']['firewall']['services']['samba']    = true
 node.normal['linux']['firewall']['services']['mdns']     = true
 
 ###
+### The encrypted payload password is stored in credentials -> passwords
+###
+
+passwords = data_bag_item('credentials', 'passwords', IO.read(Chef::Config['encrypted_data_bag_secret']))
+
+###
 ### Mount the SMB volume
 ###
 ### Note: The SMB volume was created as a 1.8TB volume using two vDisks in RAID 1.
@@ -67,6 +73,14 @@ yum_package [ 'samba',
   action :install
 end
 
+directory '/data/backup/timemachine' do
+  owner 'root'
+  group 'root'
+  mode '0755'
+  recursive true
+  action :create
+end
+
 template '/etc/samba/smb.conf' do
   source 'etc/samba/smb.conf.erb'
   owner 'root'
@@ -75,12 +89,20 @@ template '/etc/samba/smb.conf' do
   action :create
 end
 
-template '/etc/avahi/services/timemachine.service do
+template '/etc/avahi/services/timemachine.service' do
   source 'etc/avahi/services/timemachine.service.erb'
   owner 'root'
   group 'root'
   mode '0755'
   action :create
+end
+
+execute 'Configure Samba Authentication Password' do
+  command "smbpasswd -w #{passwords['samba_passwd']}"
+  #sensitive node['linux']['runtime']['sensitivity']
+  action :run
+  notifies :run, 'service[smb]', :delayed
+  not_if "strings /var/lib/samba/private/secrets.tdb 2>/dev/null | grep #{passwords['samba_passwd']} >/dev/null 2>&1"
 end
 
 service "smb" do
@@ -93,7 +115,7 @@ service "nmb" do
   action [ :enable, :start ]
 end
 
-service "avahi" do
+service "avahi-daemon" do
   supports :status => true, :restart => true
   action [ :enable, :start ]
 end

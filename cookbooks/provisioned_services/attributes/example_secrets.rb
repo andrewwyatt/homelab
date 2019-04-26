@@ -75,3 +75,16 @@
 # node.default['chef']['server_attributes']['nginx']['ssl_certificate']     = "/etc/opscode/#{node['fqdn']}.crt"
 # node.default['chef']['server_attributes']['nginx']['ssl_certificate_key'] = "/etc/opscode/#{node['fqdn']}.pem"
 # node.default['chef']['server_attributes']['nginx']['ssl_protocols']       = 'TLSv1.1 TLSv1.2'
+
+###
+### Follow the JumpCloud procedures for enabling a Samba authentication user.  Set the service password in:
+###
+### Credentials -> passwords -> samba_passwd
+###
+
+# default['samba']['server_attributes']['ldap']['base_dn'] = '{Your JumpCloud BaseDN}'
+# default['samba']['server_attributes']['ldap']['bind_dn'] = '{Your JumpCloud Samba Service Account}'
+# default['samba']['server_attributes']['ldap']['host']    = 'ldapsam:ldaps://ldap.jumpcloud.com:636'
+# default['samba']['server_attributes']['ldap']['users']   = 'ou=Users'
+# default['samba']['server_attributes']['ldap']['group']   = 'ou=Users'
+# default['samba']['server_attributes']['ldap']['tmusers']   = '@domain-users'

@@ -1,0 +1,30 @@
+[global]
+    workgroup = WORKGROUP
+    netbios name = WORKGROUP
+    protocol = SMB3
+    server min protocol = smb2
+    server string = Server %v
+    log file = /var/log/log.%m
+    max log size = 100
+    log level = 3
+    passdb backend = <%= node['samba']['server_attributes']['ldap']['host'] %>
+    ldap suffix = <%= node['samba']['server_attributes']['ldap']['base_dn'] %>
+    ldap admin dn = <%= node['samba']['server_attributes']['ldap']['bind_dn'] %>
+    ldap user suffix = <%= node['samba']['server_attributes']['ldap']['users'] %>
+    ldap group suffix = <%= node['samba']['server_attributes']['ldap']['group'] %>
+    ldap ssl = no
+    security = user
+    map to guest = bad user
+
+[timemachine]
+    comment = Time Machine
+    path = /data/backup/timemachine
+    browseable = yes
+    writeable = yes
+    create mask = 0600
+    directory mask = 0700
+    spotlight = yes
+    vfs objects = catia fruit streams_xattr
+    fruit:aapl = yes
+    fruit:time machine = yes
+    valid users = <%= node['samba']['server_attributes']['ldap']['tmusers'] %>
