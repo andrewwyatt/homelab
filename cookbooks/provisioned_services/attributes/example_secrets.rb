@@ -87,4 +87,4 @@
 # default['samba']['server_attributes']['ldap']['host']    = 'ldapsam:ldaps://ldap.jumpcloud.com:636'
 # default['samba']['server_attributes']['ldap']['users']   = 'ou=Users'
 # default['samba']['server_attributes']['ldap']['group']   = 'ou=Users'
-# default['samba']['server_attributes']['ldap']['tmusers']   = '@domain-users'
+# default['samba']['server_attributes']['ldap']['users']   = 'Users'

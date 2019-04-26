@@ -16,9 +16,23 @@
     security = user
     map to guest = bad user
 
-[timemachine]
-    comment = Time Machine
-    path = /data/timemachine/%U
+[Shared]
+    comment = Shared Files (Unencrypted)
+    path = /data/shared
+    browseable = yes
+    writeable = yes
+    create mask = 0600
+    directory mask = 0700
+    spotlight = yes
+    vfs objects = catia fruit streams_xattr
+    fruit:aapl = yes
+    fruit:time machine = no
+    root preexec = bash -c '[[ -d /data/shared ]] || mkdir -m 0770 /data/shared && chown root:<%= node['samba']['server_attributes']['ldap']['users'] %> /data/shared'
+    allow groups @<%= node['samba']['server_attributes']['ldap']['tmusers'] %>
+
+[TimeMachine]
+    comment = Time Machine share for %m
+    path = /data/timemachine/%m
     browseable = yes
     writeable = yes
     create mask = 0600
@@ -27,6 +41,6 @@
     vfs objects = catia fruit streams_xattr
     fruit:aapl = yes
     fruit:time machine = yes
-    root preexec = mkdir -p /data/timemachine/%U
+    root preexec = bash -c '[[ -d /data/timemachine/%m ]] || mkdir -m 0700 /data/timemachine/%m && chown %U:%U /data/timemachine/%m'
     valid users = %U
-    allow groups <%= node['samba']['server_attributes']['ldap']['tmusers'] %>
+    allow groups @<%= node['samba']['server_attributes']['ldap']['users'] %>

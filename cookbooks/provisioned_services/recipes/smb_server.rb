@@ -79,6 +79,7 @@ template '/etc/samba/smb.conf' do
   group 'root'
   mode '0755'
   action :create
+  notifies :restart, 'service[smb]', :delayed
 end
 
 template '/etc/avahi/services/timemachine.service' do
@@ -87,11 +88,12 @@ template '/etc/avahi/services/timemachine.service' do
   group 'root'
   mode '0755'
   action :create
+  notifies :restart, 'service[avahi-daemon]', :delayed
 end
 
 execute 'Configure Samba Authentication Password' do
   command "smbpasswd -w #{passwords['samba_passwd']}"
-  #sensitive node['linux']['runtime']['sensitivity']
+  sensitive node['linux']['runtime']['sensitivity']
   action :run
   notifies :restart, 'service[smb]', :delayed
   not_if "strings /var/lib/samba/private/secrets.tdb 2>/dev/null | grep #{passwords['samba_passwd']} >/dev/null 2>&1"
