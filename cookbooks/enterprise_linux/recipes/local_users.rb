@@ -39,7 +39,7 @@ user "root" do
   comment "root"
   password "!"
   manage_home false
-  action :lock
+  action :modify
   only_if { node['linux']['disable_root'] == true }
 end
 
@@ -52,6 +52,16 @@ user "root" do
   password passwords['root_hash']
   manage_home false
   action :modify
+  only_if { node['linux']['disable_root'] == false }
+end
+
+user "root" do
+  action :lock
+  only_if { node['linux']['disable_root'] == true }
+end
+
+user "root" do
+  action :unlock
   only_if { node['linux']['disable_root'] == false }
 end
 
