@@ -2,7 +2,7 @@
 
 ## About
 
-This repository contains a set of cookbooks that I use to manage my home lab.  They provide a suite of capabilities that allow systems to automatically provision and also be destroyed and replaced very quickly allowing me to rapidly deploy and test new software and technologies.
+This repository contains a set of cookbooks that I use to manage my home systems.  They provide a suite of capabilities that allow systems to automatically provision and also be destroyed and replaced very quickly allowing me to rapidly deploy and test new software and technologies.
 
 * Configures Chef server in a single instance or downstream replica configuration.
 * Implements PXE deployment services (just create a VM and turn it on).
@@ -34,34 +34,38 @@ limitations under the License.
 ## Wrapper Cookbook Functions
 The cookbooks in this project do not have default recipes, and that is by design.  They should only be used as part of a wrapper cookbook model.  Example wrapper cookbooks are included in the project.  They are defined as follows.
 
-### lab_management::chef\_server
+### Provisioned Services Attributes
+
+Review cookbooks/provisioned_services/attributes/example_secrets.rb for examples of how to get started with the cookbook quickly.  To configure, modify the file and rename it to secrets.rb.
+
+### provisioned_services::chef\_server
 
     Node Name: cdc0001.{DOMAIN}
     Function: Provisions a managed Chef server.
 
-### lab_management::provisioning\_server
+### provisioned_services::provisioning\_server
 
     Node Name: cdc0002.{DOMAIN}
     Function: Mirrors CentOS and local builders.
               Builds and signs source and binary RPMs.
               Deploys and configures Cobbler to automatically build managed servers.
 
-### lab_management::migrate\_self\_to\_{SERVER}
+### provisioned_services::migrate\_self\_to\_{SERVER}
 
     Node Name: Any
     Function: Migrates a server from one Chef instance to another.
 
-### lab_management::rebuild\_self
+### provisioned_services::rebuild\_self
 
     Node Name: Any
     Function: Destroy and rebuild the node that the recipe is assigned on the next Chef check-in.
 
-### lab_management::decommission\_self
+### provisioned_services::decommission\_self
 
     Node Name: Any
     Function: Destroy and shutdown the node that the recipe is assigned on the next Chef check-in.
 
-**Note:** *The lab management recipes have a specific inheritance order making it necessary to remove the lab_management::standard\_server recipe from your node roles when using them due to conflicts.  These recipes already include the standard_server recipe.*
+**Note:** *The provisioned services recipes have a specific inheritance order making it necessary to remove the provisioned_services::standard\_server recipe from your node roles when using them due to conflicts.  These recipes already include the standard_server recipe.*
 
 ## Installation
 
@@ -205,7 +209,7 @@ In order to provision a Chef server we need to ensure a few things.  The Chef se
 
 19. Upload the cookbooks to the Chef server
 
-        # knife cookbook upload chef enterprise_linux provisioner lab_management -o {path to the cookbooks}
+        # knife cookbook upload chef enterprise_linux provisioner provisioned_services -o {path to the cookbooks}
 
 20. Create an environment in Chef called '{ORG}'
 21. Assign the Chef server to the {ORG} environment.
@@ -224,7 +228,7 @@ The Chef server should now be managing itself, run Chef client again to verify.
 Configuring additional instances is simple once the first instance is online.  To bring up a worker instance, perform the following steps after generating SSL keys for each server.
 
 1. Deploy a virtual machine matching the specs for a Chef server
-2. On the master server, add the lab_management::chef\_server role to the server's auto-generated primary role.
+2. On the master server, add the provisioned_services::chef\_server role to the server's auto-generated primary role.
 
 The system should provision itself with Chef, and then download all of the environments, roles, data bags, and cookbooks from Chef instance it is connected too.  The default behavior is to sync every time the Chef client executes on the node.  This behavior will continue with Chef instances connected to these Chef instances and downstream instances of those as well.
 
