@@ -18,7 +18,7 @@
 
 [timemachine]
     comment = Time Machine
-    path = /data/backup/timemachine
+    path = /data/timemachine/%U
     browseable = yes
     writeable = yes
     create mask = 0600
@@ -27,4 +27,6 @@
     vfs objects = catia fruit streams_xattr
     fruit:aapl = yes
     fruit:time machine = yes
-    valid users = <%= node['samba']['server_attributes']['ldap']['tmusers'] %>
+    root preexec = mkdir -p /data/timemachine/%U
+    valid users = %U
+    allow groups <%= node['samba']['server_attributes']['ldap']['tmusers'] %>

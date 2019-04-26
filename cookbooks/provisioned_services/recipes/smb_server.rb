@@ -73,14 +73,6 @@ yum_package [ 'samba',
   action :install
 end
 
-directory '/data/backup/timemachine' do
-  owner 'root'
-  group 'root'
-  mode '0755'
-  recursive true
-  action :create
-end
-
 template '/etc/samba/smb.conf' do
   source 'etc/samba/smb.conf.erb'
   owner 'root'
