@@ -52,13 +52,13 @@
 
 # node.normal['chef']['install_from_source']           = false
 
-# node.normal['chef']['node.normal_organization']          = '{Your Chef Org Short Name Here}'
-# node.normal['linux']['org_abbreviation']             = node['chef']['node.normal_organization']
+# node.normal['chef']['default_organization']          = '{Your Chef Org Short Name Here}'
+# node.normal['linux']['org_abbreviation']             = node['chef']['default_organization']
 
-# node.normal['chef']['organizations']['home']['short_name']                           = node['chef']['node.normal_organization']
+# node.normal['chef']['organizations']['home']['short_name']                           = node['chef']['default_organization']
 # node.normal['chef']['organizations']['home']['full_name']                            = node['linux']['domain_name']
-# node.normal['chef']['organizations']['home']['validator']                            = "#{node['chef']['node.normal_organization']}-validator"
-# node.normal['chef']['organizations']['home']['environment']                          = node['chef']['node.normal_organization']
+# node.normal['chef']['organizations']['home']['validator']                            = "#{node['chef']['default_organization']}-validator"
+# node.normal['chef']['organizations']['home']['environment']                          = node['chef']['default_organization']
 # node.normal['chef']['organizations']['home']['run_list']                             = 'provisioned_services::standard_server'
 # node.normal['chef']['organizations']['home']['admin_user']['username']               = 'admin'
 # node.normal['chef']['organizations']['home']['admin_user']['first_name']             = 'Systems'
