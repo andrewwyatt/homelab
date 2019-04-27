@@ -21,63 +21,63 @@
 ### This is the example secrets file.  Update to meet your needs, and rename to secrets.rb
 ###
 
-# default['provisioner']['hostname_prefix']        = '{Your Hostname Prefix Here}'
+# node.normal['provisioner']['hostname_prefix']        = '{Your Hostname Prefix Here}'
 
-# default['linux']['domain_root']                  = '{Your Root Domain Here}'
-# default['linux']['domain_name']                  = "{Your Domain Prefix Here}.#{node['linux']['domain_root']}"
-# default['provisioner']['domain']                 = node['linux']['domain_name']
+# node.normal['linux']['domain_root']                  = '{Your Root Domain Here}'
+# node.normal['linux']['domain_name']                  = "{Your Domain Prefix Here}.#{node['linux']['domain_root']}"
+# node.normal['provisioner']['domain']                 = node['linux']['domain_name']
 
-# default['chef']['ssl']['hostnames']              = { 'hostname' => node['fqdn'],
+# node.normal['chef']['ssl']['hostnames']              = { 'hostname' => node['fqdn'],
 #                                                      'cname'    => "chef.#{node['linux']['domain_name']}" }
 
-# default['linux']['slack_enabled']                = true
-# default['linux']['slack_channel']                = '{Your Slack Channel Here}'
-# default['linux']['api_path']                     = '{Your API Key Here}'
+# node.normal['linux']['slack_enabled']                = true
+# node.normal['linux']['slack_channel']                = '{Your Slack Channel Here}'
+# node.normal['linux']['api_path']                     = '{Your API Key Here}'
 
-# default['chef']['slack_enabled']                 = true
-# default['chef']['slack_channel']                 = '{Your Slack Channel Here}'
-# default['chef']['api_path']                      = '{Your API Key Here}'
+# node.normal['chef']['slack_enabled']                 = true
+# node.normal['chef']['slack_channel']                 = '{Your Slack Channel Here}'
+# node.normal['chef']['api_path']                      = '{Your API Key Here}'
 
-# default['provisioner']['slack_enabled']          = true
-# default['provisioner']['slack_channel']          = '{Your Slack Channel Here}'
-# default['provisioner']['api_path']               = '{Your API Key Here}'
+# node.normal['provisioner']['slack_enabled']          = true
+# node.normal['provisioner']['slack_channel']          = '{Your Slack Channel Here}'
+# node.normal['provisioner']['api_path']               = '{Your API Key Here}'
 
-# default['provisioner']['hostname_auth_token']    = '{Your Name Generator Auth Token Here}'
+# node.normal['provisioner']['hostname_auth_token']    = '{Your Name Generator Auth Token Here}'
 
-# default['linux']['jumpcloud']['server_groupid']  = '{Your JumpCloud Server GID Here}'
+# node.normal['linux']['jumpcloud']['server_groupid']  = '{Your JumpCloud Server GID Here}'
 
-# default['linux']['runtime']['sensitivity']       = true
-# default['chef']['runtime']['sensitivity']        = true
-# default['provisioner']['runtime']['sensitivity'] = true
+# node.normal['linux']['runtime']['sensitivity']       = true
+# node.normal['chef']['runtime']['sensitivity']        = true
+# node.normal['provisioner']['runtime']['sensitivity'] = true
 
-# default['chef']['install_from_source']           = false
+# node.normal['chef']['install_from_source']           = false
 
-# default['chef']['default_organization']          = '{Your Chef Org Short Name Here}'
-# default['linux']['org_abbreviation']             = node['chef']['default_organization']
+# node.normal['chef']['node.normal_organization']          = '{Your Chef Org Short Name Here}'
+# node.normal['linux']['org_abbreviation']             = node['chef']['node.normal_organization']
 
-# default['chef']['organizations']['home']['short_name']                           = node['chef']['default_organization']
-# default['chef']['organizations']['home']['full_name']                            = node['linux']['domain_name']
-# default['chef']['organizations']['home']['validator']                            = "#{node['chef']['default_organization']}-validator"
-# default['chef']['organizations']['home']['environment']                          = node['chef']['default_organization']
-# default['chef']['organizations']['home']['run_list']                             = 'provisioned_services::standard_server'
-# default['chef']['organizations']['home']['admin_user']['username']               = 'admin'
-# default['chef']['organizations']['home']['admin_user']['first_name']             = 'Systems'
-# default['chef']['organizations']['home']['admin_user']['last_name']              = 'Administrator'
-# default['chef']['organizations']['home']['admin_user']['email']                  = "admin@#{node['linux']['domain_name']}"
-# default['chef']['organizations']['home']['groups']['admin']                      = '{JumpCloud Admin GID Here}'
-# default['chef']['organizations']['home']['groups']['users']                      = '{JumpCloud User GID Here}'
-# default['chef']['organizations']['home']['unmanaged_accounts']                   = [ 'admin', 'pivotal', 'delivery' ]
+# node.normal['chef']['organizations']['home']['short_name']                           = node['chef']['node.normal_organization']
+# node.normal['chef']['organizations']['home']['full_name']                            = node['linux']['domain_name']
+# node.normal['chef']['organizations']['home']['validator']                            = "#{node['chef']['node.normal_organization']}-validator"
+# node.normal['chef']['organizations']['home']['environment']                          = node['chef']['node.normal_organization']
+# node.normal['chef']['organizations']['home']['run_list']                             = 'provisioned_services::standard_server'
+# node.normal['chef']['organizations']['home']['admin_user']['username']               = 'admin'
+# node.normal['chef']['organizations']['home']['admin_user']['first_name']             = 'Systems'
+# node.normal['chef']['organizations']['home']['admin_user']['last_name']              = 'Administrator'
+# node.normal['chef']['organizations']['home']['admin_user']['email']                  = "admin@#{node['linux']['domain_name']}"
+# node.normal['chef']['organizations']['home']['groups']['admin']                      = '{JumpCloud Admin GID Here}'
+# node.normal['chef']['organizations']['home']['groups']['users']                      = '{JumpCloud User GID Here}'
+# node.normal['chef']['organizations']['home']['unmanaged_accounts']                   = [ 'admin', 'pivotal', 'delivery' ]
 
-# default['chef']['server_attributes']['ldap']['base_dn']             = '{BASEDN Here}'
-# default['chef']['server_attributes']['ldap']['bind_dn']             = '{BINDDN Here}'
-# default['chef']['server_attributes']['ldap']['host']                = 'ldap.jumpcloud.com'
-# default['chef']['server_attributes']['ldap']['enable_tls']          = 'true'
-# default['chef']['server_attributes']['ldap']['port']                = '389'
-# default['chef']['server_attributes']['ldap']['login_attribute']     = 'uid'
+# node.normal['chef']['server_attributes']['ldap']['base_dn']             = '{BASEDN Here}'
+# node.normal['chef']['server_attributes']['ldap']['bind_dn']             = '{BINDDN Here}'
+# node.normal['chef']['server_attributes']['ldap']['host']                = 'ldap.jumpcloud.com'
+# node.normal['chef']['server_attributes']['ldap']['enable_tls']          = 'true'
+# node.normal['chef']['server_attributes']['ldap']['port']                = '389'
+# node.normal['chef']['server_attributes']['ldap']['login_attribute']     = 'uid'
 
-# default['chef']['server_attributes']['nginx']['ssl_certificate']     = "/etc/opscode/#{node['fqdn']}.crt"
-# default['chef']['server_attributes']['nginx']['ssl_certificate_key'] = "/etc/opscode/#{node['fqdn']}.pem"
-# default['chef']['server_attributes']['nginx']['ssl_protocols']       = 'TLSv1.1 TLSv1.2'
+# node.normal['chef']['server_attributes']['nginx']['ssl_certificate']     = "/etc/opscode/#{node['fqdn']}.crt"
+# node.normal['chef']['server_attributes']['nginx']['ssl_certificate_key'] = "/etc/opscode/#{node['fqdn']}.pem"
+# node.normal['chef']['server_attributes']['nginx']['ssl_protocols']       = 'TLSv1.1 TLSv1.2'
 
 ###
 ### Follow the JumpCloud procedures for enabling a Samba authentication user.  Set the service password in:
@@ -85,9 +85,9 @@
 ### Credentials -> passwords -> samba_passwd
 ###
 
-# default['samba']['server_attributes']['ldap']['base_dn'] = '{Your JumpCloud BaseDN}'
-# default['samba']['server_attributes']['ldap']['bind_dn'] = '{Your JumpCloud Samba Service Account}'
-# default['samba']['server_attributes']['ldap']['host']    = 'ldapsam:ldaps://ldap.jumpcloud.com:636'
-# default['samba']['server_attributes']['ldap']['users']   = 'ou=Users'
-# default['samba']['server_attributes']['ldap']['group']   = 'ou=Users'
-# default['samba']['server_attributes']['ldap']['users']   = 'Users'
+# node.normal['samba']['server_attributes']['ldap']['base_dn'] = '{Your JumpCloud BaseDN}'
+# node.normal['samba']['server_attributes']['ldap']['bind_dn'] = '{Your JumpCloud Samba Service Account}'
+# node.normal['samba']['server_attributes']['ldap']['host']    = 'ldapsam:ldaps://ldap.jumpcloud.com:636'
+# node.normal['samba']['server_attributes']['ldap']['users']   = 'ou=Users'
+# node.normal['samba']['server_attributes']['ldap']['group']   = 'ou=Users'
+# node.normal['samba']['server_attributes']['ldap']['users']   = 'Users'
