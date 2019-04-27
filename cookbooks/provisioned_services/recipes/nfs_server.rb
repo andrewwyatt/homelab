@@ -105,7 +105,7 @@ template "/etc/monit.d/nfs" do
   mode 0600
   action :create
   sensitive node['linux']['runtime']['sensitivity']
-  notifies :restart, 'service[monit]', :immediately
+  notifies :restart, 'service[monit]', :delayed
   only_if { node['linux']['monit']['enabled'] == true }
 end
 

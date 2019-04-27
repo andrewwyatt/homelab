@@ -437,6 +437,40 @@ service "httpd" do
   action [ :enable, :start ]
 end
 
+template "/etc/monit.d/httpd" do
+  source "etc/monit.d/httpd.erb"
+  owner "root"
+  group "root"
+  mode 0600
+  action :create
+  sensitive node['linux']['runtime']['sensitivity']
+  notifies :restart, 'service[monit]', :delayed
+  only_if { node['linux']['monit']['enabled'] == true }
+end
+
+template "/etc/monit.d/xinetd" do
+  source "etc/monit.d/xinetd.erb"
+  owner "root"
+  group "root"
+  mode 0600
+  action :create
+  sensitive node['linux']['runtime']['sensitivity']
+  notifies :restart, 'service[monit]', :delayed
+  only_if { node['linux']['monit']['enabled'] == true }
+end
+
+yum_package 'monit' do
+  action :install
+end
+
+service 'monit' do
+  if node['linux']['monit']['enabled'] == false
+    action [:disable, :stop]
+  elsif node['linux']['monit']['enabled'] == true
+    action [:enable, :start]
+  end
+end
+
 ###
 ###  Tag myself to identify my function
 ###
