@@ -55,11 +55,9 @@ default['provisioner']['file_header']                          = node['linux']['
 ### Use CNAMES for functions if desired (cobbler, packages, provisioner, chef, etc).
 ###
 
-#default['provisioner']['hostname_prefix']                       = 'cdc'
-#default['provisioner']['domain']                                = 'lab.fewt.com'
 default['provisioner']['name_gen_path']                         = '/var/www/names'
 default['provisioner']['max_num_hosts']                         = '9999'
-default['provisioner']['name_gen_reset']                        = '900'
+default['provisioner']['name_gen_reset']                        = '86400'
 default['provisioner']['hostname_auth_token']                   = 'AUTH TOKEN GOES HERE'
 
 default['provisioner']['chef']['default_server']                = "#{node['provisioner']['hostname_prefix']}0001.#{node['provisioner']['domain']}"

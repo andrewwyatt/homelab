@@ -105,33 +105,6 @@ default['chef']['ssl']['use_acme']               = true
 default['chef']['ssl']['renewal_day']            = '7'
 default['chef']['ssl']['acme_giturl']            = 'https://github.com/Neilpang/acme.sh.git'
 
-default['chef']['ssl']['hostnames']              = { 'hostname' => node['fqdn'],
-                                                     'cname'    => 'chef.lab.fewt.com' }
-
-default['chef']['auth_user']                     = 'chef_authenticator'
-
-### Chef server bits
-default['chef']['default_organization']          = 'lab'
-default['chef']['organizations']                 = { 'lab'        => { 'short_name'          => 'lab',
-                                                                       'full_name'           => 'lab.fewt.com',
-                                                                       'validator'           => 'lab-validator',
-                                                                       'environment'         => 'lab',
-                                                                       'run_list'            => 'lab_management::standard_server',
-                                                                       'admin_user'          => { 'username'   => 'admin',
-                                                                                                  'first_name' => 'Systems',
-                                                                                                  'last_name'  => 'Administrator',
-                                                                                                  'email'      => 'admin@lab.fewt.com'
-                                                                                                },
-                                                                       'groups'              => { 'admin'        => '{JUMPCLOUD ADMIN GROUP ID}',
-                                                                                                  'users'        => '{JUMPCLOUD USER GROUP ID}'
-                                                                                                },
-                                                                       'unmanaged_accounts'  => [ 'admin',
-                                                                                                  'pivotal',
-                                                                                                  'delivery'
-                                                                                                ]
-                                                                     }
-                                                   }
-
 ###
 ### This is the directory where the admin and validation keys will be stored on the Chef server.
 ###

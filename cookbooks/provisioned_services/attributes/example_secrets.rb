@@ -27,6 +27,9 @@
 # default['linux']['domain_name']                  = "{Your Domain Prefix Here}.#{node['linux']['domain_root']}"
 # default['provisioner']['domain']                 = node['linux']['domain_name']
 
+# default['chef']['ssl']['hostnames']              = { 'hostname' => node['fqdn'],
+#                                                      'cname'    => "chef.#{node['linux']['domain_name']}" }
+
 # default['linux']['slack_enabled']                = true
 # default['linux']['slack_channel']                = '{Your Slack Channel Here}'
 # default['linux']['api_path']                     = '{Your API Key Here}'
@@ -61,8 +64,8 @@
 # default['chef']['organizations']['home']['admin_user']['first_name']             = 'Systems'
 # default['chef']['organizations']['home']['admin_user']['last_name']              = 'Administrator'
 # default['chef']['organizations']['home']['admin_user']['email']                  = "admin@#{node['linux']['domain_name']}"
-# default['chef']['organizations']['home']['admin_user']['groups']['admin']        = '{JumpCloud Admin GID Here}'
-# default['chef']['organizations']['home']['admin_user']['groups']['users']        = '{JumpCloud User GID Here}'
+# default['chef']['organizations']['home']['groups']['admin']                      = '{JumpCloud Admin GID Here}'
+# default['chef']['organizations']['home']['groups']['users']                      = '{JumpCloud User GID Here}'
 # default['chef']['organizations']['home']['unmanaged_accounts']                   = [ 'admin', 'pivotal', 'delivery' ]
 
 # default['chef']['server_attributes']['ldap']['base_dn']             = '{BASEDN Here}'

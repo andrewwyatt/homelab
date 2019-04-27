@@ -17,6 +17,13 @@
 ### limitations under the License.
 ###
 
-node.default['linux']['chef']['new_chef_server'] = 'cpc0001.home.fewt.com'
+node.from_file(run_context.resolve_attribute("provisioned_services", "secrets"))
+node.from_file(run_context.resolve_attribute("enterprise_linux", "default"))
+
+###
+### Update this attribute to the target Chef server your node(s) are being migrated too.
+###
+
+node.default['linux']['chef']['new_chef_server'] = "chef.#{node['linux']['domain_name']}"
 
 include_recipe 'enterprise_linux::relocate'
