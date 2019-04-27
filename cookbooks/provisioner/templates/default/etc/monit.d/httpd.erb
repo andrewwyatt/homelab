@@ -9,9 +9,3 @@ check process httpd with pidfile /run/xinetd.pid
     if cpu usage > 95% for 3 cycles then exec "/bin/monit-slack"
     if failed port 80 protocol http then exec "/bin/monit-slack"
     if failed port 80 protocol http then restart
-    if does not exist then
-      exec "/bin/monit-slack The http server has failed or is currently stopped."
-    if uptime < 1 minute then
-      exec "/bin/monit-slack The http server is starting or has restarted."
-    else if succeeded then
-      exec "/bin/monit-slack The http server is operating normally."

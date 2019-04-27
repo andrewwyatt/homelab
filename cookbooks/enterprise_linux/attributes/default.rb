@@ -75,7 +75,7 @@ default['linux']['chef']['org_cert']                             = "#{node['linu
 default['linux']['chef']['default_environment']                  = node['linux']['org_abbreviation']
 
 default['linux']['chef']['primary_role']                         = "enterprise_linux"
-default['linux']['chef']['bootstrap_delay']                      = "30"
+default['linux']['chef']['bootstrap_delay']                      = "10"
 default['linux']['chef']['bootstrap_user']                       = "admin"
 default['linux']['chef']['bootstrap_root']                       = "/node/"
 

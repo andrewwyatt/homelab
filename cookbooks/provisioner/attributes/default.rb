@@ -97,7 +97,7 @@ default['provisioner']['cobbler']['bootstrap_failure_notice']    = "There was an
 
 default['provisioner']['cobbler']['build_failure_notice']        = 'Something went wrong building ${HOSTNAME}, better check it out.'
 default['provisioner']['cobbler']['build_success_notice']        = '${HOSTNAME} provisioning complete.'
-default['provisioner']['cobbler']['decom_schedule']              = '* * * * *'
+default['provisioner']['cobbler']['decom_schedule']              = '00 * * * *'
 
 default['provisioner']['cobbler']['default_packages']            = { 'core' => '@core' }
 

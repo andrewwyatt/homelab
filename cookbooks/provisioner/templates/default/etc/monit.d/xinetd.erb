@@ -3,11 +3,5 @@
 check process xinetd with pidfile /run/xinetd.pid
     start program = "/usr/bin/systemctl start xinetd"
     stop  program = "/usr/bin/systemctl stop xinetd"
-  	if does not exist for 2 cycles then restart
+  	if does not exist for 2 cycles then exec "cobbler sync"
     if 2 restarts within 4 cycles then exec "/bin/monit-slack"
-    if does not exist then
-      exec "/bin/monit-slack The xinetd service has failed or is currently stopped."
-    if uptime < 1 minute then
-      exec "/bin/monit-slack The xinetd service is starting or has restarted."
-    else if succeeded then
-      exec "/bin/monit-slack The xinetd service is operating normally."
