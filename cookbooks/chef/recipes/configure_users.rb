@@ -195,6 +195,7 @@ EOF
       action :run
       sensitive node['chef']['runtime']['sensitivity']
       not_if { existing_account == true }
+      only_if { node['chef']['install_manage'] == true }
     end
 
     ###
