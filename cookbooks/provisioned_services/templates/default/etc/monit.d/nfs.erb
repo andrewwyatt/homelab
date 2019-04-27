@@ -1,8 +1,8 @@
 <%= node['linux']['chef']['file_header'] %>
 
 check process NFS with pidfile /run/rpc.statd.pid
-  	start program = "systemctl nfs-server start"
-  	stop program  = "systemctl nfs-server stop"
+  	start program = "/usr/bin/systemctl start nfs-server"
+  	stop program  = "/usr/bin/systemctl stop nfs-server"
   	if failed host 127.0.0.1 port 2049 type tcp for 2 cycles then restart
     if 2 restarts within 4 cycles then exec "/bin/monit-slack"
     if does not exist then

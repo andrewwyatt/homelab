@@ -132,6 +132,50 @@ template "/etc/monit.d/ping" do
     })
 end
 
+template "/etc/monit.d/crond" do
+  source "etc/monit.d/crond.erb"
+  owner "root"
+  group "root"
+  mode 0600
+  action :create
+  sensitive node['linux']['runtime']['sensitivity']
+  notifies :restart, 'service[monit]', :delayed
+  only_if { node['linux']['monit']['enabled'] == true }
+end
+
+template "/etc/monit.d/ntpd" do
+  source "etc/monit.d/ntpd.erb"
+  owner "root"
+  group "root"
+  mode 0600
+  action :create
+  sensitive node['linux']['runtime']['sensitivity']
+  notifies :restart, 'service[monit]', :delayed
+  only_if { node['linux']['monit']['enabled'] == true }
+end
+
+template "/etc/monit.d/jcagent" do
+  source "etc/monit.d/jcagent.erb"
+  owner "root"
+  group "root"
+  mode 0600
+  action :create
+  sensitive node['linux']['runtime']['sensitivity']
+  notifies :restart, 'service[monit]', :delayed
+  only_if { node['linux']['monit']['enabled'] == true }
+end
+
+template "/etc/monit.d/sshd" do
+  source "etc/monit.d/sshd.erb"
+  owner "root"
+  group "root"
+  mode 0600
+  action :create
+  sensitive node['linux']['runtime']['sensitivity']
+  notifies :restart, 'service[monit]', :delayed
+  only_if { node['linux']['monit']['enabled'] == true }
+end
+
 yum_package 'monit' do
   action :install
 end

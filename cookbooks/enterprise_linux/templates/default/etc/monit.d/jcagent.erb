@@ -1,0 +1,13 @@
+<%= node['linux']['chef']['file_header'] %>
+
+check process JumpCloud with pidfile /run/jcagent.pid
+  	start program = "/usr/bin/systemctl start jcagent"
+  	stop program  = "/usr/bin/systemctl stop jcagent"
+  	if does not exist for 2 cycles then restart
+    if 2 restarts within 4 cycles then exec "/bin/monit-slack"
+    if does not exist then
+      exec "/bin/monit-slack The jumpcloud agent has failed or is currently stopped."
+    if uptime < 1 minute then
+      exec "/bin/monit-slack The jumpcloud agent is starting or has restarted."
+    else if succeeded then
+      exec "/bin/monit-slack The jumpcloud agent is operating normally."
