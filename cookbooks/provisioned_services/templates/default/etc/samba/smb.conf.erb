@@ -16,7 +16,7 @@
     security = user
     map to guest = bad user
 
-[Shared]
+[shared]
     comment = Shared Files (Unencrypted)
     path = /data/shared
     browseable = yes
@@ -30,8 +30,8 @@
     root preexec = bash -c '[[ -d /data/shared ]] || mkdir -pm 0770 /data/shared && chown root:<%= node['samba']['server_attributes']['ldap']['users'] %> /data/shared'
     allow groups @<%= node['samba']['server_attributes']['ldap']['tmusers'] %>
 
-[TimeMachine]
-    comment = Time Machine share for %m
+[backups]
+    comment = Backup storage for %m
     path = /data/timemachine/%m
     browseable = yes
     writeable = yes
