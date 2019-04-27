@@ -1,0 +1,13 @@
+<%= node['linux']['chef']['file_header'] %>
+
+check process Samba with pidfile "/run/smbd.pid"
+    start program = "/bin/systemctl start smb.service"
+    stop program  = "/bin/systemctl stop smb.service"
+    if failed host 127.0.0.1 port 445 type tcp for 2 cycles then restart
+    if 2 restarts within 4 cycles then exec "/bin/monit-slack"
+    if does not exist then
+      exec "/bin/monit-slack The samba service has failed or is currently stopped."
+    if uptime < 1 minute then
+      exec "/bin/monit-slack The samba service is starting or has restarted."
+    else if succeeded then
+      exec "/bin/monit-slack The samba service is operating normally."

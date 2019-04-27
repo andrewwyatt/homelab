@@ -8,8 +8,8 @@ check process docker with pidfile /run/docker.pid
   if does not exist for 10 cycles then
     exec "/usr/bin/systemctl start docker"
   if does not exist then
-    exec "/bin/monit-slack The docker process has failed or is currently stopped."
+    exec "/bin/monit-slack The docker service has failed or is currently stopped."
   if uptime < 1 minute then
-    exec "/bin/monit-slack The docker process is starting or has restarted."
+    exec "/bin/monit-slack The docker service is starting or has restarted."
   else if succeeded then
-    exec "/bin/monit-slack The docker process is operating normally."
+    exec "/bin/monit-slack The docker service is operating normally."

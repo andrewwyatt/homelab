@@ -113,3 +113,26 @@ service "avahi-daemon" do
   supports :status => true, :restart => true
   action [ :enable, :start ]
 end
+
+template "/etc/monit.d/samba" do
+  source "etc/monit.d/samba.erb"
+  owner "root"
+  group "root"
+  mode 0600
+  action :create
+  sensitive node['linux']['runtime']['sensitivity']
+  notifies :restart, 'service[monit]', :immediately
+  only_if { node['linux']['monit']['enabled'] == true }
+end
+
+yum_package 'monit' do
+  action :install
+end
+
+service 'monit' do
+  if node['linux']['monit']['enabled'] == false
+    action [:disable, :stop]
+  elsif node['linux']['monit']['enabled'] == true
+    action [:enable, :start]
+  end
+end

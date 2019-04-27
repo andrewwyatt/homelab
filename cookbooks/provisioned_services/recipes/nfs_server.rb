@@ -97,3 +97,26 @@ service "nfs-server" do
   supports :status => true, :restart => true
   action [ :enable, :start ]
 end
+
+template "/etc/monit.d/nfs" do
+  source "etc/monit.d/nfs.erb"
+  owner "root"
+  group "root"
+  mode 0600
+  action :create
+  sensitive node['linux']['runtime']['sensitivity']
+  notifies :restart, 'service[monit]', :immediately
+  only_if { node['linux']['monit']['enabled'] == true }
+end
+
+yum_package 'monit' do
+  action :install
+end
+
+service 'monit' do
+  if node['linux']['monit']['enabled'] == false
+    action [:disable, :stop]
+  elsif node['linux']['monit']['enabled'] == true
+    action [:enable, :start]
+  end
+end
