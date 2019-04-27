@@ -188,7 +188,7 @@ template "/etc/monit.d/httpd" do
   group "root"
   mode 0600
   action :create
-  sensitive node['linux']['runtime']['sensitivity']
+  sensitive node['provisioner']['runtime']['sensitivity']
   notifies :restart, 'service[monit]', :delayed
   only_if { node['linux']['monit']['enabled'] == true }
 end
@@ -199,7 +199,7 @@ template "/etc/monit.d/xinetd" do
   group "root"
   mode 0600
   action :create
-  sensitive node['linux']['runtime']['sensitivity']
+  sensitive node['provisioner']['runtime']['sensitivity']
   notifies :restart, 'service[monit]', :delayed
   only_if { node['linux']['monit']['enabled'] == true }
 end

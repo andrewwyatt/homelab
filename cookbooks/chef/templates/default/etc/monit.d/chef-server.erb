@@ -1,0 +1,9 @@
+<%= node['linux']['chef']['file_header'] %>
+
+check host chef-server with address 127.0.0.1
+  start program = "/usr/bin/chef-server-ctl start"
+  stop program  = "/usr/bin/chef-server-ctl stop"
+  if failed (url https://<%= node['fqdn'] %>/_status and content == 'pong' and timeout 20 seconds)
+    for two cycles
+    then restart and exec "/bin/monit-slack"
+  if 2 restarts within 4 cycles then exec "/bin/monit-slack"

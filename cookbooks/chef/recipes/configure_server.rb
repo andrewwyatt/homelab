@@ -396,4 +396,27 @@ template '/etc/opscode/chef-server.rb' do
   only_if { node['chef']['manage_chef'] == true }
 end
 
+template "/etc/monit.d/chef-server" do
+  source "etc/monit.d/chef-server.erb"
+  owner "root"
+  group "root"
+  mode 0600
+  action :create
+  sensitive node['chef']['runtime']['sensitivity']
+  notifies :restart, 'service[monit]', :delayed
+  only_if { node['linux']['monit']['enabled'] == true }
+end
+
+yum_package 'monit' do
+  action :install
+end
+
+service 'monit' do
+  if node['linux']['monit']['enabled'] == false
+    action [:disable, :stop]
+  elsif node['linux']['monit']['enabled'] == true
+    action [:enable, :start]
+  end
+end
+
 tag('chef-server')
