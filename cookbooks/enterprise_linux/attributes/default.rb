@@ -369,6 +369,7 @@ default['linux']['firewall']['enable']                           = true
 default['linux']['firewall']['ignoreexisting']                   = false
 default['linux']['firewall']['ports']                            = { }
 default['linux']['firewall']['services']                         = { 'ssh'           => true }
+default['linux']['firewall']['masquerade']                       = false
 
 default['linux']['security']['secure_vartmp']                    = true
 default['linux']['security']['secure_shm']                       = true

@@ -91,3 +91,21 @@
 # node.normal['samba']['server_attributes']['ldap']['users']   = 'ou=Users'
 # node.normal['samba']['server_attributes']['ldap']['group']   = 'ou=Users'
 # node.normal['samba']['server_attributes']['ldap']['users']   = 'Users'
+
+###
+### OpenVPN configuration, set the service account password in:
+###
+### ### Credentials -> passwords -> openvpn_passwd
+###
+
+# node.normal['openvpn']['port']                                    = '1194'
+# node.normal['openvpn']['protocol']                                = 'udp'
+# node.normal['openvpn']['max_clients']                             = '100'
+# node.normal['openvpn']['routes']['0']                             = '10.100.100.0 255.255.255.0'
+# node.normal['openvpn']['easyrsa_url']                             = 'https://github.com/OpenVPN/easy-rsa/releases/download'
+# node.normal['openvpn']['easyrsa_version']                         = 'v3.0.6'
+# node.normal['openvpn']['easyrsa_package']                         = 'EasyRSA-unix-v3.0.6.tgz'
+
+# node.normal['openvpn']['ldap']['host']                            = 'ldaps://ldap.jumpcloud.com:636'
+# node.normal['openvpn']['ldap']['base_dn']                         = ''
+# node.normal['openvpn']['ldap']['bind_dn']                         = ''

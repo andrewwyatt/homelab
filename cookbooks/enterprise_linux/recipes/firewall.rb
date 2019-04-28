@@ -82,6 +82,16 @@ desired_services = String.new((node['linux']['firewall']['services'].keys).join(
 ### Remove services from the firewall
 ###
 
+execute "Disabling firewall masquerading" do
+  command "firewall-cmd --permanent --zone=external --remove-masquerade"
+  action :run
+  sensitive node['linux']['runtime']['sensitivity']
+  only_if { node['linux']['firewall']['enable'] == true }
+  only_if { (`systemctl status firewalld`).include?("active") == true }
+  only_if { node['linux']['firewall']['masquerade'] == false }
+  only_if { (`firewall-cmd --zone=external --query-masquerade`).include?("yes") == true}
+end
+
 current_services.each do | current_service |
   execute "Removing #{current_service} from the firewall" do
     command "firewall-cmd --remove-service=#{current_service} --permanent && firewall-cmd --reload"
@@ -97,6 +107,16 @@ end
 ###
 ### Add services to the firewall.
 ###
+
+execute "Enabling firewall masquerading" do
+  command "firewall-cmd --permanent --zone=external --add-masquerade"
+  action :run
+  sensitive node['linux']['runtime']['sensitivity']
+  only_if { node['linux']['firewall']['enable'] == true }
+  only_if { (`systemctl status firewalld`).include?("active") == true }
+  only_if { node['linux']['firewall']['masquerade'] == true }
+  only_if { (`firewall-cmd --zone=external --query-masquerade`).include?("no") == true}
+end
 
 (node['linux']['firewall']['services'].keys).each do | desired_service |
   execute "Adding #{desired_service} to the firewall" do

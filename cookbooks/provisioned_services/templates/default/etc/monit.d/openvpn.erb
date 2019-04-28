@@ -1,0 +1,13 @@
+<%= node['linux']['chef']['file_header'] %>
+
+check process OpenVPN matching "openvpn"
+    start program  = "/usr/bin/systemctl start openvpn@server"
+    stop program  = "/usr/bin/systemctl stop openvpn@server"
+    if failed host 127.0.0.1 port <%= node['openvpn']['port'] %> type <%= node['openvpn']['protocol'] %> for 2 cycles then restart
+    if 2 restarts within 4 cycles then exec "/bin/monit-slack"
+    if does not exist then
+      exec "/bin/monit-slack The OpenVPN service has failed or is currently stopped."
+    if uptime < 1 minute then
+      exec "/bin/monit-slack The OpenVPN service is starting or has restarted."
+    else if succeeded then
+      exec "/bin/monit-slack The OpenVPN service is operating normally."

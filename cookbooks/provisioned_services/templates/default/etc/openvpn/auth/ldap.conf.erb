@@ -1,0 +1,16 @@
+<%= node['linux']['chef']['file_header'] %>
+
+<LDAP>
+        URL             <%= node['openvpn']['ldap']['host'] %>
+        BindDN          <%= node['openvpn']['ldap']['bind_dn'] %>
+        Password        <%= @password %>
+        Timeout         15
+        TLSEnable       no
+        FollowReferrals no
+</LDAP>
+
+<Authorization>
+        BaseDN          <%= node['openvpn']['ldap']['base_dn'] %>
+        SearchFilter    "(&(uid=%u))"
+        RequireGroup    false
+</Authorization>

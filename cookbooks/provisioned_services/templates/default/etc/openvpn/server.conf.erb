@@ -1,0 +1,45 @@
+<%= node['linux']['chef']['file_header'] %>
+
+port <%= node['openvpn']['port'] %>
+proto <%= node['openvpn']['protocol'] %>
+dev tun
+ca /etc/openvpn/ca.crt
+cert /etc/openvpn/server.crt
+key /etc/openvpn/server.key
+dh /etc/openvpn/dh2048.pem
+topology subnet
+server <%= node['openvpn']['destination'] %>
+ifconfig-pool-persist ipp.txt
+
+<% node['openvpn']['routes'].each do |key,route| -%>
+push "<%= route %>"
+<% end -%>
+push "redirect-gateway def1"
+<% node['linux']['dns_resolvers'].each do |key,resolver| -%>
+push "dhcp-option DNS <%= resolver %>"
+<% end -%>
+
+keepalive 10 120
+
+remote-cert-eku "TLS Web Client Authentication"
+tls-crypt /etc/openvpn/<%= node['chef']['default_organization'] %>.tlsauth
+
+cipher AES-256-CBC
+
+compress lz4-v2
+push "compress lz4-v2"
+
+max-clients <%= node['openvpn']['max_clients'] %>
+
+user nobody
+group nobody
+
+persist-key
+persist-tun
+
+status openvpn-status.log
+verb 3
+
+explicit-exit-notify 1
+
+plugin /usr/lib64/openvpn/plugin/lib/openvpn-auth-ldap.so /etc/openvpn/auth/ldap.conf login
