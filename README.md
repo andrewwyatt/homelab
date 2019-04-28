@@ -49,6 +49,18 @@ Review cookbooks/provisioned_services/attributes/example_secrets.rb for examples
     Function: Mirrors CentOS and local builders.
               Builds and signs source and binary RPMs.
               Deploys and configures Cobbler to automatically build managed servers.
+              
+### provisioned_services::nfs\_server
+
+Provisions and manages a basic NFS server.
+
+### provisioned_services::smb\_server
+
+Deploys Samba that uses JumpCloud LDAP for authentication.  The recipe configures a basic public share, and a backup share that supports Time Machine and is unique to each connected system.
+
+### provisioned_services::openvpn\_server
+
+Provisions and manages an OpenVPN server instance that is integrated with JumpCloud for LDAP authentication.
 
 ### provisioned_services::migrate\_self\_to\_{SERVER}
 
@@ -66,6 +78,22 @@ Review cookbooks/provisioned_services/attributes/example_secrets.rb for examples
     Function: Destroy and shutdown the node that the recipe is assigned on the next Chef check-in.
 
 **Note:** *The provisioned services recipes have a specific inheritance order making it necessary to remove the provisioned_services::standard\_server recipe from your node roles when using them due to conflicts.  These recipes already include the standard_server recipe.*
+
+## Connecting OpenVPN clients
+
+OpenVPN clients use two factor authentication.  The first factor is a certificate generated and handed out with the client.  The second factor is LDAP authentication to the JumpCloud provider.  Configure clients using the process below.
+
+Edit the openvpn-clients.ovpn file in the examples directory adding your server and port.  Rename the file if desired.
+
+Log into your OpenVPN server, and generate a certificate.
+
+```
+cd /etc/openvpn/EasyRSA*
+EASYRSA_BATCH=true ./easyrsa gen-req clients nopass
+EASYRSA_BATCH=true ./easyrsa sign-req client clients
+```
+
+Copy /etc/openvpn/ca.crt, /etc/openvpn/{chefenv}.tlsauth /etc/openvpn/pki/issued/clients.crt, /etc/openvpn/pki/clients.key to the directory with openvpn-clients.ovpn.  Copy all of the files to each client and register the ovpn profile.  When connecting, the user should be prompted for a JumpCloud username and password.
 
 ## Installation
 
@@ -269,7 +297,10 @@ This bag contains the basic credentials necessary to configure servers in the en
       "jumpcloud_connect": "{JumpCloud Connect key}",
       "monit_password": "{Random monit password)",
       "zonomi_api": {Zonomi API key}",
-      "automate_token": "{Automate Token}"
+      "automate_token": "{Automate Token}",
+      "auth_user": "{Chef LDAP Service Account Password}",
+      "openvpn_passwd": "{OpenVPN LDAP Service Account Password}",
+      "samba_passwd": "{Samba LDAP Service Account Password}"
     }
 
 #### bootstrap\_passphrase
@@ -320,6 +351,14 @@ This entry contains the password for the Chef service account used for authentic
 #### automate_token
 
 This defines the automate token used to authenticate Chef clients and server to an Automate instance.
+
+#### openvpn_passwd
+
+This defines the openvpn service account password for LDAP authentication to JumpCloud.
+
+#### samba_passwd
+
+This defines the samba service account password for LDAP authentication to JumpCloud.
 
 ### Credentials / {PROVISIONER\_USER}
 
