@@ -50,7 +50,7 @@ default['provisioner']['ssl']['acme_giturl']                    = 'https://githu
 
 default['provisioner']['name_gen_path']                         = '/var/www/names'
 default['provisioner']['max_num_hosts']                         = '9999'
-default['provisioner']['name_gen_reset']                        = '86400'
+default['provisioner']['name_gen_reset']                        = '900'
 default['provisioner']['hostname_auth_token']                   = 'AUTH TOKEN GOES HERE'
 
 default['provisioner']['chef']['default_server']                = "#{node['provisioner']['hostname_prefix']}0001.#{node['provisioner']['domain']}"

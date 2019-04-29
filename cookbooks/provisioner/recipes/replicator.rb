@@ -86,24 +86,24 @@ node['provisioner']['mirrors'].each do | mirror, mirror_data |
     only_if { mirror_data['enabled'] == true }
   end
 
-  directory mirror_data['gpg_key_path'] do
-    owner "root"
-    group "bin"
-    mode "0755"
-    action :create
-  end
-
-  remote_file "#{mirror_data['gpg_key_path']}/#{mirror_data['gpg_key_name']}" do
-    source "#{mirror_data['gpg_key_url']}/#{mirror_data['gpg_key_name']}"
-    owner "root"
-    group "bin"
-    mode "0644"
-    action :create
-    sensitive node['provisioner']['runtime']['sensitivity']
-    not_if { (defined?(mirror_data['gpg_key_path'])).empty? == true }
-    not_if { (defined?(mirror_data['gpg_key_url'])).empty? == true }
-    not_if { (defined?(mirror_data['gpg_key_name'])).empty? == true }
-    not_if { mirror_data['enabled'] == false }
+  if defined?(mirror_data['gpg_key_name']) == true && \
+     defined?(mirror_data['gpg_key_url'])  == true && \
+     defined?(mirror_data['gpg_key_path']) == true
+     directory mirror_data['gpg_key_path'] do
+       owner "root"
+       group "bin"
+       mode "0755"
+       action :create
+     end
+    remote_file "#{mirror_data['gpg_key_path']}/#{mirror_data['gpg_key_name']}" do
+      source "#{mirror_data['gpg_key_url']}/#{mirror_data['gpg_key_name']}"
+      owner "root"
+      group "bin"
+      mode "0644"
+      action :create
+      sensitive node['provisioner']['runtime']['sensitivity']
+      not_if { mirror_data['enabled'] == false }
+    end
   end
 
 

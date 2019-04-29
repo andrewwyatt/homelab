@@ -140,16 +140,6 @@ bash "Remove myself from Chef, and power down." do
       knife node delete #{node['fqdn']} -c /etc/chef/client.rb -y -u #{node['linux']['chef']['bootstrap_user']} -k /etc/chef/#{node['linux']['chef']['bootstrap_user']}.pem
       knife client delete #{node['fqdn']} -c /etc/chef/client.rb -y -u #{node['linux']['chef']['bootstrap_user']} -k /etc/chef/#{node['linux']['chef']['bootstrap_user']}.pem
       rm -f /etc/chef/#{node['linux']['chef']['bootstrap_user']}.pem
-      ### Wait for the system record to be destroyed before completing the task.
-      while [ true ]
-      do
-        check=$(curl "https://#{node['linux']['cobbler']['server']}/cblr/svc/op/ks/system/#{node['fqdn']}" 2>/dev/null)
-        if [ "${check}" = "# system not found" ]
-        then
-          break
-        fi
-        sleep 5
-      done
       #{node['linux']['decom']['final_task']}' >/dev/null 2>&1 &
   EOF
   sensitive node['linux']['runtime']['sensitivity']
