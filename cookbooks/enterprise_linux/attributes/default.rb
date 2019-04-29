@@ -47,6 +47,7 @@ default['linux']['runtime']['sensitivity']                      = true
 ###
 
 default['linux']['cobbler']['server']                            = "deploy.#{node['linux']['domain_name']}"
+default['linux']['cobbler']['port']                              = "443"
 default['linux']['cobbler']['profile']                           = 'CentOS-7-x86_64'
 
 ###
@@ -550,29 +551,29 @@ default['linux']['yum']['local_mirror']                          = "mirror.#{nod
 
 
 default['linux']['yum']['package_mirrors']['CentOS_7_x86_64']    = { 'base'    => {  'name'             => 'CentOS-$releasever - Base',
-                                                                                     'baseurl'          => "http://#{node['linux']['yum']['local_mirror']}/mirrors/centos/7/os/x86_64",
+                                                                                     'baseurl'          => "https://#{node['linux']['yum']['local_mirror']}/mirrors/centos/7/os/x86_64",
                                                                                      'gpgcheck'         => '1',
                                                                                      'enabled'          => '1',
                                                                                      'gpgkey'           => 'file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7' },
                                                                      'updates' => {  'name'             => 'CentOS-$releasever - Updates',
-                                                                                     'baseurl'          => "http://#{node['linux']['yum']['local_mirror']}/mirrors/centos/7/updates/x86_64",
+                                                                                     'baseurl'          => "https://#{node['linux']['yum']['local_mirror']}/mirrors/centos/7/updates/x86_64",
                                                                                      'gpgcheck'         => '1',
                                                                                      'enabled'          => '1',
                                                                                      'gpgkey'           => 'file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7' },
                                                                      'extras'  => {  'name'             => 'CentOS-$releasever - Extras',
-                                                                                     'baseurl'          => "http://#{node['linux']['yum']['local_mirror']}/mirrors/centos/7/extras/x86_64",
+                                                                                     'baseurl'          => "https://#{node['linux']['yum']['local_mirror']}/mirrors/centos/7/extras/x86_64",
                                                                                      'gpgcheck'         => '1',
                                                                                      'enabled'          => '1',
                                                                                      'gpgkey'           => 'file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7' },
                                                                      'epel'    => {  'name'             => 'CentOS-$releasever - EPEL',
-                                                                                     'baseurl'          => "http://#{node['linux']['yum']['local_mirror']}/mirrors/epel/7/x86_64/",
+                                                                                     'baseurl'          => "https://#{node['linux']['yum']['local_mirror']}/mirrors/epel/7/x86_64/",
                                                                                      'gpgcheck'         => '1',
                                                                                      'enabled'          => '1',
-                                                                                     'gpgkey'           => "http://#{node['linux']['yum']['local_mirror']}/mirrors/epel/RPM-GPG-KEY-EPEL-7" } }
+                                                                                     'gpgkey'           => "https://#{node['linux']['yum']['local_mirror']}/mirrors/epel/RPM-GPG-KEY-EPEL-7" } }
 
 default['linux']['yum']['local_repositories']                    = { 'stable'  => {  'name'             => 'Stable Repository',
-                                                                                     'baseurl'          => "http://#{node['linux']['yum']['local_mirror']}/mirrors/local/#{node['platform_version'][0]}/STABLE/RPMS",
+                                                                                     'baseurl'          => "https://#{node['linux']['yum']['local_mirror']}/mirrors/local/#{node['platform_version'][0]}/STABLE/RPMS",
                                                                                      'gpgcheck'         => '1',
                                                                                      'enabled'          => '1',
-                                                                                     'gpgkey'           => "http://#{node['linux']['yum']['local_mirror']}/mirrors/local/RPM-GPG-KEY-LOCAL-#{node['platform_version'][0]}",
+                                                                                     'gpgkey'           => "https://#{node['linux']['yum']['local_mirror']}/mirrors/local/RPM-GPG-KEY-LOCAL-#{node['platform_version'][0]}",
                                                                                      'metadata_expire'  => '300' } }

@@ -26,10 +26,10 @@ end
 
 bash "Ensuring registration with Cobbler server" do
   code <<-EOF
-    koan -l systems --server #{node['linux']['cobbler']['server']} 2>&1 | grep $(hostname)
+    koan -l systems --server #{node['linux']['cobbler']['server']} --port #{node['linux']['cobbler']['port']} 2>&1 | grep $(hostname)
     if [ ! $? == 0 ]
     then
-      cobbler-register -s #{node['linux']['cobbler']['server']} --profile=#{node['linux']['cobbler']['profile']} || true
+      cobbler-register -s #{node['linux']['cobbler']['server']} --profile=#{node['linux']['cobbler']['profile']} -p #{node['linux']['cobbler']['port']} || true
     fi
   EOF
   sensitive node['linux']['runtime']['sensitivity']

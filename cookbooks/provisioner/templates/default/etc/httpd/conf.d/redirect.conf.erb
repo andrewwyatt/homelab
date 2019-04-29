@@ -1,0 +1,9 @@
+<%= node['provisioner']['file_header'] %>
+
+NameVirtualHost *:80
+<VirtualHost *:80>
+   ServerName <%= node['fqdn'] %>
+   RewriteEngine On
+   RewriteCond %{HTTPS}  !=on
+   RewriteRule ^/?(.*) https://%{HTTP_HOST}/$1 [R,L]
+</VirtualHost>

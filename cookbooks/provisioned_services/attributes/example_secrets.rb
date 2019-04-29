@@ -21,6 +21,22 @@
 ### This is the example secrets file.  Update to meet your needs, and rename to secrets.rb
 ###
 
+###
+### Let's define hosts in this environment - usable in other locations as well.
+###
+### Servers are cattle, not pets.
+###
+### CDC0000
+### ||||
+### |||`> Sequence         .. 1-9999
+### ||`-> Operating System .. (C)entOS, (R)edHat, (O)racle, (U)buntu, (W)indows
+### |`--> Environment      .. (D)evelopment, (S)tage, (P)roduction
+### `---> Topology         .. (D)MZ, (C)ore, (P)CI
+###
+###
+### Use CNAMES for functions if desired (cobbler, packages, provisioner, chef, etc).
+###
+
 # node.normal['provisioner']['hostname_prefix']        = '{Your Hostname Prefix Here}'
 
 # node.normal['linux']['domain_root']                  = '{Your Root Domain Here}'
@@ -29,6 +45,11 @@
 
 # node.normal['chef']['ssl']['hostnames']              = { 'hostname' => node['fqdn'],
 #                                                      'cname'    => "chef.#{node['linux']['domain_name']}" }
+
+# node.normal['provisioner']['ssl']['hostnames']       = { 'hostname' => node['fqdn'],
+#                                                          'cname1'    => "mirror.#{node['linux']['domain_name']}",
+#                                                          'cname2'    => "build7.#{node['linux']['domain_name']}",
+#                                                          'cname3'    => "deploy.#{node['linux']['domain_name']}"}
 
 # node.normal['linux']['slack_enabled']                = true
 # node.normal['linux']['slack_channel']                = '{Your Slack Channel Here}'

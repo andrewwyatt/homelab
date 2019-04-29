@@ -143,7 +143,7 @@ bash "Remove myself from Chef, and power down." do
       ### Wait for the system record to be destroyed before completing the task.
       while [ true ]
       do
-        check=$(curl "http://#{node['linux']['cobbler']['server']}/cblr/svc/op/ks/system/#{node['fqdn']}" 2>/dev/null)
+        check=$(curl "https://#{node['linux']['cobbler']['server']}/cblr/svc/op/ks/system/#{node['fqdn']}" 2>/dev/null)
         if [ "${check}" = "# system not found" ]
         then
           break

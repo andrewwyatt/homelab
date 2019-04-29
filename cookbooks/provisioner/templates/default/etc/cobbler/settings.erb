@@ -161,7 +161,7 @@ func_master: overlord.example.org
 
 # change this port if Apache is not running plaintext on port
 # 80.  Most people can leave this alone.
-http_port: 80
+http_port: <%= node['provisioner']['cobbler']['port'] %>
 
 # kernel options that should be present in every cobbler installation.
 # kernel options can also be applied at the distro/profile/system
@@ -395,7 +395,7 @@ client_use_localhost: 0
 # If set to 1, all commands to the API (not directly to the XMLRPC
 # server) will go over HTTPS instead of plaintext. Be sure to change
 # the http_port setting to the correct value for the web server
-client_use_https: 0
+client_use_https: <%= node['provisioner']['cobbler']['use_https'] %>
 
 # this is a directory of files that cobbler uses to make
 # templating easier.  See the Wiki for more information.  Changing

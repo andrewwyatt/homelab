@@ -33,8 +33,6 @@ $SNIPPET('base-hostname')
 $SNIPPET('base-build-notice')
 $SNIPPET('pre_install_network_config')
 notify "<%= node['provisioner']['cobbler']['hostname_notice'] %>"
-# Enable installation monitoring
-$SNIPPET('pre_anamon')
 notify "<%= node['provisioner']['cobbler']['provisioning_notice'] %>
 %end
 
@@ -48,7 +46,6 @@ $SNIPPET('post_install_network_config')
 $SNIPPET('base-resolver')
 $SNIPPET("base-repos-centos-CentOS_6_x86_64")
 $SNIPPET('base-chef')
-$SNIPPET('post_anamon')
 $SNIPPET('koan_environment')
 $SNIPPET('cobbler_register')
 $SNIPPET('kickstart_done')

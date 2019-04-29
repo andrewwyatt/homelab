@@ -21,6 +21,7 @@ require 'fileutils'
 
 yum_package [ 'httpd',
               'mod_security',
+              'mod_ssl',
               'dhcp',
               'bind',
               'xinetd',
@@ -41,6 +42,93 @@ cookbook_file '/etc/httpd/conf.d/get.conf' do
   action :create
   sensitive node['provisioner']['runtime']['sensitivity']
   notifies :restart, "service[httpd]", :immediately
+end
+
+###
+### Configure the http server to use the SSL certificates from Let's Encrypt
+###
+
+if node['linux']['dns']['mechanism'] == 'zonomi' && node['provisioner']['ssl']['use_acme'] == true
+  node.default['provisioner']['httpd']['ssl_certificate'] = "/etc/pki/tls/certs/localhost.crt"
+  node.default['provisioner']['httpd']['ssl_certificate_key'] = "/etc/pki/tls/private/localhost.key"
+end
+
+###
+### Does my certificate exist, or is it within the renewal window?
+###
+
+currentdate = Date.today.to_time.to_i
+
+if File.exists?(node['provisioner']['httpd']['ssl_certificate'])
+  certexpiration = `date -d "$(openssl x509 -enddate -noout -in #{node['provisioner']['httpd']['ssl_certificate']} | sed -e 's#notAfter=##')" '+%s'`
+else
+  certexpiration = currentdate
+end
+
+certdaysleft = (certexpiration.to_i - currentdate.to_i)
+if certdaysleft < node['provisioner']['ssl']['renewal_day'].to_i
+  renew_now = true
+end
+
+###
+### Deconstruct the names to pass to acme.sh
+###
+
+certnames = String.new
+node['provisioner']['ssl']['hostnames'].each do | type,value |
+   certnames = certnames + "-d " + value + " "
+end
+
+yum_package [ 'git' ] do
+  action :install
+  only_if { node['linux']['dns']['mechanism'] == 'zonomi' }
+  only_if { node['provisioner']['ssl']['use_acme'] == true }
+  only_if { renew_now == true }
+end
+
+git "#{Chef::Config[:file_cache_path]}/acme.sh" do
+  repository node['provisioner']['ssl']['acme_giturl']
+  reference 'master'
+  action :sync
+  sensitive node['provisioner']['runtime']['sensitivity']
+  not_if { Dir.exists?("#{Chef::Config['file_cache_path']}/acme.sh")}
+  only_if { node['linux']['dns']['mechanism'] == 'zonomi' }
+  only_if { node['provisioner']['ssl']['use_acme'] == true }
+  only_if { renew_now == true }
+end
+
+execute 'Creating or renewing certificate' do
+  command "ZM_Key=\"#{passwords['zonomi_api']}\" bash acme.sh --force --issue --dns dns_zonomi #{certnames} --fullchain-file #{node['provisioner']['httpd']['ssl_certificate']} --key-file #{node['provisioner']['httpd']['ssl_certificate_key']}; \
+           rm -rf /tmp/acme"
+  cwd "#{Chef::Config['file_cache_path']}/acme.sh"
+  action :run
+  sensitive node['provisioner']['runtime']['sensitivity']
+  notifies :restart, 'service[httpd]', :delayed
+  only_if { node['linux']['dns']['mechanism'] == 'zonomi' }
+  only_if { node['provisioner']['ssl']['use_acme'] == true }
+  only_if { renew_now == true }
+end
+
+template "/etc/httpd/conf.d/ssl.conf" do
+  source "etc/httpd/conf.d/ssl.conf.erb"
+  owner "root"
+  group "root"
+  mode 0644
+  action :create
+  sensitive node['provisioner']['runtime']['sensitivity']
+  notifies :restart, 'service[httpd]', :delayed
+  only_if { node['provisioner']['ssl']['enabled'] == true }
+end
+
+template "/etc/httpd/conf.d/redirect.conf" do
+  source "etc/httpd/conf.d/redirect.conf.erb"
+  owner "root"
+  group "root"
+  mode 0644
+  action :create
+  sensitive node['provisioner']['runtime']['sensitivity']
+  notifies :restart, 'service[httpd]', :delayed
+  only_if { node['provisioner']['ssl']['enabled'] == true }
 end
 
 cookbook_file '/etc/xinetd.d/tftp' do
@@ -277,6 +365,33 @@ template '/var/lib/cobbler/snippets/base-rootpw' do
   variables({
     :rootpw   => passwords['root_hash']
   })
+end
+
+template '/var/lib/cobbler/snippets/kickstart_start' do
+  source 'var/lib/cobbler/snippets/kickstart_start.erb'
+  owner 'root'
+  group 'root'
+  mode 0640
+  action :create
+  sensitive node['provisioner']['runtime']['sensitivity']
+end
+
+template '/var/lib/cobbler/snippets/kickstart_done' do
+  source 'var/lib/cobbler/snippets/kickstart_done.erb'
+  owner 'root'
+  group 'root'
+  mode 0640
+  action :create
+  sensitive node['provisioner']['runtime']['sensitivity']
+end
+
+template '/var/lib/cobbler/snippets/cobbler_register' do
+  source 'var/lib/cobbler/snippets/cobbler_register.erb'
+  owner 'root'
+  group 'root'
+  mode 0640
+  action :create
+  sensitive node['provisioner']['runtime']['sensitivity']
 end
 
 node['provisioner']['cobbler']['distros'].each do |distro,distro_metadata|
