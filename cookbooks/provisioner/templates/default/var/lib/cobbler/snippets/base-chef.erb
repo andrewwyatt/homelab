@@ -1,7 +1,7 @@
 <%= node['provisioner']['file_header'] %>
 
 notify "<%= node['provisioner']['cobbler']['bootstrap_notice'] %>"
-curl -o ./bootstrap <%= node['provisioner']['cobbler']['bootstrap_url'] %>/bootstrap --insecure
+curl -o ./bootstrap <%= node['provisioner']['cobbler']['bootstrap_url'] %>/bootstrap
 bash ./bootstrap -t 0 -p '<%= @chefpw %>' -s <%= node['provisioner']['chef']['default_server'] %> -f ${HOSTNAME} >/var/log/bootstrap.log 2>&1
 if [ $? = 0 ]
 then

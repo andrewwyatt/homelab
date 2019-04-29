@@ -28,4 +28,10 @@ SSLCryptoDevice builtin
            downgrade-1.0 force-response-1.0
   CustomLog logs/ssl_request_log \
             "%t %h %{SSL_PROTOCOL}x %{SSL_CIPHER}x \"%r\" %b"
+  <Location /cblr>
+    Order deny,allow
+    Deny from all
+    Allow from 127.0.0.1
+    Allow from <%= node['provisioner']['subnet'] %>/<%= node['provisioner']['netmask'] %>
+  </Location>
 </VirtualHost>
