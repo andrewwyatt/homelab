@@ -2,9 +2,10 @@
 
 zerombr
 clearpart --all
+part /boot/efi --fstype=efi --grow --maxsize=200 --size=20
 part /boot --asprimary --fstype ext4 --ondisk=/dev/sda --size=500
 part pv.3 --asprimary --size=100 --ondisk=/dev/sda --grow
-volgroup sysvg --pesize=32768 pv.3
+volgroup sysvg pv.3
 
 ### /boot 500MB
 ### / 		3GB
