@@ -1,9 +1,10 @@
 <%= node['provisioner']['file_header'] %>
 
-zerombr
-clearpart --all
-part /boot/efi --fstype=efi --grow --maxsize=200 --size=20
-part /boot --asprimary --fstype ext4 --ondisk=/dev/sda --size=500
+#zerombr
+#clearpart --all
+#part /boot --asprimary --fstype ext4 --ondisk=/dev/sda --size=500
+part /boot --onpart /dev/sda1 --fstype ext4
+part /efi --onpart /dev/sda2 --fstype efi
 part pv.3 --asprimary --size=100 --ondisk=/dev/sda --grow
 volgroup sysvg pv.3
 

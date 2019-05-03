@@ -31,6 +31,7 @@ $SNIPPET('kickstart_start')
 $SNIPPET('base-hostname')
 $SNIPPET('base-build-notice')
 $SNIPPET('pre_install_network_config')
+$SNIPPET('base-boot')
 notify "<%= node['provisioner']['cobbler']['hostname_notice'] %>"
 notify "<%= node['provisioner']['cobbler']['provisioning_notice'] %>
 %end

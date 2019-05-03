@@ -241,18 +241,6 @@ bash "Download the cobbler loaders" do
   not_if { File.exists? '/var/lib/cobbler/loaders/README' }
 end
 
-template '/var/lib/cobbler/kickstarts/CentOS-6-x86_64' do
-  source 'var/lib/cobbler/kickstarts/CentOS-6-x86_64.erb'
-  owner 'root'
-  group 'root'
-  mode 0640
-  action :create
-  sensitive node['provisioner']['runtime']['sensitivity']
-  variables({
-    :rootpw   => passwords['root_hash']
-  })
-end
-
 template '/var/lib/cobbler/kickstarts/CentOS-7-x86_64' do
   source 'var/lib/cobbler/kickstarts/CentOS-7-x86_64.erb'
   owner 'root'
@@ -315,6 +303,15 @@ end
 
 template '/var/lib/cobbler/snippets/base-packages' do
   source 'var/lib/cobbler/snippets/base-packages.erb'
+  owner 'root'
+  group 'root'
+  mode 0640
+  action :create
+  sensitive node['provisioner']['runtime']['sensitivity']
+end
+
+template '/var/lib/cobbler/snippets/base-boot' do
+  source 'var/lib/cobbler/snippets/base-boot.erb'
   owner 'root'
   group 'root'
   mode 0640
