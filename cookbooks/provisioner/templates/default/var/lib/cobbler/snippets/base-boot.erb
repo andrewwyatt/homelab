@@ -11,8 +11,5 @@ else
   parted -s /dev/sda mklabel msdos
 fi
 
-#parted -s /dev/sda mkpart primary 0 1
-#parted -s /dev/sda name 1 grub
-#parted -s /dev/sda set 1 buis_grub on
-parted -s /dev/sda mkpart primary ext4 1 512
+parted -s /dev/sda mkpart primary ext4 0 512
 parted -s /dev/sda mkpart primary fat32 512 768

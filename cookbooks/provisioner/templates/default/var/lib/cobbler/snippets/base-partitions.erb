@@ -1,20 +1,17 @@
 <%= node['provisioner']['file_header'] %>
 
-#zerombr
-#clearpart --all
-#part /boot --asprimary --fstype ext4 --ondisk=/dev/sda --size=500
 part /boot --onpart /dev/sda1 --fstype ext4
-part /efi --onpart /dev/sda2 --fstype efi
+part /boot/efi --onpart /dev/sda2 --fstype efi
 part pv.3 --asprimary --size=100 --ondisk=/dev/sda --grow
 volgroup sysvg pv.3
 
-### /boot 500MB
+### /boot	512MB
+### /boot/efi	256MB
 ### / 		3GB
 ### /var	1GB
 ### /home	1GB
 ### /tmp	1GB
 ### swap	2GB
-### Total Size:	8.5GB
 
 ### Removed: nodev,nosuid,noexec for mock - need to fix that
 logvol / --fstype ext4 --name=lv_root --vgname=sysvg --size=3000
