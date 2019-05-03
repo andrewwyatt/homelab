@@ -4,7 +4,12 @@
 ###
 
 dd if=/dev/zero of=/dev/sda bs=1024 count=1
-parted -s /dev/sda mklabel msdos
+if [ -e /sys/firmware/efi ]
+then
+  parted -s /dev/sda mklabel gpt
+else
+  parted -s /dev/sda mklabel msdos
+fi
 
 #parted -s /dev/sda mkpart primary 0 1
 #parted -s /dev/sda name 1 grub
