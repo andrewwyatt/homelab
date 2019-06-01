@@ -11,5 +11,5 @@ else
   parted -s /dev/sda mklabel msdos
 fi
 
-parted -s /dev/sda mkpart primary ext4 0 512
+parted -s /dev/sda mkpart primary ext4 1 512
 parted -s /dev/sda mkpart primary fat32 512 768
