@@ -21,7 +21,7 @@
 ### If the Chef license isn't accepted, don't do anything.
 ###
 
-unless node['linux']['chef']['accept_license'] == true
+unless node['chef']['accept_license'] == true
   return
 end
 

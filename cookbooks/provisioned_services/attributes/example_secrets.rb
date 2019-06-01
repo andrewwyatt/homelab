@@ -33,13 +33,13 @@
 ### https://www.chef.io/end-user-license-agreement/
 ###
 
-# default['chef']['accept_license']                 = true
+# node.normal['chef']['accept_license']                 = false
 
-# default['chef']['accept_manage_license']          = false
-# default['chef']['install_manage']                 = false
+# node.normal['chef']['accept_manage_license']          = false
+# node.normal['chef']['install_manage']                 = false
 
-# default['chef']['accept_reporting_license']       = false
-# default['chef']['install_reporting']              = false
+# node.normal['chef']['accept_reporting_license']       = false
+# node.normal['chef']['install_reporting']              = false
 
 ###
 ### Let's define hosts in this environment - usable in other locations as well.

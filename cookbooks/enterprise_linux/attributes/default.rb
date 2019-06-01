@@ -38,7 +38,7 @@
 ### https://www.chef.io/end-user-license-agreement/
 ###
 
-default['linux']['chef']['accept_license']                 = false
+default['chef']['accept_license']                               = false
 
 ###
 ### Define sensitivity as an attribute so we can override it when necessary
