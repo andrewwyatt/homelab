@@ -18,6 +18,14 @@
 ###
 
 ###
+### If the license isn't accepted, don't do anything.
+###
+
+unless node['chef']['accept_license'] == true
+  return
+end
+
+###
 ### The encrypted payload password is stored in credentials -> passwords
 ###
 

@@ -25,7 +25,7 @@ function notify() {
 }
 
 function test_client {
-  chef-client 2>&1 >${TEST_LOG}
+  chef-client --chef-license accept 2>&1 >${TEST_LOG}
   return $?
 }
 

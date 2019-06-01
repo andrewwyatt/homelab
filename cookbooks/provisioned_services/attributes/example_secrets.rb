@@ -22,6 +22,26 @@
 ###
 
 ###
+### To install, configure, and use Chef, you must accept the
+### licenses.  This is set to false by default forcing the action to be taken by
+### the user.
+###
+
+###
+### The Chef client license can be found at the following URL:
+###
+### https://www.chef.io/end-user-license-agreement/
+###
+
+# default['chef']['accept_license']                 = true
+
+# default['chef']['accept_manage_license']          = false
+# default['chef']['install_manage']                 = false
+
+# default['chef']['accept_reporting_license']       = false
+# default['chef']['install_reporting']              = false
+
+###
 ### Let's define hosts in this environment - usable in other locations as well.
 ###
 ### Servers are cattle, not pets.

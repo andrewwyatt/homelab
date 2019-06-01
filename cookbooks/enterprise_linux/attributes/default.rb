@@ -27,6 +27,20 @@
 ###
 
 ###
+### To install, configure, and use Chef, you must accept the
+### licenses.  This is set to false by default forcing the action to be taken by
+### the user.
+###
+
+###
+### The Chef client license can be found at the following URL:
+###
+### https://www.chef.io/end-user-license-agreement/
+###
+
+default['linux']['chef']['accept_license']                 = false
+
+###
 ### Define sensitivity as an attribute so we can override it when necessary
 ### for troubleshooting purposes.
 ###
@@ -56,13 +70,14 @@ default['linux']['cobbler']['profile']                           = 'CentOS-7-x86
 
 default['linux']['timezone']                                     = "America/New_York"
 
+
 ###
 ### This defines the Chef package that is used for deployment.  It is shared by other
 ### cookbooks.  Changes here affect provisioning.
 ###
 
 default['linux']['chef']['install_branch']                       = 'stable'
-default['linux']['chef']['client_version']                       = '14.11.21'
+default['linux']['chef']['client_version']                       = '15.0.300'
 default['linux']['chef']['install_via_url']                      = false
 default['linux']['chef']['client_url']                           = "https://packages.chef.io/files/#{node['linux']['chef']['install_branch']}/chef/#{node['linux']['chef']['client_version']}/el/#{node['platform_version'][0]}/"
 
@@ -88,7 +103,7 @@ default['linux']['chef']['cache_type']                           = "BasicFile"
 default['linux']['chef']['cache_options']                        = "\#{ENV['HOME']}/.chef/checksums"
 default['linux']['chef']['cookbook_path']                        = "\#{current_dir}/../cookbooks"
 
-default['linux']['chef_client_cron']                             = '00,30 * * * * root /usr/bin/sleep $(( RANDOM \%300 )); chef-client >/var/log/chef-client.log 2>&1'
+default['linux']['chef_client_cron']                             = '00,30 * * * * root /usr/bin/sleep $(( RANDOM \%300 )); chef-client --chef-license accept >/var/log/chef-client.log 2>&1'
 
 default['linux']['chef']['conf_dir']                             = "/etc/chef"
 default['linux']['chef']['run_path']                             = "/var/run/chef"

@@ -18,6 +18,14 @@
 ###
 
 ###
+### If the license isn't accepted, don't do anything.
+###
+
+unless node['chef']['accept_license'] == true
+  return
+end
+
+###
 ### Add a feature to Chef Server to serve our bootstrap payload
 ### URL: https://{chefserver}/#{node['chef']['bootstrap_root']}
 ###
