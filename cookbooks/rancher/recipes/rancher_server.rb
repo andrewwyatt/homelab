@@ -1,5 +1,5 @@
 ###
-### Cookbook:: lab_management
+### Cookbook:: provisioned_services
 ### Recipe:: rancher_server
 ###
 ### Copyright 2013-2018, Andrew Wyatt

@@ -11,7 +11,7 @@ Linux server.  It is integrated with Slack, the recipes and scripts contained wi
 See the [recipes](./recipes) and [attributes](./attributes) for more detail of the objects managed by this cookbook.
 
 **NOTICE** *These cookbooks do not have a default.rb, this is intentional.  Use wrapper
-cookbooks to consume the recipes instead.  See the lab_management cookbook and
+cookbooks to consume the recipes instead.  See the provisioned_services cookbook and
 the readme in the root of this project for more information.*
 
 **WARNING:** *These cookbooks should not be used for production without additional modification.*
