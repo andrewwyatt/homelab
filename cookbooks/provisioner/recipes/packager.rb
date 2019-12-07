@@ -434,16 +434,16 @@ end
 ### Does my certificate exist, or is it within the renewal window?
 ###
 
-currentdate = Date.today.to_time.to_i
+currentdate = `date '+%s'`.chomp
 
-if File.exists?(node['provisioner']['httpd']['ssl_certificate'])
-  certexpiration = `date -d "$(openssl x509 -enddate -noout -in #{node['provisioner']['httpd']['ssl_certificate']} | sed -e 's#notAfter=##')" '+%s'`
+if File.exists?("/etc/opscode/#{node['fqdn']}.crt")
+  certexpiration = `date -d "$(/usr/bin/openssl x509 -enddate -noout -in #{node['chef']['server_attributes']['nginx']['ssl_certificate']} | sed -e 's#notAfter=##')" '+%s'`.chomp
 else
   certexpiration = currentdate
 end
 
-certdaysleft = (certexpiration.to_i - currentdate.to_i)
-if certdaysleft < node['provisioner']['ssl']['renewal_day'].to_i
+certdaysleft = (certexpiration.to_i - currentdate.to_i)/86400
+if certdaysleft < node['chef']['ssl']['renewal_day'].to_i
   renew_now = true
 end
 
