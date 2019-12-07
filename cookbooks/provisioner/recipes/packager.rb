@@ -447,6 +447,13 @@ if certdaysleft < node['chef']['ssl']['renewal_day'].to_i
   renew_now = true
 end
 
+notification="Renewing my SSL certificate @ #{certdaysleft} days left."
+execute "Renewal notification" do
+  command "notify \"#{node['linux']['slack_channel']}\" \"#{node['provisioner']['replicator_emoji']}\" \"#{node['linux']['api_path']}\"  \"#{notification}\""
+  action :run
+  only_if { renew_now == true }
+end
+
 ###
 ### Deconstruct the names to pass to acme.sh
 ###
