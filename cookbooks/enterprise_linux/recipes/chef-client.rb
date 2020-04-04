@@ -36,7 +36,7 @@ passwords = data_bag_item('credentials', 'passwords', IO.read(Chef::Config['encr
 ### passfile is used to encrypt and decrypt file based Chef secrets.
 ###
 
-passfile = Random.rand(99999999) * Random.rand(99999999) * Random.rand(99999999)
+passfile = SecureRandom.uuid
 file "#{Chef::Config[:file_cache_path]}/.#{passfile}" do
   owner 'root'
   group 'root'
@@ -48,32 +48,33 @@ file "#{Chef::Config[:file_cache_path]}/.#{passfile}" do
 end
 
 openssl_decrypt = String.new("openssl aes-256-cbc -a -d -pass file:#{Chef::Config[:file_cache_path]}/.#{passfile}")
-openssl_encrypt = String.new("openssl aes-256-cbc -a -salt -pass file:#{Chef::Config[:file_cache_path]}/.#{passfile}")
 
 node.default['linux']['chef']['server'] = `printf $(grep chef_server_url /etc/chef/client.rb  | sed -s -e "s#^.*//##" -e "s#/.*\\\$##")`
 
-server_version_test = `rpm -qi chef-#{node['linux']['chef']['client_version']} 2>/dev/null`
-unless $CHILD_STATUS.exitstatus == 0
-  if node['linux']['chef']['install_via_url'] == true
-    install_file = `curl "#{node['linux']['chef']['client_url']}" 2>/dev/null | grep "chef.*.x86_64.rpm" | sed -s -e 's/^.*href="//' -e 's/".*$//' -e 's/<[^>]*>//g' | head -n 1 | awk '{printf $1}'`
-    remote_file "#{Chef::Config['file_cache_path']}/#{install_file}" do
-      source "#{node['linux']['chef']['client_url']}#{install_file}"
-      owner 'root'
-      group 'root'
-      mode 0640
-      action :create
-    end
-    rpm_package "chef-#{node['linux']['chef']['client_version']} " do
-      allow_downgrade true
-      source "#{Chef::Config['file_cache_path']}/#{install_file}"
-      action :install
-    end
-  else
-    yum_package [ "chef = #{node['linux']['chef']['client_version']} " ] do
-      action :install
-      flush_cache [ :before ]
-    end
-  end
+install_file = `curl "#{node['linux']['chef']['client_url']}" 2>/dev/null | grep "chef.*.x86_64.rpm" | sed -s -e 's/^.*href="//' -e 's/".*$//' -e 's/<[^>]*>//g' | head -n 1 | awk '{printf $1}'`
+remote_file "#{Chef::Config['file_cache_path']}/#{install_file}" do
+  source "#{node['linux']['chef']['client_url']}#{install_file}"
+  owner 'root'
+  group 'root'
+  mode 0640
+  action :create
+  not_if "rpm -qi chef-#{node['linux']['chef']['client_version']} 2>/dev/null"
+  only_if { node['linux']['chef']['install_via_url'] == true }
+end
+
+rpm_package "chef-#{node['linux']['chef']['client_version']} " do
+  allow_downgrade true
+  source "#{Chef::Config['file_cache_path']}/#{install_file}"
+  action :install
+  not_if "rpm -qi chef-#{node['linux']['chef']['client_version']} 2>/dev/null"
+  only_if { node['linux']['chef']['install_via_url'] == true }
+end
+
+yum_package [ "chef = #{node['linux']['chef']['client_version']} " ] do
+  action :install
+  flush_cache [ :before ]
+  not_if "rpm -qi chef-#{node['linux']['chef']['client_version']} 2>/dev/null"
+  not_if { node['linux']['chef']['install_via_url'] == true }
 end
 
 ### Secure the Chef directories so non-root

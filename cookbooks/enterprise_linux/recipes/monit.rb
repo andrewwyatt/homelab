@@ -47,7 +47,6 @@ end
 ### Get a list of nodes from Chef, use the list for ping monitors.
 ###
 
-node_list = []
 node_list = `knife node list -k /etc/chef/client.pem -c /etc/chef/client.rb`.split("\n")
 node_list.sort
 
@@ -80,9 +79,7 @@ template '/etc/monitrc' do
   sensitive node['linux']['runtime']['sensitivity']
   notifies :restart, 'service[monit]', :delayed
   only_if { node['linux']['monit']['enabled'] == true }
-  variables ({
-    password: passwords['monit_password'],
-    })
+  variables ({ password: passwords['monit_password'] })
 end
 
 template '/etc/monit.d/host' do
@@ -127,9 +124,7 @@ template '/etc/monit.d/ping' do
   sensitive node['linux']['runtime']['sensitivity']
   notifies :restart, 'service[monit]', :delayed
   only_if { node['linux']['monit']['enabled'] == true }
-  variables ({
-    ping_nodes: ping_nodes,
-    })
+  variables ({ ping_nodes: ping_nodes })
 end
 
 template '/etc/monit.d/crond' do

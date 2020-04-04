@@ -71,14 +71,13 @@ node['chef']['organizations'].each do |org_name, organization|
     ###
 
     if $CHILD_STATUS.exitstatus > 0
-      return
+      return 0
     end
 
     if cudata.empty?
-      return
+      return 0
     end
 
-    cuattrs = {}
     cuattrs = JSON.parse(cudata)
 
     cuattrs.each do |key|
@@ -95,13 +94,12 @@ node['chef']['organizations'].each do |org_name, organization|
         ###
 
         if $CHILD_STATUS.exitstatus > 0
-          return
+          return 0
         end
 
         if mdata.empty?
-          return
+          return 0
         end
-        mattrs = {}
         mattrs = JSON.parse(mdata)
 
         unless authorized_users[mattrs['username']].is_a?(Hash)
@@ -200,10 +198,9 @@ EOF
     ### Ensure the user is a member of the appropriate orgs.
     ###
     next if attributes['type'] == 'local'
-    association = ''
     json = `chef-server-ctl user-show #{account} -l -F json 2>/dev/null ||:`
     if json.empty?
-      return
+      return 0
     end
     account_attributes = JSON.parse(json)
     add_to_org = false

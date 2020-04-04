@@ -35,7 +35,7 @@ passwords = data_bag_item('credentials', 'passwords', IO.read(Chef::Config['encr
 ### passfile is used to encrypt and decrypt file based Chef secrets.
 ###
 
-passfile = Random.rand(99999999) * Random.rand(99999999) * Random.rand(99999999)
+passfile = SecureRandom.uuid
 file "#{Chef::Config[:file_cache_path]}/.#{passfile}" do
   owner 'root'
   group 'root'
@@ -290,8 +290,6 @@ end
 
 node['chef']['organizations'].each do |_key, org|
   notification = "Creating the #{org['full_name']} organization."
-  chef_org_test = `chef-server-ctl org-show "#{org['short_name']}" 2>/dev/null`
-  next if $CHILD_STATUS.exitstatus == 0
   bash notification do
     code <<-EOF
         chef-server-ctl org-create #{org['short_name']} "#{org['full_name']}" --association_user #{org['admin_user']['username']} -f #{node['chef']['keys']}/#{org['short_name']}-validator.pem
@@ -299,6 +297,7 @@ node['chef']['organizations'].each do |_key, org|
     sensitive node['chef']['runtime']['sensitivity']
     only_if { ::File.exist?('/etc/opscode/chef-server-running.json') }
     only_if { ::File.exist?('/usr/bin/chef-server-ctl') }
+    not_if 'chef-server-ctl org-show ' # {org['short_name']}" 2>/dev/null"
   end
 end
 

@@ -28,7 +28,6 @@ passwords = data_bag_item('credentials', 'passwords', IO.read(Chef::Config['encr
 ### Remove kickstart artifacts from /root
 ###
 
-ks_artifacts = []
 ks_artifacts = [ 'cobbler.ks', 'ks-pre.log', 'anaconda-ks.cfg', 'original-ks.cfg' ]
 
 ks_artifacts.each do |artifact|

@@ -44,8 +44,6 @@ template '/etc/yum.conf' do
   )
 end
 
-
-
 ###
 ### This is to support mirrors from upstream
 ###

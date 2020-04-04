@@ -27,7 +27,7 @@ passwords = data_bag_item('credentials', 'passwords', IO.read(Chef::Config['encr
 ### passfile is used to encrypt and decrypt file based Chef secrets.
 ###
 
-passfile = Random.rand(99999999) * Random.rand(99999999) * Random.rand(99999999)
+passfile = SecureRandom.uuid
 file "#{Chef::Config[:file_cache_path]}/.#{passfile}" do
   owner 'root'
   group 'root'
@@ -39,7 +39,6 @@ file "#{Chef::Config[:file_cache_path]}/.#{passfile}" do
 end
 
 openssl_decrypt = String.new("openssl aes-256-cbc -a -d -pass file:#{Chef::Config[:file_cache_path]}/.#{passfile}")
-openssl_encrypt = String.new("openssl aes-256-cbc -a -salt -pass file:#{Chef::Config[:file_cache_path]}/.#{passfile}")
 
 if node['chef']['sync_host'] == node['fqdn']
   if tagged?(node['chef']['worker_tag'])
