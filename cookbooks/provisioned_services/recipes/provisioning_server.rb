@@ -17,9 +17,9 @@
 ### limitations under the License.
 ###
 
-node.from_file(run_context.resolve_attribute("provisioned_services", "secrets"))
-node.from_file(run_context.resolve_attribute("enterprise_linux", "default"))
-node.from_file(run_context.resolve_attribute("provisioner", "default"))
+node.from_file(run_context.resolve_attribute('provisioned_services', 'secrets'))
+node.from_file(run_context.resolve_attribute('enterprise_linux', 'default'))
+node.from_file(run_context.resolve_attribute('provisioner', 'default'))
 
 ###
 ### This recipe combines packaging, mirroring, and node building

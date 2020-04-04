@@ -42,14 +42,14 @@ end
 openssl_decrypt = String.new("openssl aes-256-cbc -a -d -pass file:#{Chef::Config[:file_cache_path]}/.#{passfile}")
 openssl_encrypt = String.new("openssl aes-256-cbc -a -salt -pass file:#{Chef::Config[:file_cache_path]}/.#{passfile}")
 
-execute "Clean any old relocation data" do
+execute 'Clean any old relocation data' do
   command "rm -rf #{Chef::Config[:file_cache_path]}/.chefdata 2>/dev/null"
   action :run
   sensitive node['linux']['runtime']['sensitivity']
 end
 
-current_chef_server=`printf $(grep chef_server_url /etc/chef/client.rb  | sed -s -e "s#^.*//##" -e "s#/.*\\\$##")`
-if (defined?(node['linux']['chef']['new_chef_server'])).nil? == false
+current_chef_server = `printf $(grep chef_server_url /etc/chef/client.rb  | sed -s -e "s#^.*//##" -e "s#/.*\\\$##")`
+if defined?(node['linux']['chef']['new_chef_server']).nil? == false
   unless current_chef_server == node['linux']['chef']['new_chef_server']
     directory "#{Chef::Config[:file_cache_path]}/.chefdata" do
       owner 'root'
@@ -58,8 +58,8 @@ if (defined?(node['linux']['chef']['new_chef_server'])).nil? == false
       action :create
     end
 
-    node_role = String.new
-    node_role = node['fqdn'].gsub(".", "_")
+    node_role = ''
+    node_role = node['fqdn'].gsub('.', '_')
 
     mychefdata = [ "/clients/#{node['fqdn']}",
                    "/nodes/#{node['fqdn']}",
@@ -75,11 +75,11 @@ if (defined?(node['linux']['chef']['new_chef_server'])).nil? == false
       end
     end
 
-    execute "Fetch SSL certificates" do
+    execute 'Fetch SSL certificates' do
       command "knife ssl fetch https://#{node['linux']['chef']['new_chef_server']} -c /etc/chef/client.rb"
       action :run
       sensitive node['linux']['runtime']['sensitivity']
-      not_if { File.exists? "/etc/chef/trusted_certs/#{node['linux']['chef']['new_chef_server']}.crt" }
+      not_if { File.exist? "/etc/chef/trusted_certs/#{node['linux']['chef']['new_chef_server']}.crt" }
     end
 
     remote_file "#{Chef::Config['file_cache_path']}/#{node['linux']['chef']['bootstrap_user']}-#{current_chef_server}.pem.enc" do
@@ -115,7 +115,7 @@ if (defined?(node['linux']['chef']['new_chef_server'])).nil? == false
     end
 
     mychefdata.each do |bit|
-      if bit =~ /^\/role/
+      if bit =~ %r{^/role}
         execute "Creating role #{bit}" do
           command "knife role from file #{Chef::Config[:file_cache_path]}/.chefdata/#{bit}.json -c /etc/chef/client.rb --server-url https://#{node['linux']['chef']['new_chef_server']}#{node['linux']['chef']['chef_org']} --user #{node['linux']['chef']['bootstrap_user']} -k /etc/chef/#{node['linux']['chef']['bootstrap_user']}.pem"
           action :run
@@ -130,7 +130,7 @@ if (defined?(node['linux']['chef']['new_chef_server'])).nil? == false
       end
     end
 
-    notification="Deleting myself from Chef server #{current_chef_server}."
+    notification = "Deleting myself from Chef server #{current_chef_server}."
     bash notification do
       code <<-EOF
         ### Sleep until the chef client has finished before trying to remove the client.
@@ -156,17 +156,17 @@ if (defined?(node['linux']['chef']['new_chef_server'])).nil? == false
       sensitive node['linux']['runtime']['sensitivity']
     end
 
-    template "/etc/chef/client.rb" do
-      source "etc/chef/client.rb.erb"
-      owner "root"
-      group "root"
+    template '/etc/chef/client.rb' do
+      source 'etc/chef/client.rb.erb'
+      owner 'root'
+      group 'root'
       mode 0600
       action :create
       sensitive node['linux']['runtime']['sensitivity']
-      variables({
-        :fqdn      => node['fqdn'],
-        :chefsvr   => node['linux']['chef']['new_chef_server']
-      })
+      variables(
+        fqdn: node['fqdn'],
+        chefsvr: node['linux']['chef']['new_chef_server']
+      )
     end
   end
 end

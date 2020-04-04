@@ -18,25 +18,25 @@
 ###
 
 template '/etc/systemd/journald.conf' do
-  source "etc/systemd/journald.conf.erb"
-  owner "root"
-  group "root"
+  source 'etc/systemd/journald.conf.erb'
+  owner 'root'
+  group 'root'
   mode 0644
   action :create
-	sensitive node['linux']['runtime']['sensitivity']
-  notifies :restart, "service[systemd-journald]", :immediately
-  notifies :restart, "service[rsyslog]", :delayed
-	only_if { node['platform_version'] =~ /^7/ }
+  sensitive node['linux']['runtime']['sensitivity']
+  notifies :restart, 'service[systemd-journald]', :immediately
+  notifies :restart, 'service[rsyslog]', :delayed
+  only_if { node['platform_version'] =~ /^7/ }
 end
 
-service "systemd-journald" do
-  supports :status => true, :restart => true
+service 'systemd-journald' do
+  supports status: true, restart: true
   action [ :enable, :start ]
-	only_if { node['platform_version'] =~ /^7/ }
+  only_if { node['platform_version'] =~ /^7/ }
 end
 
-service "rsyslog" do
-   supports :status => true, :restart => true
-   action [ :enable, :start ]
-	 only_if { node['platform_version'] =~ /^7/ }
- end
+service 'rsyslog' do
+  supports status: true, restart: true
+  action [ :enable, :start ]
+  only_if { node['platform_version'] =~ /^7/ }
+end

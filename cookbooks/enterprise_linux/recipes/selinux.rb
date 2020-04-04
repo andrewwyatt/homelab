@@ -18,10 +18,10 @@
 ###
 
 ### Configure default hosts
-template "/etc/sysconfig/selinux" do
-  source "etc/sysconfig/selinux.erb"
-  owner "root"
-  group "root"
+template '/etc/sysconfig/selinux' do
+  source 'etc/sysconfig/selinux.erb'
+  owner 'root'
+  group 'root'
   mode 0644
   action :create
   sensitive node['linux']['runtime']['sensitivity']

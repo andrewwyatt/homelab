@@ -31,13 +31,13 @@
 ### for troubleshooting purposes.
 ###
 
-default['provisioner']['runtime']['sensitivity']                = true
+default['provisioner']['runtime']['sensitivity'] = true
 
 ###
 ### Set up the file header to follow the enterprise linux header.
 ###
 
-default['provisioner']['file_header']                          = node['linux']['chef']['file_header']
+default['provisioner']['file_header'] = node['linux']['chef']['file_header']
 
 ###
 ### Use the ACME shell script to provision the certificate (also requires zonomi DNS)
@@ -85,8 +85,8 @@ default['provisioner']['cobbler']['bootstrap_url']               = "https://#{no
 default['provisioner']['cobbler']['pxe_timeout']                 = '10'
 
 default['provisioner']['cobbler']['build_notice']                = "Oh, a new server has appeared!  I'll provision it with $profile_name."
-default['provisioner']['cobbler']['hostname_notice']             = "This node will be known as ${HOSTNAME}."
-default['provisioner']['cobbler']['provisioning_notice']         = "Provisioning..${HOSTNAME} This may take a few minutes."
+default['provisioner']['cobbler']['hostname_notice']             = 'This node will be known as ${HOSTNAME}.'
+default['provisioner']['cobbler']['provisioning_notice']         = 'Provisioning..${HOSTNAME} This may take a few minutes.'
 default['provisioner']['cobbler']['bootstrap_notice']            = "The OS is installed, now I will bootstrap ${HOSTNAME} to #{node['provisioner']['chef']['default_server']}"
 default['provisioner']['cobbler']['bootstrap_success_notice']    = "Bootstrap of ${HOSTNAME} to #{node['provisioner']['chef']['default_server']} was successful."
 default['provisioner']['cobbler']['bootstrap_failure_notice']    = "There was an error bootstrapping ${HOSTNAME} to #{node['provisioner']['chef']['default_server']}, drop everything and get on it!"
@@ -99,44 +99,44 @@ default['provisioner']['cobbler']['default_packages']            = { 'core' => '
 
 default['provisioner']['cobbler']['bootimage_path']              = '/var/www/html/images'
 
-default['provisioner']['cobbler']['bootimages']                  = { 'vmlinuz'    => "https://#{node['provisioner']['mirror_host']}/mirrors/centos/7/os/x86_64/images/pxeboot/vmlinuz",
+default['provisioner']['cobbler']['bootimages']                  = { 'vmlinuz' => "https://#{node['provisioner']['mirror_host']}/mirrors/centos/7/os/x86_64/images/pxeboot/vmlinuz",
                                                                      'initrd.img' => "https://#{node['provisioner']['mirror_host']}/mirrors/centos/7/os/x86_64/images/pxeboot/initrd.img" }
 
 default['provisioner']['cobbler']['default_profile']             = node['linux']['cobbler']['profile']
-default['provisioner']['cobbler']['distros']                     = { 'CentOS-7-x86_64' => { 'name'       => 'CentOS-7-x86_64',
-                                                                                            'owners'     => 'admin',
-                                                                                            'kernel'     => "/var/www/html/images/CentOS-7-x86_64/pxeboot/vmlinuz",
-                                                                                            'initrd'     => "/var/www/html/images/CentOS-7-x86_64/pxeboot/initrd.img",
-                                                                                            'ksmeta'     => "tree=https://#{node['provisioner']['mirror_host']}/mirrors/centos/7/os/x86_64",
-                                                                                            'arch'       => 'x86_64',
-                                                                                            'breed'      => 'redhat',
+default['provisioner']['cobbler']['distros']                     = { 'CentOS-7-x86_64' => { 'name' => 'CentOS-7-x86_64',
+                                                                                            'owners' => 'admin',
+                                                                                            'kernel' => '/var/www/html/images/CentOS-7-x86_64/pxeboot/vmlinuz',
+                                                                                            'initrd' => '/var/www/html/images/CentOS-7-x86_64/pxeboot/initrd.img',
+                                                                                            'ksmeta' => "tree=https://#{node['provisioner']['mirror_host']}/mirrors/centos/7/os/x86_64",
+                                                                                            'arch' => 'x86_64',
+                                                                                            'breed' => 'redhat',
                                                                                             'os-version' => 'rhel7',
-                                                                                            'repos'      => { 'base'    => "https://#{node['provisioner']['mirror_host']}/mirrors/centos/7/os/x86_64",
-                                                                                                              'updates' => "https://#{node['provisioner']['mirror_host']}/mirrors/centos/7/updates/x86_64",
-                                                                                                              'extras'  => "https://#{node['provisioner']['mirror_host']}/mirrors/centos/7/extras/x86_64",
-                                                                                                              'epel'    => "https://#{node['provisioner']['mirror_host']}/mirrors/epel/7/x86_64/",
-                                                                                                              'stable'  => "https://#{node['provisioner']['mirror_host']}/mirrors/local/7/STABLE/RPMS"
-                                                                                                            }
-                                                                                         }
+                                                                                            'repos' => { 'base' => "https://#{node['provisioner']['mirror_host']}/mirrors/centos/7/os/x86_64",
+                                                                                                         'updates' => "https://#{node['provisioner']['mirror_host']}/mirrors/centos/7/updates/x86_64",
+                                                                                                         'extras' => "https://#{node['provisioner']['mirror_host']}/mirrors/centos/7/extras/x86_64",
+                                                                                                         'epel' => "https://#{node['provisioner']['mirror_host']}/mirrors/epel/7/x86_64/",
+                                                                                                         'stable' => "https://#{node['provisioner']['mirror_host']}/mirrors/local/7/STABLE/RPMS",
+                                                                                                            },
+                                                                                         },
                                                                    }
 
-default['provisioner']['cobbler']['repos']                       = { 'CentOS-7-x86_64' => { 'name'          => 'CentOS-7-x86_64',
-                                                                                            'arch'          => 'x86_64',
-                                                                                            'breed'         => 'yum',
-                                                                                            'keep-updated'  => 'False',
-                                                                                            'mirror'        => "https://#{node['provisioner']['mirror_host']}/mirrors/centos/7/os/x86_64/",
-                                                                                            'owners'        => 'admin' }}
+default['provisioner']['cobbler']['repos']                       = { 'CentOS-7-x86_64' => { 'name' => 'CentOS-7-x86_64',
+                                                                                            'arch' => 'x86_64',
+                                                                                            'breed' => 'yum',
+                                                                                            'keep-updated' => 'False',
+                                                                                            'mirror' => "https://#{node['provisioner']['mirror_host']}/mirrors/centos/7/os/x86_64/",
+                                                                                            'owners' => 'admin' } }
 
-default['provisioner']['cobbler']['profiles']                    = { 'CentOS-7-x86_64' => { 'name'                => 'CentOS-7-x86_64',
-                                                                                            'distro'              => 'CentOS-7-x86_64',
-                                                                                            'enable-menu'         => 'True',
-                                                                                            'kickstart'           => '/var/lib/cobbler/kickstarts/CentOS-7-x86_64',
-                                                                                            'name-servers'        => '10.100.100.10',
-                                                                                            'name-servers-search' => node['provisioner']['domain'] }}
+default['provisioner']['cobbler']['profiles']                    = { 'CentOS-7-x86_64' => { 'name' => 'CentOS-7-x86_64',
+                                                                                            'distro' => 'CentOS-7-x86_64',
+                                                                                            'enable-menu' => 'True',
+                                                                                            'kickstart' => '/var/lib/cobbler/kickstarts/CentOS-7-x86_64',
+                                                                                            'name-servers' => '10.100.100.10',
+                                                                                            'name-servers-search' => node['provisioner']['domain'] } }
 
-default['provisioner']['cobbler']['systems']                     = { 'default' => { 'name'            => 'default',
-                                                                                    'profile'         => node['provisioner']['cobbler']['default_profile'],
-                                                                                    'netboot-enabled' => 'True' }}
+default['provisioner']['cobbler']['systems']                     = { 'default' => { 'name' => 'default',
+                                                                                    'profile' => node['provisioner']['cobbler']['default_profile'],
+                                                                                    'netboot-enabled' => 'True' } }
 
 default['provisioner']['conf']                                  = "epel-#{node['platform_version'][0]}-x86_64"
 default['provisioner']['user']                                  = 'builder'
@@ -157,8 +157,8 @@ default['provisioner']['uploadpath']                            = "/opt/store/#{
 default['provisioner']['failedpath']                            = "/opt/store/#{node['platform_version'][0]}/FAILED"
 default['provisioner']['repopath']                              = '${BASEREPOPATH}/STABLE'
 default['provisioner']['watch_schedule']                        = '* * * * *'
-default['provisioner']['repositories']                          = { 'stable'   => 'STABLE',
-                                                                    'testing'  => 'TESTING',
+default['provisioner']['repositories']                          = { 'stable' => 'STABLE',
+                                                                    'testing' => 'TESTING',
                                                                     'unstable' => 'UNSTABLE' }
 
 default['provisioner']['slack_enabled']                         = false
@@ -178,35 +178,34 @@ default['provisioner']['pubkey']                                = "RPM-GPG-KEY-L
 default['provisioner']['rsync_excludes']                        = '--exclude "local*" --exclude "drpms/" --exclude "SRPMS/" --exclude "i386/" --exclude "ppc64*" --exclude "aarch64*" --exclude "debug" --exclude "isos" --exclude "*SHA256"'
 default['provisioner']['retry_delay']                           = '30'
 default['provisioner']['mirrorroot']                            = "#{node['provisioner']['webroot']}/mirrors"
-default['provisioner']['mirrors']                               = { 'centos-7' => { 'name'            => 'centos_7',
-                                                                                    'url'             => 'rsync://mirror.atlantic.net/centos/7/',
-                                                                                    'gpg_key_url'     => 'http://mirror.atlantic.net/centos/',
-                                                                                    'gpg_key_name'    => 'RPM-GPG-KEY-CentOS-7',
-                                                                                    'gpg_key_path'    => "#{node['provisioner']['mirrorroot']}/centos/",
-                                                                                    'mirror_path'     => "#{node['provisioner']['mirrorroot']}/centos/7/",
+default['provisioner']['mirrors']                               = { 'centos-7' => { 'name' => 'centos_7',
+                                                                                    'url' => 'rsync://mirror.atlantic.net/centos/7/',
+                                                                                    'gpg_key_url' => 'http://mirror.atlantic.net/centos/',
+                                                                                    'gpg_key_name' => 'RPM-GPG-KEY-CentOS-7',
+                                                                                    'gpg_key_path' => "#{node['provisioner']['mirrorroot']}/centos/",
+                                                                                    'mirror_path' => "#{node['provisioner']['mirrorroot']}/centos/7/",
                                                                                     'mirror_schedule' => '00 00 * * *',
-                                                                                    'enabled'         => true
+                                                                                    'enabled' => true,
                                                                                   },
-                                                                    'epel-7'   => { 'name'            => 'epel_7',
-                                                                                    'url'             => 'rsync://download-ib01.fedoraproject.org/fedora-epel/7/',
-                                                                                    'gpg_key_url'     => 'http://archive.fedoraproject.org/pub/epel/',
-                                                                                    'gpg_key_name'    => 'RPM-GPG-KEY-EPEL-7',
-                                                                                    'gpg_key_path'    => "#{node['provisioner']['mirrorroot']}/epel/",
-                                                                                    'mirror_path'     => "#{node['provisioner']['mirrorroot']}/epel/7/",
-                                                                                    'mirror_schedule' => '30 00 * * *',
-                                                                                    'enabled'         => true
+                                                                    'epel-7' => { 'name' => 'epel_7',
+                                                                                  'url' => 'rsync://download-ib01.fedoraproject.org/fedora-epel/7/',
+                                                                                  'gpg_key_url' => 'http://archive.fedoraproject.org/pub/epel/',
+                                                                                  'gpg_key_name' => 'RPM-GPG-KEY-EPEL-7',
+                                                                                  'gpg_key_path' => "#{node['provisioner']['mirrorroot']}/epel/",
+                                                                                  'mirror_path' => "#{node['provisioner']['mirrorroot']}/epel/7/",
+                                                                                  'mirror_schedule' => '30 00 * * *',
+                                                                                  'enabled' => true,
                                                                                   },
-                                                                    'local-7'  => { 'name'            => 'local_7',
-                                                                                    'url'             => "rsync://#{node['provisioner']['builder_host']}/store/7/",
-                                                                                    'gpg_key_url'     => "https://#{node['provisioner']['builder_host']}/store/",
-                                                                                    'gpg_key_name'    => "RPM-GPG-KEY-LOCAL-7",
-                                                                                    'gpg_key_path'    => "#{node['provisioner']['mirrorroot']}/local/",
-                                                                                    'mirror_path'     => "#{node['provisioner']['mirrorroot']}/local/7/",
-                                                                                    'mirror_schedule' => '*/5 * * * *',
-                                                                                    'enabled'         => true
-                                                                    }
+                                                                    'local-7' => { 'name' => 'local_7',
+                                                                                   'url' => "rsync://#{node['provisioner']['builder_host']}/store/7/",
+                                                                                   'gpg_key_url' => "https://#{node['provisioner']['builder_host']}/store/",
+                                                                                   'gpg_key_name' => 'RPM-GPG-KEY-LOCAL-7',
+                                                                                   'gpg_key_path' => "#{node['provisioner']['mirrorroot']}/local/",
+                                                                                   'mirror_path' => "#{node['provisioner']['mirrorroot']}/local/7/",
+                                                                                   'mirror_schedule' => '*/5 * * * *',
+                                                                                   'enabled' => true,
+                                                                    },
                                                                   }
-
 
 default['provisioner']['common']['rsync']['pid_file']                      = '/var/run/rsyncd.pid'
 default['provisioner']['common']['rsync']['uid']                           = 'nobody'
@@ -220,10 +219,10 @@ default['provisioner']['common']['rsync']['log_format']                    = '%t
 default['provisioner']['common']['rsync']['syslog_facility']               = 'local3'
 default['provisioner']['common']['rsync']['timeout']                       = '300'
 
-default['provisioner']['packager']['rsync']['repository_name']               = "store"
+default['provisioner']['packager']['rsync']['repository_name']               = 'store'
 default['provisioner']['packager']['rsync']['repository_path']               = node['provisioner']['reporoot']
 default['provisioner']['packager']['rsync']['repository_comment']            = "Internal Package Service for EL#{node['platform_version'][0]}"
 
-default['provisioner']['replicator']['rsync']['repository_name']             = "mirror"
+default['provisioner']['replicator']['rsync']['repository_name']             = 'mirror'
 default['provisioner']['replicator']['rsync']['repository_path']             = node['provisioner']['webroot']
-default['provisioner']['replicator']['rsync']['repository_comment']          = "Internal CentOS Mirror Service"
+default['provisioner']['replicator']['rsync']['repository_comment']          = 'Internal CentOS Mirror Service'

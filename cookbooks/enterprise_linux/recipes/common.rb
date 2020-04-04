@@ -25,12 +25,12 @@ tag("el#{node['platform_version'][0]}")
 
 ### Better bash prompt
 template '/etc/profile.d/prompt.sh' do
-   owner 'root'
-   group 'root'
-   mode 0755
-   source 'etc/profile.d/prompt.sh.erb'
-   action :create
-   sensitive node['linux']['runtime']['sensitivity']
+  owner 'root'
+  group 'root'
+  mode 0755
+  source 'etc/profile.d/prompt.sh.erb'
+  action :create
+  sensitive node['linux']['runtime']['sensitivity']
 end
 
 ### Common things that get installed all the time

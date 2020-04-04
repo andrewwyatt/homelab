@@ -42,10 +42,10 @@ end
 openssl_decrypt = String.new("openssl aes-256-cbc -a -d -pass file:#{Chef::Config[:file_cache_path]}/.#{passfile}")
 openssl_encrypt = String.new("openssl aes-256-cbc -a -salt -pass file:#{Chef::Config[:file_cache_path]}/.#{passfile}")
 
-node.default['linux']['chef']['server']=`printf $(grep chef_server_url /etc/chef/client.rb  | sed -s -e "s#^.*//##" -e "s#/.*\\\$##")`
+node.default['linux']['chef']['server'] = `printf $(grep chef_server_url /etc/chef/client.rb  | sed -s -e "s#^.*//##" -e "s#/.*\\\$##")`
 
-notification=node['linux']['decom']['decom_notice']
-bash "Send decom notice" do
+notification = node['linux']['decom']['decom_notice']
+bash 'Send decom notice' do
   code <<-EOF
     ### user channel emoji api_key message
     notify "#{node['linux']['slack_channel']}" "#{node['linux']['emoji']}" "#{node['linux']['api_path']}" "#{notification}"
@@ -57,12 +57,12 @@ ruby_block 'Get the systemKey' do
   block do
     localdata = `cat /opt/jc/jcagent.conf 2>/dev/null`
 
-    if localdata.length < 1
-      localdata = "{}"
+    if localdata.empty?
+      localdata = '{}'
     end
 
     lattrs = JSON.parse(localdata)
-    lattrs = Hash[*lattrs.collect{|h| h.to_a}.flatten]
+    lattrs = Hash[*lattrs.collect(&:to_a).flatten]
     node.run_state['systemKey'] = lattrs['systemKey']
   end
   sensitive node['linux']['runtime']['sensitivity']
@@ -70,7 +70,8 @@ ruby_block 'Get the systemKey' do
 end
 
 execute "Ensuring #{node['fqdn']} is removed from JumpCloud." do
-  command lazy { <<-EOF
+  command lazy {
+    <<-EOF
     curl -X DELETE "#{node['linux']['jumpcloud']['api_url']}/systems/#{node.run_state['systemKey']}" \
          -H 'Accept: application/json'                \
          -H 'Content-Type: application/json'          \
@@ -107,8 +108,8 @@ execute 'Configure the admin key' do
 end
 
 ### Remove my partition table
-notification="Removing my partition table"
-bash "Flushing my partition table" do
+notification = 'Removing my partition table'
+bash 'Flushing my partition table' do
   code <<-EOF
     notify "#{node['linux']['slack_channel']}" "#{node['linux']['emoji']}" "#{node['linux']['api_path']}" "#{notification}"
     dd if=/dev/zero of=/dev/sda bs=512 count=1
@@ -116,11 +117,11 @@ bash "Flushing my partition table" do
   sensitive node['linux']['runtime']['sensitivity']
 end
 
-node_role = String.new
-node_role = node['fqdn'].gsub(".", "_")
+node_role = ''
+node_role = node['fqdn'].gsub('.', '_')
 
-notification="Deleting myself from Chef server #{node['linux']['chef']['server']}."
-bash "Remove myself from Chef, and power down." do
+notification = "Deleting myself from Chef server #{node['linux']['chef']['server']}."
+bash 'Remove myself from Chef, and power down.' do
   code <<-EOF
     notify "#{node['linux']['slack_channel']}" "#{node['linux']['emoji']}" "#{node['linux']['api_path']}" "#{notification}"
     nohup bash -c '

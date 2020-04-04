@@ -17,39 +17,56 @@
 ### limitations under the License.
 ###
 
-Dir["/etc/yum.repos.d/*CentOS*"].each do |path|
+Dir['/etc/yum.repos.d/*CentOS*'].each do |path|
   file ::File.expand_path(path) do
     action :delete
   end
 end
 
-Dir["/etc/yum.repos.d/*epel*"].each do |path|
+Dir['/etc/yum.repos.d/*epel*'].each do |path|
   file ::File.expand_path(path) do
     action :delete
   end
 end
+
+###
+### Manage yum.conf
+###
+template '/etc/yum.conf' do
+  owner 'root'
+  group 'root'
+  mode   0644
+  source 'etc/yum.conf.erb'
+  action :create
+  sensitive node['linux']['runtime']['sensitivity']
+  variables(
+    mirror: "CentOS_#{node['platform_version'][0]}_x86_64"
+  )
+end
+
+
 
 ###
 ### This is to support mirrors from upstream
 ###
 
-template "/etc/yum.repos.d/upstream.repo" do
+template '/etc/yum.repos.d/upstream.repo' do
   owner 'root'
   group 'root'
   mode   0644
   source 'etc/yum.repos.d/mirrored.repo.erb'
   action :create
   sensitive node['linux']['runtime']['sensitivity']
-  variables({
-    :mirror      => "CentOS_#{node['platform_version'][0]}_x86_64",
-  })
+  variables(
+    mirror: "CentOS_#{node['platform_version'][0]}_x86_64"
+  )
 end
 
 ###
 ### This is to support local repositories for packages managed internally
 ###
 
-template "/etc/yum.repos.d/local.repo" do
+template '/etc/yum.repos.d/local.repo' do
   owner 'root'
   group 'root'
   mode   0644

@@ -22,23 +22,23 @@ yum_package 'rsyslog' do
 end
 
 template '/etc/rsyslog.conf' do
-  source "etc/rsyslog.conf.erb"
-  owner "root"
-  group "root"
+  source 'etc/rsyslog.conf.erb'
+  owner 'root'
+  group 'root'
   mode 0644
   action :create
   sensitive node['linux']['runtime']['sensitivity']
-  notifies :restart, "service[rsyslog]", :immediately
+  notifies :restart, 'service[rsyslog]', :immediately
 end
 
 directory '/etc/rsyslog.d' do
-  owner "root"
-  group "root"
+  owner 'root'
+  group 'root'
   mode 0700
   action :create
 end
 
-service "rsyslog" do
-  supports :status => true, :restart => true
+service 'rsyslog' do
+  supports status: true, restart: true
   action [ :enable, :start ]
 end

@@ -17,10 +17,10 @@
 ### limitations under the License.
 ###
 
-node.from_file(run_context.resolve_attribute("provisioned_services", "secrets"))
-node.from_file(run_context.resolve_attribute("enterprise_linux", "default"))
+node.from_file(run_context.resolve_attribute('provisioned_services', 'secrets'))
+node.from_file(run_context.resolve_attribute('enterprise_linux', 'default'))
 
-node.normal['linux']['sysctl']['net.ipv4.conf.all.forwarding'] = "1"
+node.normal['linux']['sysctl']['net.ipv4.conf.all.forwarding'] = '1'
 
 ###
 ### Inherit the standard server configuration.
@@ -37,15 +37,15 @@ yum_package [ 'docker',
   action :install
 end
 
-service "docker" do
-  supports :status => true, :restart => true
+service 'docker' do
+  supports status: true, restart: true
   action [ :enable, :start ]
 end
 
-template "/etc/monit.d/docker" do
-  source "etc/monit.d/docker.erb"
-  owner "root"
-  group "root"
+template '/etc/monit.d/docker' do
+  source 'etc/monit.d/docker.erb'
+  owner 'root'
+  group 'root'
   mode 0600
   action :create
   sensitive node['linux']['runtime']['sensitivity']

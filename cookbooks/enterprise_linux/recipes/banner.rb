@@ -22,7 +22,7 @@
 file '/etc/issue' do
   owner 'root'
   group 'root'
-  mode   0644
+  mode 0644
   content node['linux']['banner']
   action :create
   sensitive node['linux']['runtime']['sensitivity']
@@ -31,7 +31,7 @@ end
 file '/etc/issue.net' do
   owner 'root'
   group 'root'
-  mode   0644
+  mode 0644
   content node['linux']['banner']
   action :create
   sensitive node['linux']['runtime']['sensitivity']
@@ -40,7 +40,7 @@ end
 file '/etc/motd' do
   owner 'root'
   group 'root'
-  mode   0644
+  mode 0644
   content node['linux']['motd']
   action :create
   sensitive node['linux']['runtime']['sensitivity']

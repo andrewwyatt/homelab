@@ -26,7 +26,7 @@ template '/etc/sysctl.conf' do
   sensitive node['linux']['runtime']['sensitivity']
 end
 
-bash "Refreshing sysctl if necessary" do
+bash 'Refreshing sysctl if necessary' do
   code <<-EOF
     if [ -e "/etc/.sysctl.hash" ]
     then

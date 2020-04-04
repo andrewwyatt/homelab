@@ -18,10 +18,10 @@
 ###
 
 ### Configure default shells
-template "/etc/shells" do
-  source "etc/shells.erb"
-  owner "root"
-  group "root"
+template '/etc/shells' do
+  source 'etc/shells.erb'
+  owner 'root'
+  group 'root'
   mode 0644
   action :create
   sensitive node['linux']['runtime']['sensitivity']
@@ -41,24 +41,22 @@ file '/etc/profile.d/history.sh' do
   action :delete
   sensitive node['linux']['runtime']['sensitivity']
   not_if { node['linux']['shell']['timestamp_history'] == true }
-  only_if { File.exists? '/etc/profile.d/history.sh' }
+  only_if { File.exist? '/etc/profile.d/history.sh' }
 end
-
 
 template '/etc/profile.d/tmout.sh' do
-   owner 'root'
-   group 'root'
-   mode  '0755'
-   source 'etc/profile.d/tmout.sh.erb'
-   action :create
-   sensitive node['linux']['runtime']['sensitivity']
-   only_if { node['linux']['shell']['timeout'] =~ /[0-9]/ }
+  owner 'root'
+  group 'root'
+  mode  '0755'
+  source 'etc/profile.d/tmout.sh.erb'
+  action :create
+  sensitive node['linux']['runtime']['sensitivity']
+  only_if { node['linux']['shell']['timeout'] =~ /[0-9]/ }
 end
-
 
 file '/etc/profile.d/tmout.sh' do
   action :delete
   sensitive node['linux']['runtime']['sensitivity']
-  only_if { File.exists? '/etc/profile.d/tmout.sh' }
+  only_if { File.exist? '/etc/profile.d/tmout.sh' }
   not_if { node['linux']['shell']['timeout'] =~ /[0-9]/ }
 end

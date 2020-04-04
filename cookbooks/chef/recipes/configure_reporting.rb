@@ -43,7 +43,7 @@ file "#{Chef::Config[:file_cache_path]}/.#{passfile}" do
 end
 
 execute 'reporting-reconfigure' do
-  command "opscode-reporting-ctl reconfigure --accept-license"
+  command 'opscode-reporting-ctl reconfigure --accept-license'
   sensitive node['chef']['runtime']['sensitivity']
   action :nothing
 end
@@ -62,7 +62,7 @@ remote_file "#{Chef::Config['file_cache_path']}/#{install_file}" do
   not_if { reporting_version_test == node['chef']['reporting_version'] }
 end
 
-rpm_package "opscode-reporting" do
+rpm_package 'opscode-reporting' do
   allow_downgrade true
   source "#{Chef::Config['file_cache_path']}/#{install_file}"
   action :install

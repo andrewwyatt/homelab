@@ -31,41 +31,41 @@ passwords = data_bag_item('credentials', 'passwords', IO.read(Chef::Config['encr
 ### Disable Root User - Force use of sudo.  If enabled, use the password hash stored in the data bag.
 ###
 
-user "root" do
+user 'root' do
   uid 0
   gid 0
-  shell "/sbin/nologin"
-  home "/root"
-  comment "root"
-  password "!"
+  shell '/sbin/nologin'
+  home '/root'
+  comment 'root'
+  password '!'
   manage_home false
   action :modify
   only_if { node['linux']['disable_root'] == true }
 end
 
-user "root" do
+user 'root' do
   uid 0
   gid 0
-  shell "/bin/bash"
-  home "/root"
-  comment "root"
+  shell '/bin/bash'
+  home '/root'
+  comment 'root'
   password passwords['root_hash']
   manage_home false
   action :modify
   only_if { node['linux']['disable_root'] == false }
 end
 
-user "root" do
+user 'root' do
   action :lock
   only_if { node['linux']['disable_root'] == true }
 end
 
-user "root" do
+user 'root' do
   action :unlock
   only_if { node['linux']['disable_root'] == false }
 end
 
-bash "Ensure local account controls are applied" do
+bash 'Ensure local account controls are applied' do
   code <<-EOF
      for user in $(awk 'BEGIN { FS=":" } /1/ { print $1 }' /etc/shadow)
      do

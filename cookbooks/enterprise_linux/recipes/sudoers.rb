@@ -22,26 +22,26 @@ yum_package 'sudo' do
 end
 
 template '/etc/sudoers' do
-  source "etc/sudoers.erb"
-  owner "root"
-  group "root"
+  source 'etc/sudoers.erb'
+  owner 'root'
+  group 'root'
   mode 0440
   action :create
   sensitive node['linux']['runtime']['sensitivity']
 end
 
 directory '/etc/sudoers.d' do
-  owner "root"
-  group "root"
+  owner 'root'
+  group 'root'
   mode 0755
   action :create
   sensitive node['linux']['runtime']['sensitivity']
 end
 
-node['linux']['sudoers']['properties'].each do |key,configitem|
+node['linux']['sudoers']['properties'].each do |key, configitem|
   file "/etc/sudoers.d/#{key}" do
-    owner "root"
-    group "root"
+    owner 'root'
+    group 'root'
     mode 0440
     action :create
     content configitem

@@ -30,7 +30,7 @@ end
 file '/etc/crontab' do
   owner 'root'
   group 'root'
-  mode   0600
+  mode 0600
   sensitive node['linux']['runtime']['sensitivity']
 end
 
@@ -39,22 +39,22 @@ cron_dirs = [ '/etc/cron.hourly',
               '/etc/cron.weekly',
               '/etc/cron.monthly',
               '/etc/cron.d' ]
-cron_dirs.each do | dir |
+cron_dirs.each do |dir|
   directory dir do
     owner 'root'
     group 'root'
-    mode   0700
+    mode 0700
   end
 end
 
-execute "Ensure proper ownership of /var/spool/cron" do
-  command "chown -Rf root:root /var/spool/cron"
+execute 'Ensure proper ownership of /var/spool/cron' do
+  command 'chown -Rf root:root /var/spool/cron'
   sensitive node['linux']['runtime']['sensitivity']
 end
 
-execute "Ensure proper permissions of /var/spool/cron" do
-  command "chmod -f 755 /var/spool/cron ||:"
-  command "chmod -f 644 /var/spool/cron/* ||:"
+execute 'Ensure proper permissions of /var/spool/cron' do
+  command 'chmod -f 755 /var/spool/cron ||:'
+  command 'chmod -f 644 /var/spool/cron/* ||:'
   sensitive node['linux']['runtime']['sensitivity']
 end
 

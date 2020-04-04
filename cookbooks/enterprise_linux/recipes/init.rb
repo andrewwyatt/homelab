@@ -17,19 +17,19 @@
 ### limitations under the License.
 ###
 
-template "/etc/sysconfig/init" do
-  source "etc/sysconfig/init.erb"
-  owner "root"
-  group "root"
+template '/etc/sysconfig/init' do
+  source 'etc/sysconfig/init.erb'
+  owner 'root'
+  group 'root'
   mode 0644
   action :create
   sensitive node['linux']['runtime']['sensitivity']
 end
 
-template "/etc/init.d/functions" do
-  source "etc/init.d/functions.erb"
-  owner "root"
-  group "root"
+template '/etc/init.d/functions' do
+  source 'etc/init.d/functions.erb'
+  owner 'root'
+  group 'root'
   mode 0644
   action :create
   sensitive node['linux']['runtime']['sensitivity']
@@ -42,45 +42,45 @@ execute "Setting #{node['linux']['target']}" do
   only_if { node['platform_version'] =~ /^7/ }
 end
 
-template "/usr/sbin/bootnotice" do
-  source "usr/sbin/bootnotice.erb"
-  owner "root"
-  group "root"
+template '/usr/sbin/bootnotice' do
+  source 'usr/sbin/bootnotice.erb'
+  owner 'root'
+  group 'root'
   mode 0750
   action :create
   sensitive node['linux']['runtime']['sensitivity']
-  notifies :enable, "service[bootnotice]", :delayed
+  notifies :enable, 'service[bootnotice]', :delayed
   only_if { node['platform_version'] =~ /^7/ }
 end
 
-template "/usr/sbin/bootnotice" do
-  source "usr/sbin/bootnotice.erb"
-  owner "root"
-  group "root"
+template '/usr/sbin/bootnotice' do
+  source 'usr/sbin/bootnotice.erb'
+  owner 'root'
+  group 'root'
   mode 0750
   action :create
   sensitive node['linux']['runtime']['sensitivity']
   only_if { node['platform_version'] =~ /^7/ }
 end
 
-template "/usr/lib/systemd/system/bootnotice.service" do
-  source "usr/lib/systemd/system/bootnotice.service.erb"
-  owner "root"
-  group "root"
+template '/usr/lib/systemd/system/bootnotice.service' do
+  source 'usr/lib/systemd/system/bootnotice.service.erb'
+  owner 'root'
+  group 'root'
   mode 0750
   action :create
   sensitive node['linux']['runtime']['sensitivity']
-  notifies :enable, "service[bootnotice]", :immediately
-  notifies :run, "execute[Reload systemctl daemons]", :immediately
+  notifies :enable, 'service[bootnotice]', :immediately
+  notifies :run, 'execute[Reload systemctl daemons]', :immediately
   only_if { node['platform_version'] =~ /^7/ }
 end
 
-execute "Reload systemctl daemons" do
-  command "systemctl daemon-reload"
+execute 'Reload systemctl daemons' do
+  command 'systemctl daemon-reload'
   action :nothing
 end
 
-service "bootnotice" do
-  supports :start => true, :stop => true
+service 'bootnotice' do
+  supports start: true, stop: true
   action [ :nothing ]
 end

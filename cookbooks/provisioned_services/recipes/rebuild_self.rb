@@ -17,8 +17,8 @@
 ### limitations under the License.
 ###
 
-node.from_file(run_context.resolve_attribute("provisioned_services", "secrets"))
-node.from_file(run_context.resolve_attribute("enterprise_linux", "default"))
+node.from_file(run_context.resolve_attribute('provisioned_services', 'secrets'))
+node.from_file(run_context.resolve_attribute('enterprise_linux', 'default'))
 
 ###
 ### This recipe will decommission any server that it has been assigned.

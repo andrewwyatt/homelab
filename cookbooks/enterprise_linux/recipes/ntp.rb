@@ -21,27 +21,27 @@ yum_package [ 'ntp' ] do
   action :install
 end
 
-template "/etc/sysconfig/ntpd" do
-  source "etc/sysconfig/ntpd.erb"
-  owner "root"
-  group "root"
+template '/etc/sysconfig/ntpd' do
+  source 'etc/sysconfig/ntpd.erb'
+  owner 'root'
+  group 'root'
   mode 0644
   action :create
   sensitive node['linux']['runtime']['sensitivity']
-  notifies :restart, "service[ntpd]", :delayed
+  notifies :restart, 'service[ntpd]', :delayed
 end
 
-template "/etc/ntp.conf" do
-  source "etc/ntp.conf.erb"
-  owner "root"
-  group "root"
+template '/etc/ntp.conf' do
+  source 'etc/ntp.conf.erb'
+  owner 'root'
+  group 'root'
   mode 0644
   action :create
   sensitive node['linux']['runtime']['sensitivity']
-  notifies :restart, "service[ntpd]", :immediately
+  notifies :restart, 'service[ntpd]', :immediately
 end
 
-service "ntpd" do
-  supports :status => true, :restart => true
+service 'ntpd' do
+  supports status: true, restart: true
   action [ :enable, :start ]
 end

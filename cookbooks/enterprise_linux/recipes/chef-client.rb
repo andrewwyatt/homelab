@@ -50,10 +50,10 @@ end
 openssl_decrypt = String.new("openssl aes-256-cbc -a -d -pass file:#{Chef::Config[:file_cache_path]}/.#{passfile}")
 openssl_encrypt = String.new("openssl aes-256-cbc -a -salt -pass file:#{Chef::Config[:file_cache_path]}/.#{passfile}")
 
-node.default['linux']['chef']['server']=`printf $(grep chef_server_url /etc/chef/client.rb  | sed -s -e "s#^.*//##" -e "s#/.*\\\$##")`
+node.default['linux']['chef']['server'] = `printf $(grep chef_server_url /etc/chef/client.rb  | sed -s -e "s#^.*//##" -e "s#/.*\\\$##")`
 
 server_version_test = `rpm -qi chef-#{node['linux']['chef']['client_version']} 2>/dev/null`
-unless $?.exitstatus == 0
+unless $CHILD_STATUS.exitstatus == 0
   if node['linux']['chef']['install_via_url'] == true
     install_file = `curl "#{node['linux']['chef']['client_url']}" 2>/dev/null | grep "chef.*.x86_64.rpm" | sed -s -e 's/^.*href="//' -e 's/".*$//' -e 's/<[^>]*>//g' | head -n 1 | awk '{printf $1}'`
     remote_file "#{Chef::Config['file_cache_path']}/#{install_file}" do
@@ -82,22 +82,22 @@ directory '/var/chef' do
   owner 'root'
   group 'root'
   mode  '0700'
-  only_if { ::Dir.exists?("/var/chef") }
+  only_if { ::Dir.exist?('/var/chef') }
 end
 
 directory '/etc/chef' do
   owner 'root'
   group 'root'
   mode  '0700'
-  only_if { ::Dir.exists?("/etc/chef") }
+  only_if { ::Dir.exist?('/etc/chef') }
 end
 
 directory '/etc/opscode' do
   owner 'opscode'
   group 'opscode'
   mode  '0700'
-  only_if { ::Dir.exists?("/etc/opscode") }
-  only_if "getent passwd opscode"
+  only_if { ::Dir.exist?('/etc/opscode') }
+  only_if 'getent passwd opscode'
 end
 
 ### This directory does not exist by default
@@ -122,10 +122,10 @@ execute 'Configure data bag secret' do
   notifies :create, "file[#{Chef::Config[:file_cache_path]}/.#{passfile}]", :before
   notifies :delete, "file[#{Chef::Config[:file_cache_path]}/.#{passfile}]", :delayed
   sensitive node['linux']['runtime']['sensitivity']
-  not_if { File.exists? "/etc/chef/encrypted_data_bag_secret" }
+  not_if { File.exist? '/etc/chef/encrypted_data_bag_secret' }
 end
 
-file "/etc/chef/encrypted_data_bag_secret" do
+file '/etc/chef/encrypted_data_bag_secret' do
   owner 'root'
   group 'root'
   mode 0600
@@ -149,8 +149,8 @@ file '/etc/systemd/system/chef-client.service' do
   action :delete
 end
 
-template "/etc/sysconfig/chef-client" do
-  source "etc/sysconfig/chef-client.erb"
+template '/etc/sysconfig/chef-client' do
+  source 'etc/sysconfig/chef-client.erb'
   mode 0644
   sensitive node['linux']['runtime']['sensitivity']
 end
@@ -172,17 +172,17 @@ directory node['linux']['chef']['ohai_plugin_path'] do
   action :create
 end
 
-template "/etc/chef/client.rb" do
-  source "etc/chef/client.rb.erb"
-  owner "root"
-  group "root"
+template '/etc/chef/client.rb' do
+  source 'etc/chef/client.rb.erb'
+  owner 'root'
+  group 'root'
   mode 0600
   action :create
   sensitive node['linux']['runtime']['sensitivity']
-  variables({
-    :fqdn      => node['fqdn'],
-    :chefsvr   => node['linux']['chef']['server']
-  })
+  variables(
+    fqdn: node['fqdn'],
+    chefsvr: node['linux']['chef']['server']
+  )
 end
 
 template '/usr/bin/chef-health' do

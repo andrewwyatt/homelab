@@ -65,7 +65,7 @@ file '/etc/shadow-' do
   group 'root'
   mode  '0600'
   sensitive node['linux']['runtime']['sensitivity']
-  only_if { File.exists? "/etc/shadow-" }
+  only_if { File.exist? '/etc/shadow-' }
 end
 
 file '/etc/gshadow' do
@@ -73,7 +73,7 @@ file '/etc/gshadow' do
   group 'root'
   mode  '0640'
   sensitive node['linux']['runtime']['sensitivity']
-  only_if { File.exists? "/etc/gshadow" }
+  only_if { File.exist? '/etc/gshadow' }
 end
 
 file '/etc/gshadow-' do
@@ -81,7 +81,7 @@ file '/etc/gshadow-' do
   group 'root'
   mode  '0600'
   sensitive node['linux']['runtime']['sensitivity']
-  only_if { File.exists? "/etc/gshadow-" }
+  only_if { File.exist? '/etc/gshadow-' }
 end
 
 file '/etc/passwd' do
@@ -96,7 +96,7 @@ file '/etc/passwd-' do
   group 'root'
   mode  '0600'
   sensitive node['linux']['runtime']['sensitivity']
-  only_if { File.exists? "/etc/passwd-" }
+  only_if { File.exist? '/etc/passwd-' }
 end
 
 file '/etc/group' do
@@ -111,10 +111,10 @@ file '/etc/group-' do
   group 'root'
   mode  '0600'
   sensitive node['linux']['runtime']['sensitivity']
-  only_if { File.exists? "/etc/group-" }
+  only_if { File.exist? '/etc/group-' }
 end
 
-bash "Ensure inactive users are disabled after 35 days" do
+bash 'Ensure inactive users are disabled after 35 days' do
   code <<-EOF
     INA=`grep "^INACTIVE" /etc/default/useradd`
     if [[ ! ${INA} =~ ^INACTIVE ]]

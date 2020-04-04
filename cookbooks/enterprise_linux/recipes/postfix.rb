@@ -26,42 +26,42 @@ passwords = data_bag_item('credentials', 'passwords', IO.read(Chef::Config['encr
 
 yum_package [ 'postfix',
               'cyrus-sasl-plain',
-               'mailx' ] do
+              'mailx' ] do
   action :install
 end
 
-template "/etc/postfix/main.cf" do
-  source "etc/postfix/main.cf.erb"
-  owner "root"
-  group "root"
+template '/etc/postfix/main.cf' do
+  source 'etc/postfix/main.cf.erb'
+  owner 'root'
+  group 'root'
   mode 0644
   action :create
   sensitive node['linux']['runtime']['sensitivity']
-  notifies :restart, "service[postfix]", :immediately
+  notifies :restart, 'service[postfix]', :immediately
 end
 
- file "/etc/postfix/sasl_passwd" do
-   owner "root"
-   group "root"
-   mode 0600
-   content passwords['sasl_passwd']
-   action :create
-   sensitive node['linux']['runtime']['sensitivity']
-   only_if { node['linux']['postfix']['smtp_sasl_auth_enable'] == "yes" }
-   only_if { (defined?(passwords['sasl_passwd'])).nil? == false }
- end
+file '/etc/postfix/sasl_passwd' do
+  owner 'root'
+  group 'root'
+  mode 0600
+  content passwords['sasl_passwd']
+  action :create
+  sensitive node['linux']['runtime']['sensitivity']
+  only_if { node['linux']['postfix']['smtp_sasl_auth_enable'] == 'yes' }
+  only_if { defined?(passwords['sasl_passwd']).nil? == false }
+end
 
- execute "Configuring postfix SASL creds." do
-   command "postmap /etc/postfix/sasl_passwd"
-   action :run
-   notifies :restart, "service[postfix]", :immediately
-   sensitive node['linux']['runtime']['sensitivity']
-   not_if { ::File.exists?("/etc/postfix/sasl_passwd.db") }
-   only_if { node['linux']['postfix']['smtp_sasl_auth_enable'] == "yes" }
-   only_if { (defined?(passwords['sasl_passwd'])).nil? == false }
- end
+execute 'Configuring postfix SASL creds.' do
+  command 'postmap /etc/postfix/sasl_passwd'
+  action :run
+  notifies :restart, 'service[postfix]', :immediately
+  sensitive node['linux']['runtime']['sensitivity']
+  not_if { ::File.exist?('/etc/postfix/sasl_passwd.db') }
+  only_if { node['linux']['postfix']['smtp_sasl_auth_enable'] == 'yes' }
+  only_if { defined?(passwords['sasl_passwd']).nil? == false }
+end
 
-service "postfix" do
-  supports :status => true, :restart => true
+service 'postfix' do
+  supports status: true, restart: true
   action [ :enable, :start ]
 end

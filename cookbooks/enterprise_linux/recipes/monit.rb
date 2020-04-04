@@ -24,10 +24,10 @@
 
 passwords = data_bag_item('credentials', 'passwords', IO.read(Chef::Config['encrypted_data_bag_secret']))
 
-template "/bin/monit-slack" do
-  source "usr/bin/monit-slack.erb"
-  owner "root"
-  group "root"
+template '/bin/monit-slack' do
+  source 'usr/bin/monit-slack.erb'
+  owner 'root'
+  group 'root'
   mode 0700
   action :create
   sensitive node['linux']['runtime']['sensitivity']
@@ -35,8 +35,8 @@ template "/bin/monit-slack" do
 end
 
 directory '/etc/monit.d' do
-  owner "root"
-  group "root"
+  owner 'root'
+  group 'root'
   mode 0700
   action :create
   sensitive node['linux']['runtime']['sensitivity']
@@ -47,7 +47,7 @@ end
 ### Get a list of nodes from Chef, use the list for ping monitors.
 ###
 
-node_list = Array.new
+node_list = []
 node_list = `knife node list -k /etc/chef/client.pem -c /etc/chef/client.rb`.split("\n")
 node_list.sort
 
@@ -60,7 +60,7 @@ node_location = node_list.find_index(node['fqdn'])
 previous_node = node_location - 1
 if previous_node < 0
   previous_node = node_list.length
-  previous_node = previous_node - 1
+  previous_node -= 1
 end
 
 next_node = node_location + 1
@@ -71,24 +71,24 @@ end
 ping_nodes = [ node_list[previous_node],
                node_list[next_node] ]
 
-template "/etc/monitrc" do
-  source "etc/monitrc.erb"
-  owner "root"
-  group "root"
+template '/etc/monitrc' do
+  source 'etc/monitrc.erb'
+  owner 'root'
+  group 'root'
   mode 0600
   action :create
   sensitive node['linux']['runtime']['sensitivity']
   notifies :restart, 'service[monit]', :delayed
   only_if { node['linux']['monit']['enabled'] == true }
   variables ({
-    :password => passwords['monit_password']
+    password: passwords['monit_password'],
     })
 end
 
-template "/etc/monit.d/host" do
-  source "etc/monit.d/host.erb"
-  owner "root"
-  group "root"
+template '/etc/monit.d/host' do
+  source 'etc/monit.d/host.erb'
+  owner 'root'
+  group 'root'
   mode 0600
   action :create
   sensitive node['linux']['runtime']['sensitivity']
@@ -96,10 +96,10 @@ template "/etc/monit.d/host" do
   only_if { node['linux']['monit']['enabled'] == true }
 end
 
-template "/etc/monit.d/network" do
-  source "etc/monit.d/network.erb"
-  owner "root"
-  group "root"
+template '/etc/monit.d/network' do
+  source 'etc/monit.d/network.erb'
+  owner 'root'
+  group 'root'
   mode 0600
   action :create
   sensitive node['linux']['runtime']['sensitivity']
@@ -107,10 +107,10 @@ template "/etc/monit.d/network" do
   only_if { node['linux']['monit']['enabled'] == true }
 end
 
-template "/etc/monit.d/filesystems" do
-  source "etc/monit.d/filesystems.erb"
-  owner "root"
-  group "root"
+template '/etc/monit.d/filesystems' do
+  source 'etc/monit.d/filesystems.erb'
+  owner 'root'
+  group 'root'
   mode 0600
   action :create
   sensitive node['linux']['runtime']['sensitivity']
@@ -118,24 +118,24 @@ template "/etc/monit.d/filesystems" do
   only_if { node['linux']['monit']['enabled'] == true }
 end
 
-template "/etc/monit.d/ping" do
-  source "etc/monit.d/ping.erb"
-  owner "root"
-  group "root"
+template '/etc/monit.d/ping' do
+  source 'etc/monit.d/ping.erb'
+  owner 'root'
+  group 'root'
   mode 0600
   action :create
   sensitive node['linux']['runtime']['sensitivity']
   notifies :restart, 'service[monit]', :delayed
   only_if { node['linux']['monit']['enabled'] == true }
   variables ({
-    :ping_nodes => ping_nodes
+    ping_nodes: ping_nodes,
     })
 end
 
-template "/etc/monit.d/crond" do
-  source "etc/monit.d/crond.erb"
-  owner "root"
-  group "root"
+template '/etc/monit.d/crond' do
+  source 'etc/monit.d/crond.erb'
+  owner 'root'
+  group 'root'
   mode 0600
   action :create
   sensitive node['linux']['runtime']['sensitivity']
@@ -143,10 +143,10 @@ template "/etc/monit.d/crond" do
   only_if { node['linux']['monit']['enabled'] == true }
 end
 
-template "/etc/monit.d/ntpd" do
-  source "etc/monit.d/ntpd.erb"
-  owner "root"
-  group "root"
+template '/etc/monit.d/ntpd' do
+  source 'etc/monit.d/ntpd.erb'
+  owner 'root'
+  group 'root'
   mode 0600
   action :create
   sensitive node['linux']['runtime']['sensitivity']
@@ -154,10 +154,10 @@ template "/etc/monit.d/ntpd" do
   only_if { node['linux']['monit']['enabled'] == true }
 end
 
-template "/etc/monit.d/jcagent" do
-  source "etc/monit.d/jcagent.erb"
-  owner "root"
-  group "root"
+template '/etc/monit.d/jcagent' do
+  source 'etc/monit.d/jcagent.erb'
+  owner 'root'
+  group 'root'
   mode 0600
   action :create
   sensitive node['linux']['runtime']['sensitivity']
@@ -165,10 +165,10 @@ template "/etc/monit.d/jcagent" do
   only_if { node['linux']['monit']['enabled'] == true }
 end
 
-template "/etc/monit.d/sshd" do
-  source "etc/monit.d/sshd.erb"
-  owner "root"
-  group "root"
+template '/etc/monit.d/sshd' do
+  source 'etc/monit.d/sshd.erb'
+  owner 'root'
+  group 'root'
   mode 0600
   action :create
   sensitive node['linux']['runtime']['sensitivity']

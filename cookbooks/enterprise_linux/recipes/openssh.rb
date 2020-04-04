@@ -26,16 +26,16 @@ end
 ###
 
 template '/etc/ssh/sshd_config' do
-  source "etc/ssh/sshd_config.erb"
-  owner "root"
-  group "root"
+  source 'etc/ssh/sshd_config.erb'
+  owner 'root'
+  group 'root'
   mode 0600
   action :create
   sensitive node['linux']['runtime']['sensitivity']
-  notifies :restart, "service[sshd]", :immediately
+  notifies :restart, 'service[sshd]', :immediately
 end
 
-service "sshd" do
-  supports :status => true, :restart => true
+service 'sshd' do
+  supports status: true, restart: true
   action [ :enable, :start ]
 end

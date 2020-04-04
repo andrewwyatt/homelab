@@ -17,8 +17,8 @@
 ### limitations under the License.
 ###
 
-node.from_file(run_context.resolve_attribute("provisioned_services", "secrets"))
-node.from_file(run_context.resolve_attribute("enterprise_linux", "default"))
+node.from_file(run_context.resolve_attribute('provisioned_services', 'secrets'))
+node.from_file(run_context.resolve_attribute('enterprise_linux', 'default'))
 
 ###
 ### NFS servers need NFS ports.
@@ -58,9 +58,9 @@ node.default['linux']['mounts']['data']['group']          = 'root'
 node.default['linux']['mounts']['data']['mode']           = '0755'
 
 node.default['nfs']['exports']                            = { 'exports' => { 'mount_point' => '/exports/data',
-                                                                             'hosts'       => '10.100.100.0/24',
-                                                                             'options'     => 'rw,sync,no_root_squash,no_subtree_check'
-                                                                           }
+                                                                             'hosts' => '10.100.100.0/24',
+                                                                             'options' => 'rw,sync,no_root_squash,no_subtree_check',
+                                                                           },
                                                             }
 
 ###
@@ -85,7 +85,7 @@ template '/etc/exports' do
   group 'root'
   mode '0755'
   action :create
-  notifies :run, "execute[exportfs]", :delayed
+  notifies :run, 'execute[exportfs]', :delayed
 end
 
 execute 'exportfs' do
@@ -93,15 +93,15 @@ execute 'exportfs' do
   action :nothing
 end
 
-service "nfs-server" do
-  supports :status => true, :restart => true
+service 'nfs-server' do
+  supports status: true, restart: true
   action [ :enable, :start ]
 end
 
-template "/etc/monit.d/nfs" do
-  source "etc/monit.d/nfs.erb"
-  owner "root"
-  group "root"
+template '/etc/monit.d/nfs' do
+  source 'etc/monit.d/nfs.erb'
+  owner 'root'
+  group 'root'
   mode 0600
   action :create
   sensitive node['linux']['runtime']['sensitivity']

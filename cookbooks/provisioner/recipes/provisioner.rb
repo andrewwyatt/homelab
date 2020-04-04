@@ -41,7 +41,7 @@ cookbook_file '/etc/httpd/conf.d/get.conf' do
   mode 0644
   action :create
   sensitive node['provisioner']['runtime']['sensitivity']
-  notifies :restart, "service[httpd]", :immediately
+  notifies :restart, 'service[httpd]', :immediately
 end
 
 ###
@@ -49,8 +49,8 @@ end
 ###
 
 if node['linux']['dns']['mechanism'] == 'zonomi' && node['provisioner']['ssl']['use_acme'] == true
-  node.default['provisioner']['httpd']['ssl_certificate'] = "/etc/pki/tls/certs/localhost.crt"
-  node.default['provisioner']['httpd']['ssl_certificate_key'] = "/etc/pki/tls/private/localhost.key"
+  node.default['provisioner']['httpd']['ssl_certificate'] = '/etc/pki/tls/certs/localhost.crt'
+  node.default['provisioner']['httpd']['ssl_certificate_key'] = '/etc/pki/tls/private/localhost.key'
 end
 
 ###
@@ -59,19 +59,19 @@ end
 
 currentdate = `date '+%s'`.chomp
 
-if File.exists?("/etc/opscode/#{node['fqdn']}.crt")
-  certexpiration = `date -d "$(/usr/bin/openssl x509 -enddate -noout -in #{node['chef']['server_attributes']['nginx']['ssl_certificate']} | sed -e 's#notAfter=##')" '+%s'`.chomp
-else
-  certexpiration = currentdate
-end
+certexpiration = if File.exist?("/etc/opscode/#{node['fqdn']}.crt")
+                   `date -d "$(/usr/bin/openssl x509 -enddate -noout -in #{node['chef']['server_attributes']['nginx']['ssl_certificate']} | sed -e 's#notAfter=##')" '+%s'`.chomp
+                 else
+                   currentdate
+                 end
 
-certdaysleft = (certexpiration.to_i - currentdate.to_i)/86400
+certdaysleft = (certexpiration.to_i - currentdate.to_i) / 86400
 if certdaysleft < node['chef']['ssl']['renewal_day'].to_i
   renew_now = true
 end
 
-notification="Renewing my SSL certificate @ #{certdaysleft} days left."
-execute "Renewal notification" do
+notification = "Renewing my SSL certificate @ #{certdaysleft} days left."
+execute 'Renewal notification' do
   command "notify \"#{node['linux']['slack_channel']}\" \"#{node['provisioner']['replicator_emoji']}\" \"#{node['linux']['api_path']}\"  \"#{notification}\""
   action :run
   only_if { renew_now == true }
@@ -81,9 +81,9 @@ end
 ### Deconstruct the names to pass to acme.sh
 ###
 
-certnames = String.new
-node['provisioner']['ssl']['hostnames'].each do | type,value |
-   certnames = certnames + "-d " + value + " "
+certnames = ''
+node['provisioner']['ssl']['hostnames'].each do |_type, value|
+  certnames = certnames + '-d ' + value + ' '
 end
 
 yum_package [ 'git' ] do
@@ -98,7 +98,7 @@ git "#{Chef::Config[:file_cache_path]}/acme.sh" do
   reference 'master'
   action :sync
   sensitive node['provisioner']['runtime']['sensitivity']
-  not_if { Dir.exists?("#{Chef::Config['file_cache_path']}/acme.sh")}
+  not_if { Dir.exist?("#{Chef::Config['file_cache_path']}/acme.sh") }
   only_if { node['linux']['dns']['mechanism'] == 'zonomi' }
   only_if { node['provisioner']['ssl']['use_acme'] == true }
   only_if { renew_now == true }
@@ -116,10 +116,10 @@ execute 'Creating or renewing certificate' do
   only_if { renew_now == true }
 end
 
-template "/etc/httpd/conf.d/ssl.conf" do
-  source "etc/httpd/conf.d/ssl.conf.erb"
-  owner "root"
-  group "root"
+template '/etc/httpd/conf.d/ssl.conf' do
+  source 'etc/httpd/conf.d/ssl.conf.erb'
+  owner 'root'
+  group 'root'
   mode 0644
   action :create
   sensitive node['provisioner']['runtime']['sensitivity']
@@ -127,10 +127,10 @@ template "/etc/httpd/conf.d/ssl.conf" do
   only_if { node['provisioner']['ssl']['enabled'] == true }
 end
 
-template "/etc/httpd/conf.d/redirect.conf" do
-  source "etc/httpd/conf.d/redirect.conf.erb"
-  owner "root"
-  group "root"
+template '/etc/httpd/conf.d/redirect.conf' do
+  source 'etc/httpd/conf.d/redirect.conf.erb'
+  owner 'root'
+  group 'root'
   mode 0644
   action :create
   sensitive node['provisioner']['runtime']['sensitivity']
@@ -145,7 +145,7 @@ cookbook_file '/etc/xinetd.d/tftp' do
   mode 0644
   action :create
   sensitive node['provisioner']['runtime']['sensitivity']
-  notifies :restart, "service[xinetd]", :immediately
+  notifies :restart, 'service[xinetd]', :immediately
 end
 
 directory node['provisioner']['name_gen_path'] do
@@ -180,7 +180,7 @@ template '/etc/cobbler/dhcp.template' do
   mode 0644
   action :create
   sensitive node['provisioner']['runtime']['sensitivity']
-  notifies :restart, "service[cobblerd]", :immediate
+  notifies :restart, 'service[cobblerd]', :immediate
 end
 
 template '/etc/cobbler/named.template' do
@@ -190,7 +190,7 @@ template '/etc/cobbler/named.template' do
   mode 0644
   action :create
   sensitive node['provisioner']['runtime']['sensitivity']
-  notifies :restart, "service[cobblerd]", :immediate
+  notifies :restart, 'service[cobblerd]', :immediate
 end
 
 template '/etc/cobbler/zone.template' do
@@ -200,7 +200,7 @@ template '/etc/cobbler/zone.template' do
   mode 0644
   action :create
   sensitive node['provisioner']['runtime']['sensitivity']
-  notifies :restart, "service[cobblerd]", :immediate
+  notifies :restart, 'service[cobblerd]', :immediate
 end
 
 template '/etc/cobbler/named.template' do
@@ -210,7 +210,7 @@ template '/etc/cobbler/named.template' do
   mode 0644
   action :create
   sensitive node['provisioner']['runtime']['sensitivity']
-  notifies :restart, "service[cobblerd]", :immediate
+  notifies :restart, 'service[cobblerd]', :immediate
 end
 
 template '/etc/cobbler/settings' do
@@ -220,10 +220,10 @@ template '/etc/cobbler/settings' do
   mode 0644
   action :create
   sensitive node['provisioner']['runtime']['sensitivity']
-  notifies :restart, "service[cobblerd]", :immediate
-  variables({
-    :password   => passwords['cobbler']
-  })
+  notifies :restart, 'service[cobblerd]', :immediate
+  variables(
+    password: passwords['cobbler']
+  )
 end
 
 template '/etc/cobbler/pxe/pxedefault.template' do
@@ -233,19 +233,19 @@ template '/etc/cobbler/pxe/pxedefault.template' do
   mode 0644
   action :create
   sensitive node['provisioner']['runtime']['sensitivity']
-  notifies :restart, "service[cobblerd]", :immediate
-  variables({
-    :root_hash   => passwords['root_hash']
-  })
+  notifies :restart, 'service[cobblerd]', :immediate
+  variables(
+    root_hash: passwords['root_hash']
+  )
 end
 
-bash "Download the cobbler loaders" do
+bash 'Download the cobbler loaders' do
   code <<-EOF
     (systemctl status cobblerd | grep "Active: active" >/dev/null 2>&1) || systemctl start cobblerd
     cobbler get-loaders
   EOF
   sensitive node['provisioner']['runtime']['sensitivity']
-  not_if { File.exists? '/var/lib/cobbler/loaders/README' }
+  not_if { File.exist? '/var/lib/cobbler/loaders/README' }
 end
 
 template '/var/lib/cobbler/kickstarts/CentOS-7-x86_64' do
@@ -255,9 +255,9 @@ template '/var/lib/cobbler/kickstarts/CentOS-7-x86_64' do
   mode 0640
   action :create
   sensitive node['provisioner']['runtime']['sensitivity']
-  variables({
-    :rootpw   => passwords['root_hash']
-  })
+  variables(
+    rootpw: passwords['root_hash']
+  )
 end
 
 template '/var/lib/cobbler/snippets/base-build-notice' do
@@ -276,9 +276,9 @@ template '/var/lib/cobbler/snippets/base-chef' do
   mode 0640
   action :create
   sensitive node['provisioner']['runtime']['sensitivity']
-  variables({
-    :chefpw   => passwords['bootstrap_passphrase']
-  })
+  variables(
+    chefpw: passwords['bootstrap_passphrase']
+  )
 end
 
 template '/var/lib/cobbler/snippets/base-complete' do
@@ -335,7 +335,7 @@ template '/var/lib/cobbler/snippets/base-partitions' do
   sensitive node['provisioner']['runtime']['sensitivity']
 end
 
-node['linux']['yum']['package_mirrors'].each do |id,data|
+node['linux']['yum']['package_mirrors'].each do |id, _data|
   mirror = id
   template "/var/lib/cobbler/snippets/base-repos-centos-#{mirror}" do
     source 'var/lib/cobbler/snippets/base-repos-centos.erb'
@@ -344,9 +344,9 @@ node['linux']['yum']['package_mirrors'].each do |id,data|
     mode 0640
     action :create
     sensitive node['provisioner']['runtime']['sensitivity']
-    variables({
-      :mirror      => mirror
-    })
+    variables(
+      mirror: mirror
+    )
   end
 end
 
@@ -366,9 +366,9 @@ template '/var/lib/cobbler/snippets/base-rootpw' do
   mode 0640
   action :create
   sensitive node['provisioner']['runtime']['sensitivity']
-  variables({
-    :rootpw   => passwords['root_hash']
-  })
+  variables(
+    rootpw: passwords['root_hash']
+  )
 end
 
 template '/var/lib/cobbler/snippets/kickstart_start' do
@@ -398,7 +398,7 @@ template '/var/lib/cobbler/snippets/cobbler_register' do
   sensitive node['provisioner']['runtime']['sensitivity']
 end
 
-node['provisioner']['cobbler']['distros'].each do |distro,distro_metadata|
+node['provisioner']['cobbler']['distros'].each do |distro, distro_metadata|
   directory "#{node['provisioner']['cobbler']['bootimage_path']}/#{distro}/pxeboot" do
     owner 'apache'
     group 'apache'
@@ -409,7 +409,7 @@ node['provisioner']['cobbler']['distros'].each do |distro,distro_metadata|
   end
 
   remote_file distro_metadata['kernel'] do
-    source "#{node['provisioner']['cobbler']['repos']["#{distro}"]['mirror']}/images/pxeboot/vmlinuz" #~FC002
+    source "#{node['provisioner']['cobbler']['repos'][distro.to_s]['mirror']}/images/pxeboot/vmlinuz" # ~FC002
     owner 'apache'
     group 'apache'
     mode 0644
@@ -418,7 +418,7 @@ node['provisioner']['cobbler']['distros'].each do |distro,distro_metadata|
   end
 
   remote_file distro_metadata['initrd'] do
-    source "#{node['provisioner']['cobbler']['repos']["#{distro}"]['mirror']}/images/pxeboot/initrd.img" #~FC002
+    source "#{node['provisioner']['cobbler']['repos'][distro.to_s]['mirror']}/images/pxeboot/initrd.img" # ~FC002
     owner 'apache'
     group 'apache'
     mode 0644
@@ -427,59 +427,56 @@ node['provisioner']['cobbler']['distros'].each do |distro,distro_metadata|
   end
 end
 
-node['provisioner']['cobbler']['distros'].each do |id,parameters|
-  distro_list=`cobbler distro list 2>&1 | awk '{print $1}'`
-  add_command=String.new
-  unless distro_list =~/#{id}/i
-    parameters.each do |key,value|
-      unless key == "repos"
-        add_command=add_command + " --#{key} #{value}"
-      end
+node['provisioner']['cobbler']['distros'].each do |id, parameters|
+  distro_list = `cobbler distro list 2>&1 | awk '{print $1}'`
+  add_command = ''
+  next if distro_list =~ /#{id}/i
+  parameters.each do |key, value|
+    unless key == 'repos'
+      add_command += " --#{key} #{value}"
     end
-    bash "Adding the #{id} distro to cobbler" do
-      code <<-EOF
+  end
+  bash "Adding the #{id} distro to cobbler" do
+    code <<-EOF
         cobbler distro add #{add_command}
-      EOF
-      sensitive node['provisioner']['runtime']['sensitivity']
-    end
+    EOF
+    sensitive node['provisioner']['runtime']['sensitivity']
   end
 end
 
-node['provisioner']['cobbler']['profiles'].each do |id,parameters|
-  profile_list=`cobbler profile list 2>&1 | awk '{print $1}'`
-  add_command=String.new
-  unless profile_list =~/#{id}/i
-    parameters.each do |key,value|
-      add_command=add_command + " --#{key} #{value}"
-    end
-    bash "Adding the #{id} profile to cobbler" do
-      code <<-EOF
+node['provisioner']['cobbler']['profiles'].each do |id, parameters|
+  profile_list = `cobbler profile list 2>&1 | awk '{print $1}'`
+  add_command = ''
+  next if profile_list =~ /#{id}/i
+  parameters.each do |key, value|
+    add_command += " --#{key} #{value}"
+  end
+  bash "Adding the #{id} profile to cobbler" do
+    code <<-EOF
         cobbler profile add #{add_command}
-      EOF
-      sensitive node['provisioner']['runtime']['sensitivity']
-    end
+    EOF
+    sensitive node['provisioner']['runtime']['sensitivity']
   end
 end
 
-node['provisioner']['cobbler']['systems'].each do |id,parameters|
-  system_list=`cobbler system list 2>&1 | awk '{print $1}'`
-  add_command=String.new
-  unless system_list =~/#{id}/i
-    parameters.each do |key,value|
-      add_command=add_command + " --#{key} #{value}"
-    end
-    bash "Adding the #{id} system to cobbler" do
-      code <<-EOF
+node['provisioner']['cobbler']['systems'].each do |id, parameters|
+  system_list = `cobbler system list 2>&1 | awk '{print $1}'`
+  add_command = ''
+  next if system_list =~ /#{id}/i
+  parameters.each do |key, value|
+    add_command += " --#{key} #{value}"
+  end
+  bash "Adding the #{id} system to cobbler" do
+    code <<-EOF
         cobbler system add #{add_command}
-      EOF
-      sensitive node['provisioner']['runtime']['sensitivity']
-    end
+    EOF
+    sensitive node['provisioner']['runtime']['sensitivity']
   end
 end
 
-default_system=`cobbler system dumpvars --name default | awk '/profile_name/ {printf $3}' 2>/dev/null ||:`
+default_system = `cobbler system dumpvars --name default | awk '/profile_name/ {printf $3}' 2>/dev/null ||:`
 
-bash "Configure the cobbler default profile" do
+bash 'Configure the cobbler default profile' do
   code <<-EOF
     cobbler system remove --name default 2>/dev/null
     cobbler system add --name default --profile #{node['linux']['cobbler']['profile']}
@@ -487,64 +484,64 @@ bash "Configure the cobbler default profile" do
   not_if { default_system == node['linux']['cobbler']['profile'] }
 end
 
-bash "Execute Cobbler Sync" do
+bash 'Execute Cobbler Sync' do
   code <<-EOF
     cobbler sync
   EOF
   action :run
   sensitive node['provisioner']['runtime']['sensitivity']
   subscribes :run, 'file[/etc/cobbler/dhcp.template]', :delayed
-  subscribes :run,'template[/etc/cobbler/named.template]', :delayed
+  subscribes :run, 'template[/etc/cobbler/named.template]', :delayed
 end
 
-service "httpd" do
-  supports :status => true, :restart => true
+service 'httpd' do
+  supports status: true, restart: true
   action [ :enable, :start ]
 end
 
-service "xinetd" do
-  supports :status => true, :restart => true
+service 'xinetd' do
+  supports status: true, restart: true
   action [ :enable, :start ]
 end
 
-service "named" do
-  supports :status => true, :restart => true
+service 'named' do
+  supports status: true, restart: true
   action [ :enable, :start ]
-  only_if { node['provisioner']['manage_dns'] == "1" }
+  only_if { node['provisioner']['manage_dns'] == '1' }
 end
 
-service "dhcpd" do
-  supports :status => true, :restart => true
-  action [ :enable, :start ]
-end
-
-service "cobblerd" do
-  supports :status => true, :restart => true
+service 'dhcpd' do
+  supports status: true, restart: true
   action [ :enable, :start ]
 end
 
-template "/usr/bin/decom-watch" do
-  source "usr/bin/decom-watch.erb"
-  owner "root"
-  group "bin"
-  mode "0755"
+service 'cobblerd' do
+  supports status: true, restart: true
+  action [ :enable, :start ]
+end
+
+template '/usr/bin/decom-watch' do
+  source 'usr/bin/decom-watch.erb'
+  owner 'root'
+  group 'bin'
+  mode '0755'
   action :create
   sensitive node['provisioner']['runtime']['sensitivity']
 end
 
-template "/etc/cron.d/decom-watch" do
-  source "etc/cron.d/decom-watch.erb"
-  owner "root"
-  group "root"
-  mode "0644"
+template '/etc/cron.d/decom-watch' do
+  source 'etc/cron.d/decom-watch.erb'
+  owner 'root'
+  group 'root'
+  mode '0644'
   action :create
   sensitive node['provisioner']['runtime']['sensitivity']
 end
 
-template "/etc/monit.d/httpd" do
-  source "etc/monit.d/httpd.erb"
-  owner "root"
-  group "root"
+template '/etc/monit.d/httpd' do
+  source 'etc/monit.d/httpd.erb'
+  owner 'root'
+  group 'root'
   mode 0600
   action :create
   sensitive node['provisioner']['runtime']['sensitivity']
@@ -552,10 +549,10 @@ template "/etc/monit.d/httpd" do
   only_if { node['linux']['monit']['enabled'] == true }
 end
 
-template "/etc/monit.d/xinetd" do
-  source "etc/monit.d/xinetd.erb"
-  owner "root"
-  group "root"
+template '/etc/monit.d/xinetd' do
+  source 'etc/monit.d/xinetd.erb'
+  owner 'root'
+  group 'root'
   mode 0600
   action :create
   sensitive node['provisioner']['runtime']['sensitivity']
@@ -563,10 +560,10 @@ template "/etc/monit.d/xinetd" do
   only_if { node['linux']['monit']['enabled'] == true }
 end
 
-template "/etc/monit.d/httpd" do
-  source "etc/monit.d/httpd.erb"
-  owner "root"
-  group "root"
+template '/etc/monit.d/httpd' do
+  source 'etc/monit.d/httpd.erb'
+  owner 'root'
+  group 'root'
   mode 0600
   action :create
   sensitive node['provisioner']['runtime']['sensitivity']
@@ -600,5 +597,5 @@ bash notification do
     touch /var/.provisioner
   EOF
   only_if { node['linux']['slack_enabled'] == true }
-  not_if { File.exists? '/var/.provisioner' }
+  not_if { File.exist? '/var/.provisioner' }
 end

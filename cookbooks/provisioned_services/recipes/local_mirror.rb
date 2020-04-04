@@ -17,9 +17,9 @@
 ### limitations under the License.
 ###
 
-node.from_file(run_context.resolve_attribute("provisioned_services", "secrets"))
-node.from_file(run_context.resolve_attribute("enterprise_linux", "default"))
-node.from_file(run_context.resolve_attribute("provisioner", "default"))
+node.from_file(run_context.resolve_attribute('provisioned_services', 'secrets'))
+node.from_file(run_context.resolve_attribute('enterprise_linux', 'default'))
+node.from_file(run_context.resolve_attribute('provisioner', 'default'))
 
 ###
 ### This recipe configures mirror nodes that replicate from another mirror node.
@@ -49,7 +49,6 @@ node.normal['provisioner']['mirrors']['primary']['enabled']          = true
 
 node.normal['linux']['firewall']['ports']['80/tcp']      = true
 node.normal['linux']['firewall']['ports']['443/tcp']     = true
-
 
 include_recipe 'provisioned_services::standard_server'
 

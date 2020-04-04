@@ -56,7 +56,7 @@ user node['provisioner']['user'] do
   gid node['provisioner']['user']
   shell node['provisioner']['shell']
   home node['provisioner']['path']
-  comment "Package Builder"
+  comment 'Package Builder'
   manage_home true
   action :create
   sensitive node['provisioner']['runtime']['sensitivity']
@@ -67,13 +67,13 @@ group node['provisioner']['package_group'] do
   sensitive node['provisioner']['runtime']['sensitivity']
 end
 
-package_members = String.new
+package_members = ''
 node['provisioner']['package_members'].each do |package_member|
-  if package_members =~ /[A-z]/
-    package_members = package_members + "," + package_member
-  else
-    package_members = package_member
-  end
+  package_members = if package_members =~ /[A-z]/
+                      package_members + ',' + package_member
+                    else
+                      package_member
+                    end
 end
 
 group node['provisioner']['package_group'] do
@@ -86,9 +86,9 @@ end
 ### Configure the build account with sudo permissions.
 ###
 
-node.normal['linux']['sudoers']['properties'] = {node['provisioner']['user'] => "#{node['provisioner']['user']} ALL=(ALL) NOPASSWD:ALL" }
+node.normal['linux']['sudoers']['properties'] = { node['provisioner']['user'] => "#{node['provisioner']['user']} ALL=(ALL) NOPASSWD:ALL" }
 
-group "mock" do
+group 'mock' do
   action :modify
   members node['provisioner']['user']
   append true
@@ -102,35 +102,35 @@ end
 directory node['provisioner']['path'] do
   owner node['provisioner']['user']
   group node['provisioner']['user']
-  mode "0700"
+  mode '0700'
   action :create
 end
 
 directory "#{node['provisioner']['path']}/bin" do
   owner node['provisioner']['user']
   group node['provisioner']['user']
-  mode "0700"
+  mode '0700'
   action :create
 end
 
 directory "#{node['provisioner']['path']}/etc" do
   owner node['provisioner']['user']
   group node['provisioner']['user']
-  mode "0700"
+  mode '0700'
   action :create
 end
 
 directory node['provisioner']['buildpath'] do
-  owner "root"
-  group "mock"
-  mode "0775"
+  owner 'root'
+  group 'mock'
+  mode '0775'
   action :create
 end
 
 directory "#{node['provisioner']['buildpath']}/mock" do
   owner node['provisioner']['user']
   group node['provisioner']['package_group']
-  mode "0775"
+  mode '0775'
   action :create
 end
 
@@ -141,7 +141,7 @@ end
 directory node['provisioner']['baserepopath'] do
   owner node['provisioner']['user']
   group node['provisioner']['package_group']
-  mode "0775"
+  mode '0775'
   recursive true
   action :create
 end
@@ -149,7 +149,7 @@ end
 directory "#{node['provisioner']['baserepopath']}/UPLOADS" do
   owner node['provisioner']['user']
   group node['provisioner']['package_group']
-  mode "0775"
+  mode '0775'
   action :create
 end
 
@@ -166,10 +166,10 @@ end
 ###
 
 cookbook_file "#{node['provisioner']['path']}/bin/build_package.sh" do
-  source "bin/build_package.sh"
+  source 'bin/build_package.sh'
   owner node['provisioner']['user']
   group node['provisioner']['package_group']
-  mode "0755"
+  mode '0755'
   action :create
   sensitive node['provisioner']['runtime']['sensitivity']
 end
@@ -179,10 +179,10 @@ end
 ###
 
 cookbook_file "#{node['provisioner']['path']}/bin/import_package.sh" do
-  source "bin/import_package.sh"
+  source 'bin/import_package.sh'
   owner node['provisioner']['user']
   group node['provisioner']['package_group']
-  mode "0755"
+  mode '0755'
   action :create
   sensitive node['provisioner']['runtime']['sensitivity']
 end
@@ -192,10 +192,10 @@ end
 ###
 
 cookbook_file "#{node['provisioner']['path']}/bin/watch_repos.sh" do
-  source "bin/watch_repos.sh"
+  source 'bin/watch_repos.sh'
   owner node['provisioner']['user']
   group node['provisioner']['package_group']
-  mode "0755"
+  mode '0755'
   action :create
   sensitive node['provisioner']['runtime']['sensitivity']
 end
@@ -205,10 +205,10 @@ end
 ###
 
 cookbook_file "#{node['provisioner']['path']}/bin/watch_uploads.sh" do
-  source "bin/watch_uploads.sh"
+  source 'bin/watch_uploads.sh'
   owner node['provisioner']['user']
   group node['provisioner']['package_group']
-  mode "0755"
+  mode '0755'
   action :create
   sensitive node['provisioner']['runtime']['sensitivity']
 end
@@ -217,62 +217,61 @@ end
 ### Sets up a read only mirror to be consumed by the mirror hosts.
 ###
 
-directory "/etc/rsyncd.d" do
+directory '/etc/rsyncd.d' do
   owner 'root'
   group 'root'
-  mode "0775"
+  mode '0775'
   action :create
 end
 
-template "/etc/rsyncd.conf" do
-  source "etc/rsyncd.conf.erb"
-  owner "root"
-  group "bin"
-  mode "0644"
-  action :create
-  sensitive node['provisioner']['runtime']['sensitivity']
-  variables({
-    :pid_file             => node['provisioner']['common']['rsync']['pid_file'],
-    :uid                  => node['provisioner']['common']['rsync']['uid'],
-    :gid                  => node['provisioner']['common']['rsync']['gid'],
-    :use_chroot           => node['provisioner']['common']['rsync']['use_chroot'],
-    :read_only            => node['provisioner']['common']['rsync']['read_only'],
-    :hosts_allow          => node['provisioner']['common']['rsync']['hosts_allow'],
-    :hosts_deny           => node['provisioner']['common']['rsync']['hosts_deny'],
-    :max_connections      => node['provisioner']['common']['rsync']['max_connections'],
-    :log_format           => node['provisioner']['common']['rsync']['log_format'],
-    :syslog_facility      => node['provisioner']['common']['rsync']['syslog_facility'],
-    :timeout              => node['provisioner']['common']['rsync']['timeout'],
-  })
-end
-
-template "/etc/rsyncd.d/packager.conf" do
-  source "etc/rsyncd.d/template.conf.erb"
-  owner "root"
-  group "bin"
-  mode "0644"
+template '/etc/rsyncd.conf' do
+  source 'etc/rsyncd.conf.erb'
+  owner 'root'
+  group 'bin'
+  mode '0644'
   action :create
   sensitive node['provisioner']['runtime']['sensitivity']
-  variables({
-    :repository_name      => node['provisioner']['packager']['rsync']['repository_name'],
-    :repository_path      => node['provisioner']['packager']['rsync']['repository_path'],
-    :repository_comment   => node['provisioner']['packager']['rsync']['repository_comment']
-  })
+  variables(
+    pid_file: node['provisioner']['common']['rsync']['pid_file'],
+    uid: node['provisioner']['common']['rsync']['uid'],
+    gid: node['provisioner']['common']['rsync']['gid'],
+    use_chroot: node['provisioner']['common']['rsync']['use_chroot'],
+    read_only: node['provisioner']['common']['rsync']['read_only'],
+    hosts_allow: node['provisioner']['common']['rsync']['hosts_allow'],
+    hosts_deny: node['provisioner']['common']['rsync']['hosts_deny'],
+    max_connections: node['provisioner']['common']['rsync']['max_connections'],
+    log_format: node['provisioner']['common']['rsync']['log_format'],
+    syslog_facility: node['provisioner']['common']['rsync']['syslog_facility'],
+    timeout: node['provisioner']['common']['rsync']['timeout']
+  )
 end
 
-
-template "/etc/xinetd.d/rsync" do
-  source "etc/xinetd.d/rsync.erb"
-  owner "root"
-  group "bin"
-  mode "0644"
+template '/etc/rsyncd.d/packager.conf' do
+  source 'etc/rsyncd.d/template.conf.erb'
+  owner 'root'
+  group 'bin'
+  mode '0644'
   action :create
   sensitive node['provisioner']['runtime']['sensitivity']
-  notifies :restart, "service[xinetd]", :immediately
+  variables(
+    repository_name: node['provisioner']['packager']['rsync']['repository_name'],
+    repository_path: node['provisioner']['packager']['rsync']['repository_path'],
+    repository_comment: node['provisioner']['packager']['rsync']['repository_comment']
+  )
 end
 
-service "xinetd" do
-  supports :status => true, :restart => true
+template '/etc/xinetd.d/rsync' do
+  source 'etc/xinetd.d/rsync.erb'
+  owner 'root'
+  group 'bin'
+  mode '0644'
+  action :create
+  sensitive node['provisioner']['runtime']['sensitivity']
+  notifies :restart, 'service[xinetd]', :immediately
+end
+
+service 'xinetd' do
+  supports status: true, restart: true
   action [ :enable, :start ]
 end
 
@@ -280,31 +279,30 @@ end
 ### This configuration file sets up mock to build packages for the platform.
 ###
 
-node['provisioner']['repositories'].each do |key,repository|
+node['provisioner']['repositories'].each do |_key, repository|
   template "/etc/mock/epel-#{node['platform_version'][0]}-x86_64-#{repository}.cfg" do
     source "etc/epel-#{node['platform_version'][0]}-x86_64.cfg.erb"
-    owner "root"
-    group "bin"
-    mode "0644"
+    owner 'root'
+    group 'bin'
+    mode '0644'
     action :create
     sensitive node['provisioner']['runtime']['sensitivity']
-    variables({
-      :repository  => repository,
-      :mirror      => "CentOS_#{node['platform_version'][0]}_x86_64"
-    })
+    variables(
+      repository: repository,
+      mirror: "CentOS_#{node['platform_version'][0]}_x86_64"
+    )
   end
-
 end
 
 ###
 ### LADIES AND GENTLEMAN START YOUR BUILDERS
 ###
 
-template "/etc/cron.d/builder" do
-  source "etc/cron.d/builder.erb"
-  owner "root"
-  group "root"
-  mode "0644"
+template '/etc/cron.d/builder' do
+  source 'etc/cron.d/builder.erb'
+  owner 'root'
+  group 'root'
+  mode '0644'
   action :create
   sensitive node['provisioner']['runtime']['sensitivity']
 end
@@ -312,7 +310,7 @@ end
 directory "#{node['provisioner']['path']}/signing_keys" do
   owner node['provisioner']['user']
   group node['provisioner']['package_group']
-  mode "0700"
+  mode '0700'
   action :create
 end
 
@@ -326,7 +324,7 @@ rpmmacros = build_properties['rpmmacros']
 file "#{node['provisioner']['path']}/.rpmmacros" do
   owner node['provisioner']['user']
   group node['provisioner']['package_group']
-  mode  "0700"
+  mode  '0700'
   content rpmmacros
   sensitive node['provisioner']['runtime']['sensitivity']
 end
@@ -336,15 +334,15 @@ end
 ###
 
 template "#{node['provisioner']['path']}/etc/builder.conf" do
-  source "etc/builder.conf.erb"
+  source 'etc/builder.conf.erb'
   owner node['provisioner']['user']
   group node['provisioner']['user']
-  mode "0700"
+  mode '0700'
   action :create
   sensitive node['provisioner']['runtime']['sensitivity']
-  variables({
-    :signkey   => build_properties['signing_passphrase'],
-  })
+  variables(
+    signkey: build_properties['signing_passphrase']
+  )
 end
 
 ###
@@ -355,7 +353,7 @@ private_key = build_properties['private_key']
 file "#{node['provisioner']['path']}/signing_keys/#{node['provisioner']['user']}.pvt" do
   owner node['provisioner']['user']
   group node['provisioner']['package_group']
-  mode  "0600"
+  mode  '0600'
   content private_key
   sensitive node['provisioner']['runtime']['sensitivity']
 end
@@ -368,7 +366,7 @@ public_key = build_properties['public_key']
 file "#{node['provisioner']['reporoot']}/#{node['provisioner']['pubkey']}" do
   owner node['provisioner']['user']
   group node['provisioner']['package_group']
-  mode  "0644"
+  mode  '0644'
   content public_key
   sensitive node['provisioner']['runtime']['sensitivity']
 end
@@ -378,7 +376,7 @@ end
 ###
 
 gpgid = build_properties['gpgid']
-bash "Install GPG key" do
+bash 'Install GPG key' do
   code "su #{node['provisioner']['user']} -l -c \"gpg --import #{node['provisioner']['path']}/signing_keys/#{node['provisioner']['user']}.pvt\""
   sensitive node['provisioner']['runtime']['sensitivity']
   not_if "su #{node['provisioner']['user']} -l -c \"gpg --list-keys | grep #{gpgid}\""
@@ -388,7 +386,7 @@ end
 ### Configures all of the locally defined repositories for use by the build service.
 ###
 
-node['provisioner']['repositories'].each do |key,repository|
+node['provisioner']['repositories'].each do |_key, repository|
   bash "Create initial [#{repository}] RPM repository." do
     code <<-EOF
       if [ ! -d "#{node['provisioner']['baserepopath']}/#{repository}/RPMS" ]
@@ -416,9 +414,9 @@ end
 ### Removes the Apache welcome to allow the repository to be browseable.
 ###
 
-file "/etc/httpd/conf.d/welcome.conf" do
+file '/etc/httpd/conf.d/welcome.conf' do
   action :delete
-  notifies :restart, "service[httpd]", :immediately
+  notifies :restart, 'service[httpd]', :immediately
 end
 
 ###
@@ -426,8 +424,8 @@ end
 ###
 
 if node['linux']['dns']['mechanism'] == 'zonomi' && node['provisioner']['ssl']['use_acme'] == true
-  node.default['provisioner']['httpd']['ssl_certificate'] = "/etc/pki/tls/certs/localhost.crt"
-  node.default['provisioner']['httpd']['ssl_certificate_key'] = "/etc/pki/tls/private/localhost.key"
+  node.default['provisioner']['httpd']['ssl_certificate'] = '/etc/pki/tls/certs/localhost.crt'
+  node.default['provisioner']['httpd']['ssl_certificate_key'] = '/etc/pki/tls/private/localhost.key'
 end
 
 ###
@@ -436,19 +434,19 @@ end
 
 currentdate = `date '+%s'`.chomp
 
-if File.exists?("/etc/opscode/#{node['fqdn']}.crt")
-  certexpiration = `date -d "$(/usr/bin/openssl x509 -enddate -noout -in #{node['chef']['server_attributes']['nginx']['ssl_certificate']} | sed -e 's#notAfter=##')" '+%s'`.chomp
-else
-  certexpiration = currentdate
-end
+certexpiration = if File.exist?("/etc/opscode/#{node['fqdn']}.crt")
+                   `date -d "$(/usr/bin/openssl x509 -enddate -noout -in #{node['chef']['server_attributes']['nginx']['ssl_certificate']} | sed -e 's#notAfter=##')" '+%s'`.chomp
+                 else
+                   currentdate
+                 end
 
-certdaysleft = (certexpiration.to_i - currentdate.to_i)/86400
+certdaysleft = (certexpiration.to_i - currentdate.to_i) / 86400
 if certdaysleft < node['chef']['ssl']['renewal_day'].to_i
   renew_now = true
 end
 
-notification="Renewing my SSL certificate @ #{certdaysleft} days left."
-execute "Renewal notification" do
+notification = "Renewing my SSL certificate @ #{certdaysleft} days left."
+execute 'Renewal notification' do
   command "notify \"#{node['linux']['slack_channel']}\" \"#{node['provisioner']['replicator_emoji']}\" \"#{node['linux']['api_path']}\"  \"#{notification}\""
   action :run
   only_if { renew_now == true }
@@ -458,9 +456,9 @@ end
 ### Deconstruct the names to pass to acme.sh
 ###
 
-certnames = String.new
-node['provisioner']['ssl']['hostnames'].each do | type,value |
-   certnames = certnames + "-d " + value + " "
+certnames = ''
+node['provisioner']['ssl']['hostnames'].each do |_type, value|
+  certnames = certnames + '-d ' + value + ' '
 end
 
 yum_package [ 'git' ] do
@@ -475,7 +473,7 @@ git "#{Chef::Config[:file_cache_path]}/acme.sh" do
   reference 'master'
   action :sync
   sensitive node['provisioner']['runtime']['sensitivity']
-  not_if { Dir.exists?("#{Chef::Config['file_cache_path']}/acme.sh")}
+  not_if { Dir.exist?("#{Chef::Config['file_cache_path']}/acme.sh") }
   only_if { node['linux']['dns']['mechanism'] == 'zonomi' }
   only_if { node['provisioner']['ssl']['use_acme'] == true }
   only_if { renew_now == true }
@@ -493,10 +491,10 @@ execute 'Creating or renewing certificate' do
   only_if { renew_now == true }
 end
 
-template "/etc/httpd/conf.d/ssl.conf" do
-  source "etc/httpd/conf.d/ssl.conf.erb"
-  owner "root"
-  group "root"
+template '/etc/httpd/conf.d/ssl.conf' do
+  source 'etc/httpd/conf.d/ssl.conf.erb'
+  owner 'root'
+  group 'root'
   mode 0644
   action :create
   sensitive node['provisioner']['runtime']['sensitivity']
@@ -504,10 +502,10 @@ template "/etc/httpd/conf.d/ssl.conf" do
   only_if { node['provisioner']['ssl']['enabled'] == true }
 end
 
-template "/etc/httpd/conf.d/redirect.conf" do
-  source "etc/httpd/conf.d/redirect.conf.erb"
-  owner "root"
-  group "root"
+template '/etc/httpd/conf.d/redirect.conf' do
+  source 'etc/httpd/conf.d/redirect.conf.erb'
+  owner 'root'
+  group 'root'
   mode 0644
   action :create
   sensitive node['provisioner']['runtime']['sensitivity']
@@ -528,15 +526,15 @@ link "#{node['provisioner']['webroot']}/#{node['provisioner']['linkname']}" do
   only_if { ::File.directory?(node['provisioner']['webroot']) == true }
 end
 
-service "httpd" do
-  supports :status => true, :restart => true
+service 'httpd' do
+  supports status: true, restart: true
   action [ :enable, :start ]
 end
 
-template "/etc/monit.d/httpd" do
-  source "etc/monit.d/httpd.erb"
-  owner "root"
-  group "root"
+template '/etc/monit.d/httpd' do
+  source 'etc/monit.d/httpd.erb'
+  owner 'root'
+  group 'root'
   mode 0600
   action :create
   sensitive node['provisioner']['runtime']['sensitivity']
@@ -544,10 +542,10 @@ template "/etc/monit.d/httpd" do
   only_if { node['linux']['monit']['enabled'] == true }
 end
 
-template "/etc/monit.d/xinetd" do
-  source "etc/monit.d/xinetd.erb"
-  owner "root"
-  group "root"
+template '/etc/monit.d/xinetd' do
+  source 'etc/monit.d/xinetd.erb'
+  owner 'root'
+  group 'root'
   mode 0600
   action :create
   sensitive node['provisioner']['runtime']['sensitivity']
@@ -573,7 +571,6 @@ end
 
 tag('builder')
 
-
 ###
 ### Send a notification that this system is now a package builder
 ###
@@ -584,6 +581,6 @@ bash notification do
     notify "#{node['linux']['slack_channel']}" "#{node['provisioner']['builder_emoji']}" "#{node['linux']['api_path']}" "#{notification}"
     touch /var/.builder
   EOF
-  not_if { File.exists? '/var/.builder' }
+  not_if { File.exist? '/var/.builder' }
   only_if { node['linux']['slack_enabled'] == true }
 end

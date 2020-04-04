@@ -17,8 +17,8 @@
 ### limitations under the License.
 ###
 
-node.from_file(run_context.resolve_attribute("provisioned_services", "secrets"))
-node.from_file(run_context.resolve_attribute("enterprise_linux", "default"))
+node.from_file(run_context.resolve_attribute('provisioned_services', 'secrets'))
+node.from_file(run_context.resolve_attribute('enterprise_linux', 'default'))
 
 ###
 ### Configure to be a Samba Server
@@ -99,25 +99,25 @@ execute 'Configure Samba Authentication Password' do
   not_if "strings /var/lib/samba/private/secrets.tdb 2>/dev/null | grep #{passwords['samba_passwd']} >/dev/null 2>&1"
 end
 
-service "smb" do
-  supports :status => true, :restart => true
+service 'smb' do
+  supports status: true, restart: true
   action [ :enable, :start ]
 end
 
-service "nmb" do
-  supports :status => true, :restart => true
+service 'nmb' do
+  supports status: true, restart: true
   action [ :enable, :start ]
 end
 
-service "avahi-daemon" do
-  supports :status => true, :restart => true
+service 'avahi-daemon' do
+  supports status: true, restart: true
   action [ :enable, :start ]
 end
 
-template "/etc/monit.d/samba" do
-  source "etc/monit.d/samba.erb"
-  owner "root"
-  group "root"
+template '/etc/monit.d/samba' do
+  source 'etc/monit.d/samba.erb'
+  owner 'root'
+  group 'root'
   mode 0600
   action :create
   sensitive node['linux']['runtime']['sensitivity']

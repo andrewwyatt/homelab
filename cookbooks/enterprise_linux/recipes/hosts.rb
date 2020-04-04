@@ -18,16 +18,16 @@
 ###
 
 ### Configure default hosts
-template "/etc/hosts" do
-  source "etc/hosts.erb"
-  owner "root"
-  group "root"
+template '/etc/hosts' do
+  source 'etc/hosts.erb'
+  owner 'root'
+  group 'root'
   mode 0644
   action :create
   sensitive node['linux']['runtime']['sensitivity']
-  variables({
-    :hostname  => node['hostname'],
-    :fqdn      => node['fqdn'],
-    :ipaddress => node['ipaddress']
-  })
+  variables(
+    hostname: node['hostname'],
+    fqdn: node['fqdn'],
+    ipaddress: node['ipaddress']
+  )
 end

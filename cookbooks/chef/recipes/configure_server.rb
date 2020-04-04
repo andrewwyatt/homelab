@@ -63,7 +63,7 @@ remote_file "#{Chef::Config['file_cache_path']}/#{install_file}" do
   not_if { server_version_test == node['chef']['server_version'] }
 end
 
-rpm_package "chef-server-core" do
+rpm_package 'chef-server-core' do
   allow_downgrade true
   source "#{Chef::Config['file_cache_path']}/#{install_file}"
   action :install
@@ -98,7 +98,7 @@ end
 
 ### Get my upstream Chef server
 if node['chef']['sync_host'].empty? == true
-  node.default['chef']['sync_host']=`grep chef_server_url /etc/chef/client.rb  | sed -s -e "s#^.*//##" -e "s#/.*\\\$##" | awk '{printf $1}'`
+  node.default['chef']['sync_host'] = `grep chef_server_url /etc/chef/client.rb  | sed -s -e "s#^.*//##" -e "s#/.*\\\$##" | awk '{printf $1}'`
 end
 
 ###
@@ -106,12 +106,12 @@ end
 ###
 
 execute 'chef-reconfigure' do
-  command "chef-server-ctl reconfigure"
+  command 'chef-server-ctl reconfigure'
   action :nothing
 end
 
 execute 'chef-nginx-restart' do
-  command "chef-server-ctl restart nginx"
+  command 'chef-server-ctl restart nginx'
   action :nothing
 end
 
@@ -119,10 +119,10 @@ end
 ### If there's a chef config that already exists, but Chef is down, kill it.
 ###
 
-file "/etc/opscode/chef-server.rb" do
+file '/etc/opscode/chef-server.rb' do
   action :delete
   only_if { node['chef']['manage_chef'] == true }
-  not_if { ::File.exists?("/etc/opscode/chef-server-running.json") }
+  not_if { ::File.exist?('/etc/opscode/chef-server-running.json') }
 end
 
 ###
@@ -130,11 +130,11 @@ end
 ### use.  If there's an existing configuration before we do, move it temporarily.
 ###
 
-bash "Chef Server has never been configured, configuring Chef Server." do
+bash 'Chef Server has never been configured, configuring Chef Server.' do
   code <<-EOF
     chef-server-ctl reconfigure
   EOF
-  not_if { ::File.exists?("/etc/opscode/chef-server-running.json") }
+  not_if { ::File.exist?('/etc/opscode/chef-server-running.json') }
   sensitive node['chef']['runtime']['sensitivity']
 end
 
@@ -179,20 +179,19 @@ end
 
 currentdate = `date '+%s'`.chomp
 
-if File.exists?("/etc/opscode/#{node['fqdn']}.crt")
-  certexpiration = `date -d "$(/usr/bin/openssl x509 -enddate -noout -in #{node['chef']['server_attributes']['nginx']['ssl_certificate']} | sed -e 's#notAfter=##')" '+%s'`.chomp
-else
-  certexpiration = currentdate
-end
+certexpiration = if File.exist?("/etc/opscode/#{node['fqdn']}.crt")
+                   `date -d "$(/usr/bin/openssl x509 -enddate -noout -in #{node['chef']['server_attributes']['nginx']['ssl_certificate']} | sed -e 's#notAfter=##')" '+%s'`.chomp
+                 else
+                   currentdate
+                 end
 
-certdaysleft = (certexpiration.to_i - currentdate.to_i)/86400
+certdaysleft = (certexpiration.to_i - currentdate.to_i) / 86400
 if certdaysleft < node['chef']['ssl']['renewal_day'].to_i
   renew_now = true
 end
 
-
-notification="Renewing my SSL certificate @ #{certdaysleft} days left."
-execute "Renewal notification" do
+notification = "Renewing my SSL certificate @ #{certdaysleft} days left."
+execute 'Renewal notification' do
   command "notify \"#{node['chef']['slack_channel']}\" \"#{node['chef']['emoji']}\" \"#{node['chef']['api_path']}\" \"#{notification}\""
   action :run
   only_if { renew_now == true }
@@ -202,9 +201,9 @@ end
 ### Deconstruct the names to pass to acme.sh
 ###
 
-certnames = String.new
-node['chef']['ssl']['hostnames'].each do | type,value |
-   certnames = certnames + "-d " + value + " "
+certnames = ''
+node['chef']['ssl']['hostnames'].each do |_type, value|
+  certnames = certnames + '-d ' + value + ' '
 end
 
 yum_package [ 'git' ] do
@@ -219,7 +218,7 @@ git "#{Chef::Config[:file_cache_path]}/acme.sh" do
   reference 'master'
   action :sync
   sensitive node['chef']['runtime']['sensitivity']
-  not_if { Dir.exists?("#{Chef::Config['file_cache_path']}/acme.sh")}
+  not_if { Dir.exist?("#{Chef::Config['file_cache_path']}/acme.sh") }
   only_if { node['linux']['dns']['mechanism'] == 'zonomi' }
   only_if { node['chef']['ssl']['use_acme'] == true }
   only_if { renew_now == true }
@@ -236,51 +235,50 @@ execute 'Creating or renewing certificate' do
   only_if { renew_now == true }
 end
 
-notification = "Adding the LDAP password."
+notification = 'Adding the LDAP password.'
 bash notification do
   code <<-EOF
     chef-server-ctl set-secret ldap bind_password '#{passwords['auth_user']}'
   EOF
   sensitive node['chef']['runtime']['sensitivity']
-  only_if { ::File.exists?("/etc/opscode/chef-server-running.json") }
-  not_if { (defined?(passwords['auth_user'])).nil? == true }
-  not_if { `grep \'bind_password\' /etc/opscode/chef-server-running.json 2>/dev/null`.include?(passwords['auth_user'].to_s)}
+  only_if { ::File.exist?('/etc/opscode/chef-server-running.json') }
+  not_if { defined?(passwords['auth_user']).nil? == true }
+  not_if { `grep \'bind_password\' /etc/opscode/chef-server-running.json 2>/dev/null`.include?(passwords['auth_user'].to_s) }
   notifies :run, 'execute[chef-reconfigure]', :immediately
 end
 
-notification = "Adding the Automate authentication token."
+notification = 'Adding the Automate authentication token.'
 bash notification do
   code <<-EOF
     chef-server-ctl set-secret data_collector token '#{passwords['automate_token']}'
   EOF
   sensitive node['chef']['runtime']['sensitivity']
-  only_if { ::File.exists?("/etc/opscode/chef-server-running.json") }
-  not_if { (defined?(passwords['automate_token'])).nil? == true }
-  not_if { `grep \'#{passwords['automate_token']}\' /etc/opscode/chef-server-running.json 2>/dev/null`.include?(passwords['automate_token'].to_s)}
+  only_if { ::File.exist?('/etc/opscode/chef-server-running.json') }
+  not_if { defined?(passwords['automate_token']).nil? == true }
+  not_if { `grep \'#{passwords['automate_token']}\' /etc/opscode/chef-server-running.json 2>/dev/null`.include?(passwords['automate_token'].to_s) }
   notifies :run, 'execute[chef-reconfigure]', :immediately
 end
-
 
 ###
 ### Creates the administrative users for each org
 ### The password is credentials -> chef -> admin username -> password
 ###
 
-node['chef']['organizations'].each do |key,org|
+node['chef']['organizations'].each do |_key, org|
   notification = "Creating the #{org['short_name']} admin account."
-  password = ""
-  passchars='!#%^:,./?1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
-  length=(16+rand(16))
+  password = ''
+  passchars = '!#%^:,./?1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+  length = (16 + rand(16))
   (0..length).each do
-     paschar=passchars[(rand(passchars.length)-1)]
-     password << paschar
+    paschar = passchars[(rand(passchars.length) - 1)]
+    password << paschar
   end
-  bash notification do #~FC022
+  bash notification do # ~FC022
     code <<-EOF
       chef-server-ctl user-create #{org['admin_user']['username']} #{org['admin_user']['first_name']} #{org['admin_user']['last_name']} #{org['admin_user']['email']} #{password} -f #{node['chef']['keys']}/#{org['admin_user']['username']}.pem
     EOF
-    only_if { ::File.exists?("/etc/opscode/chef-server-running.json") }
-    only_if { ::File.exists?("/usr/bin/chef-server-ctl") }
+    only_if { ::File.exist?('/etc/opscode/chef-server-running.json') }
+    only_if { ::File.exist?('/usr/bin/chef-server-ctl') }
     not_if "chef-server-ctl user-list 2>/dev/null | grep #{org['admin_user']['username']} >/dev/null 2>&1"
     sensitive node['chef']['runtime']['sensitivity']
   end
@@ -290,18 +288,17 @@ end
 ### Create the organizations, and then add the previously created user as the administrator.
 ###
 
-node['chef']['organizations'].each do |key,org|
-  notification="Creating the #{org['full_name']} organization."
+node['chef']['organizations'].each do |_key, org|
+  notification = "Creating the #{org['full_name']} organization."
   chef_org_test = `chef-server-ctl org-show "#{org['short_name']}" 2>/dev/null`
-  unless $?.exitstatus == 0
-    bash notification do
-      code <<-EOF
+  next if $CHILD_STATUS.exitstatus == 0
+  bash notification do
+    code <<-EOF
         chef-server-ctl org-create #{org['short_name']} "#{org['full_name']}" --association_user #{org['admin_user']['username']} -f #{node['chef']['keys']}/#{org['short_name']}-validator.pem
-      EOF
-      sensitive node['chef']['runtime']['sensitivity']
-      only_if { ::File.exists?("/etc/opscode/chef-server-running.json") }
-      only_if { ::File.exists?("/usr/bin/chef-server-ctl") }
-    end
+    EOF
+    sensitive node['chef']['runtime']['sensitivity']
+    only_if { ::File.exist?('/etc/opscode/chef-server-running.json') }
+    only_if { ::File.exist?('/usr/bin/chef-server-ctl') }
   end
 end
 
@@ -309,8 +306,8 @@ end
 ### Create the environments if they doesn't exist.
 ###
 
-node['chef']['organizations'].each do |key,org|
-  notification="Creating the #{org['environment']} environment."
+node['chef']['organizations'].each do |_key, org|
+  notification = "Creating the #{org['environment']} environment."
   template "#{Chef::Config['file_cache_path']}/#{node['fqdn']}.rb" do
     source 'chef/client.rb.erb'
     owner 'root'
@@ -318,17 +315,17 @@ node['chef']['organizations'].each do |key,org|
     mode 0700
     sensitive node['chef']['runtime']['sensitivity']
     action :create
-    variables({
-      chef_server:         node['fqdn'],
-      chef_org:            org['environment']
-    })
+    variables(
+      chef_server: node['fqdn'],
+      chef_org: org['environment']
+    )
   end
-  execute "Fetching my local certificate" do
+  execute 'Fetching my local certificate' do
     command "knife ssl fetch -c #{Chef::Config['file_cache_path']}/#{node['fqdn']}.rb 2>/dev/null"
     action :run
     sensitive node['chef']['runtime']['sensitivity']
   end
-  bash notification do #~FC022
+  bash notification do # ~FC022
     code <<-EOF
       cat <<EOC >#{Chef::Config['file_cache_path']}/#{org['environment']}.json
       {
@@ -350,20 +347,19 @@ EOC
       knife environment from file #{Chef::Config['file_cache_path']}/#{org['environment']}.json -c #{Chef::Config['file_cache_path']}/#{node['fqdn']}.rb -u pivotal -k /etc/opscode/pivotal.pem
     EOF
     sensitive node['chef']['runtime']['sensitivity']
-    only_if { ::File.exists?("/etc/opscode/chef-server-running.json") }
-    only_if { ::File.exists?("/usr/bin/chef-server-ctl") }
+    only_if { ::File.exist?('/etc/opscode/chef-server-running.json') }
+    only_if { ::File.exist?('/usr/bin/chef-server-ctl') }
     not_if "knife environment show #{org['environment']} -c #{Chef::Config['file_cache_path']}/#{node['fqdn']}.rb -u pivotal -k /etc/opscode/pivotal.pem >/dev/null 2>&1"
   end
   cleanup = [ "#{Chef::Config['file_cache_path']}/#{org['environment']}.json",
-               "#{Chef::Config['file_cache_path']}/#{node['fqdn']}.rb" ]
+              "#{Chef::Config['file_cache_path']}/#{node['fqdn']}.rb" ]
 
-  cleanup.each do | cfile |
+  cleanup.each do |cfile|
     file cfile do
       action :delete
     end
   end
 end
-
 
 ###
 ### If enabled, generate a Chef Server configuration based on attributes we've defined for our
@@ -371,9 +367,9 @@ end
 ###
 
 if node['chef']['manage_chef'] == true
-  def walk_config(value,prefix)
-    data = String.new
-    value.each do | key, value |
+  def walk_config(value, prefix)
+    data = ''
+    value.each do |key, value|
       if value.is_a?(Hash)
         data << "[\'#{key}\']"
         data << walk_config(value).to_s
@@ -381,20 +377,20 @@ if node['chef']['manage_chef'] == true
         data << prefix + "[\'#{key}\'] = \'#{value}\'\n"
       end
     end
-    return data
+    data
   end
-  config = Array.new
-  output = String.new
-  node['chef']['server_attributes'].each do | key, value |
-    if value.is_a?(Hash)
-      output << walk_config(value,key).to_s
-    else
-      output << "#{key} = \'#{value}\'"
-    end
-    if (defined?(output)).empty? == false
+  config = []
+  output = ''
+  node['chef']['server_attributes'].each do |key, value|
+    output << if value.is_a?(Hash)
+                walk_config(value, key).to_s
+              else
+                "#{key} = \'#{value}\'"
+              end
+    if defined?(output).empty? == false
       config.push output
     end
-    output = ""
+    output = ''
   end
 end
 
@@ -406,16 +402,16 @@ template '/etc/opscode/chef-server.rb' do
   action :create
   sensitive node['chef']['runtime']['sensitivity']
   variables ({
-    config: config
+    config: config,
   })
   notifies :run, 'execute[chef-reconfigure]', :immediately
   only_if { node['chef']['manage_chef'] == true }
 end
 
-template "/etc/monit.d/chef-server" do
-  source "etc/monit.d/chef-server.erb"
-  owner "root"
-  group "root"
+template '/etc/monit.d/chef-server' do
+  source 'etc/monit.d/chef-server.erb'
+  owner 'root'
+  group 'root'
   mode 0600
   action :create
   sensitive node['chef']['runtime']['sensitivity']

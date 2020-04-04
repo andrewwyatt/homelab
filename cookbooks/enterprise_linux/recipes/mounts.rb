@@ -18,18 +18,17 @@
 ###
 
 ### Configure filesystems that are mounted on a system
-template "/etc/fstab" do
-  source "etc/fstab.erb"
-  owner "root"
-  group "root"
+template '/etc/fstab' do
+  source 'etc/fstab.erb'
+  owner 'root'
+  group 'root'
   mode 0644
   action :create
   sensitive node['linux']['runtime']['sensitivity']
 end
 
-node['linux']['mounts'].each do |key,mount|
-
-  if mount['fs_type'].include?("swap")
+node['linux']['mounts'].each do |_key, mount|
+  if mount['fs_type'].include?('swap')
     next
   end
 
@@ -39,9 +38,9 @@ node['linux']['mounts'].each do |key,mount|
 
   elements = mount['mount_point'].split('/')
   elements.shift()
-  cwd = String.new()
-  elements.each do | element |
-    cwd = cwd + "/" + element
+  cwd = ''
+  elements.each do |element|
+    cwd = cwd + '/' + element
     directory cwd do
       owner mount['owner']
       group mount['group']
@@ -55,15 +54,14 @@ node['linux']['mounts'].each do |key,mount|
     action :run
     only_if "grep \" #{mount['mount_point']} \" /proc/mounts"
   end
-
 end
 
-execute "Ensure mounts are mounted" do
+execute 'Ensure mounts are mounted' do
   command '/usr/bin/mount -a'
   action :run
 end
 
-execute "Ensuring swap is enabled" do
+execute 'Ensuring swap is enabled' do
   command '/usr/sbin/swapon -a'
   action :run
   ### Only if guards here...

@@ -31,5 +31,5 @@ execute 'Configure my DNS record' do
   action :run
   sensitive node['linux']['runtime']['sensitivity']
   only_if { node['linux']['dns']['mechanism'] == 'zonomi' }
-  not_if { (`host #{node['fqdn']}`).include?(node['ipaddress']) }
+  not_if { `host #{node['fqdn']}`.include?(node['ipaddress']) }
 end

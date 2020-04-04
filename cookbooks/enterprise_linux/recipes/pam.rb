@@ -19,21 +19,21 @@
 
 ### This makes me feel dirty, but pam sucks.
 
-bash "Ensure PAM password retries= and minlen=" do
+bash 'Ensure PAM password retries= and minlen=' do
   code <<-EOF
      sed -i "s/pam_cracklib.so try_first_pass.*\$/pam_cracklib.so try_first_pass #{node['linux']['auth']['cracklib']}/" /etc/pam.d/system-auth
   EOF
   sensitive node['linux']['runtime']['sensitivity']
 end
 
-bash "Ensure PAM password sufficent" do
+bash 'Ensure PAM password sufficent' do
   code <<-EOF
      sed -i "s/password    sufficient    pam_unix.so.*\$/password    sufficient    pam_unix.so #{node['linux']['auth']['password_sufficient']}/" /etc/pam.d/system-auth
   EOF
   sensitive node['linux']['runtime']['sensitivity']
 end
 
-bash "Ensure only members of the wheel group can su" do
+bash 'Ensure only members of the wheel group can su' do
   code <<-EOF
     sed -i "s/^#auth[[:blank:]]\+required[[:blank:]]\+pam_wheel.so[[:blank:]]\+use_uid/auth\t\trequired\tpam_wheel.so use_uid/" /etc/pam.d/su
   EOF
@@ -41,7 +41,7 @@ bash "Ensure only members of the wheel group can su" do
 end
 
 template '/etc/security/pwquality.conf' do
-  source "etc/security/pwquality.conf.erb"
+  source 'etc/security/pwquality.conf.erb'
   owner 'root'
   group 'root'
   mode '0644'

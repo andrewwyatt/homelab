@@ -28,10 +28,10 @@ passwords = data_bag_item('credentials', 'passwords', IO.read(Chef::Config['encr
 ### Remove kickstart artifacts from /root
 ###
 
-ks_artifacts = Array.new
+ks_artifacts = []
 ks_artifacts = [ 'cobbler.ks', 'ks-pre.log', 'anaconda-ks.cfg', 'original-ks.cfg' ]
 
-ks_artifacts.each do | artifact |
+ks_artifacts.each do |artifact|
   file "/root/#{artifact}" do
     action :delete
   end
@@ -43,7 +43,7 @@ yum_package 'arpwatch' do
 end
 
 service 'arpwatch' do
-  supports :status => true, :restart => true
+  supports status: true, restart: true
   action [ :enable, :start ]
   only_if { node['linux']['security']['enable_arpwatch'] == true }
 end
@@ -60,11 +60,11 @@ template '/etc/usbguard/usbguard-daemon.conf' do
   source 'etc/usbguard/usbguard-daemon.conf.erb'
   action :create
   sensitive node['linux']['runtime']['sensitivity']
-  notifies :restart, "service[usbguard]", :immediately
+  notifies :restart, 'service[usbguard]', :immediately
 end
 
 service 'usbguard' do
-  supports :status => true, :restart => true
+  supports status: true, restart: true
   action [ :enable, :start ]
   only_if { node['linux']['security']['enable_usbguard'] == true }
 end
@@ -74,15 +74,15 @@ yum_package 'psacct' do
   only_if { node['linux']['security']['enable_psacct'] == true }
 end
 
-service "psacct" do
-  supports :status => true, :restart => true
+service 'psacct' do
+  supports status: true, restart: true
   action [ :enable, :start ]
   only_if { node['linux']['security']['enable_psacct'] == true }
 end
 
 yum_package 'aide' do
   action :install
-  notifies :run, "execute[aide init]", :immediately
+  notifies :run, 'execute[aide init]', :immediately
   only_if { node['linux']['security']['enable_aide'] == true }
 end
 
@@ -97,7 +97,7 @@ file '/var/lib/aide/aide.db.gz' do
   group 'root'
   mode '0600'
   action :create
-  only_if { File.exists? '/var/lib/aide/aide.db.gz' }
+  only_if { File.exist? '/var/lib/aide/aide.db.gz' }
 end
 
 ###
@@ -127,7 +127,7 @@ file '/boot/grub2/grub.cfg' do
   group 'root'
   mode '0600'
   action :create
-  only_if { File.exists? '/boot/grub2/grub.cfg' }
+  only_if { File.exist? '/boot/grub2/grub.cfg' }
 end
 
 execute 'Remove unrestricted grub option' do
@@ -144,7 +144,7 @@ file '/boot/grub2/user.cfg' do
   content passwords['grub2_hash']
   action :create
   sensitive node['linux']['runtime']['sensitivity']
-  only_if { (defined?(passwords['grub2_hash'])).nil? == false }
+  only_if { defined?(passwords['grub2_hash']).nil? == false }
 end
 
 template '/etc/modprobe.d/blacklist-modules.conf' do
@@ -181,17 +181,17 @@ template '/etc/audit/rules.d/audit.rules' do
   mode  '0600'
   action :create
   sensitive node['linux']['runtime']['sensitivity']
-  notifies :run, "execute[restart auditd]", :immediately
+  notifies :run, 'execute[restart auditd]', :immediately
 end
 
-execute 'restart auditd' do #~FC004 - Wish I could foodcritic, wish I could. :)
+execute 'restart auditd' do # ~FC004 - Wish I could foodcritic, wish I could. :)
   command '/sbin/service auditd restart'
   sensitive node['linux']['runtime']['sensitivity']
   action :nothing
 end
 
-service "auditd" do
-  supports :status => true, :restart => true
+service 'auditd' do
+  supports status: true, restart: true
   action [ :enable, :start ]
 end
 

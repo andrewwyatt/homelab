@@ -17,8 +17,8 @@
 ### limitations under the License.
 ###
 
-node.from_file(run_context.resolve_attribute("provisioned_services", "secrets"))
-node.from_file(run_context.resolve_attribute("enterprise_linux", "default"))
+node.from_file(run_context.resolve_attribute('provisioned_services', 'secrets'))
+node.from_file(run_context.resolve_attribute('enterprise_linux', 'default'))
 
 ###
 ### Firewall and forwarding changes for OpenVPN
@@ -51,27 +51,27 @@ yum_package [ 'openvpn',
   action :install
 end
 
-template "/etc/openvpn/server.conf" do
-  source "etc/openvpn/server.conf.erb"
-  owner "root"
-  group "root"
+template '/etc/openvpn/server.conf' do
+  source 'etc/openvpn/server.conf.erb'
+  owner 'root'
+  group 'root'
   mode 0600
   action :create
   sensitive node['linux']['runtime']['sensitivity']
   notifies :restart, 'service[openvpn@server]', :delayed
 end
 
-template "/etc/openvpn/auth/ldap.conf" do
-  source "etc/openvpn/auth/ldap.conf.erb"
-  owner "root"
-  group "root"
+template '/etc/openvpn/auth/ldap.conf' do
+  source 'etc/openvpn/auth/ldap.conf.erb'
+  owner 'root'
+  group 'root'
   mode 0600
   action :create
   sensitive node['linux']['runtime']['sensitivity']
   notifies :restart, 'service[openvpn@server]', :delayed
-  variables({
-    :password  => passwords['openvpn_passwd']
-  })
+  variables(
+    password: passwords['openvpn_passwd']
+  )
 end
 
 remote_file "#{Chef::Config['file_cache_path']}/#{node['openvpn']['easyrsa_package']}" do
@@ -88,93 +88,92 @@ execute "Extract EasyRSA-#{node['openvpn']['easyrsa_version']}" do
            chown -R root:openvpn /etc/openvpn/EasyRSA-#{node['openvpn']['easyrsa_version']}"
   action :run
   sensitive node['linux']['runtime']['sensitivity']
-  not_if { Dir.exists?("/etc/openvpn/EasyRSA-#{node['openvpn']['easyrsa_version']}") }
+  not_if { Dir.exist?("/etc/openvpn/EasyRSA-#{node['openvpn']['easyrsa_version']}") }
 end
 
 template "/etc/openvpn/EasyRSA-#{node['openvpn']['easyrsa_version']}/vars" do
-  source "etc/openvpn/easyrsa_vars.erb"
-  owner "root"
-  group "root"
+  source 'etc/openvpn/easyrsa_vars.erb'
+  owner 'root'
+  group 'root'
   mode 0600
   action :create
   sensitive node['linux']['runtime']['sensitivity']
   notifies :restart, 'service[openvpn@server]', :delayed
 end
 
-directory "/etc/openvpn/pki" do
+directory '/etc/openvpn/pki' do
   owner 'root'
   group 'openvpn'
   mode 0750
   action :create
 end
 
-execute "Generate Diffie hellman parameters" do
-  command "openssl dhparam -out /etc/openvpn/dh2048.pem 2048"
+execute 'Generate Diffie hellman parameters' do
+  command 'openssl dhparam -out /etc/openvpn/dh2048.pem 2048'
   action :run
   sensitive node['linux']['runtime']['sensitivity']
-  not_if { File.exists?("/etc/openvpn/dh2048.pem") }
+  not_if { File.exist?('/etc/openvpn/dh2048.pem') }
 end
 
-execute "Create TLS Certificate" do
+execute 'Create TLS Certificate' do
   command "openvpn --genkey --secret /etc/openvpn/#{node['chef']['default_organization']}.tlsauth"
   action :run
   sensitive node['linux']['runtime']['sensitivity']
-  not_if { File.exists?("/etc/openvpn/#{node['chef']['default_organization']}.tlsauth") }
+  not_if { File.exist?("/etc/openvpn/#{node['chef']['default_organization']}.tlsauth") }
 end
 
-execute "Initialize EasyRSA" do
+execute 'Initialize EasyRSA' do
   command "EASYRSA_BATCH=true /etc/openvpn/EasyRSA-#{node['openvpn']['easyrsa_version']}/easyrsa init-pki"
   action :run
   sensitive node['linux']['runtime']['sensitivity']
-  not_if { File.exists?("/etc/openvpn/pki/openssl-easyrsa.cnf") }
+  not_if { File.exist?('/etc/openvpn/pki/openssl-easyrsa.cnf') }
 end
 
-execute "Generate CA" do
+execute 'Generate CA' do
   command "EASYRSA_BATCH=true /etc/openvpn/EasyRSA-#{node['openvpn']['easyrsa_version']}/easyrsa build-ca nopass"
   action :run
   sensitive node['linux']['runtime']['sensitivity']
-  not_if { File.exists?("/etc/openvpn/pki/ca.crt") }
+  not_if { File.exist?('/etc/openvpn/pki/ca.crt') }
 end
 
 execute "Create req for #{node['fqdn']}" do
   command "EASYRSA_BATCH=true /etc/openvpn/EasyRSA-#{node['openvpn']['easyrsa_version']}/easyrsa gen-req #{node['hostname']} nopass"
   action :run
   sensitive node['linux']['runtime']['sensitivity']
-  not_if { File.exists?("/etc/openvpn/pki/reqs/#{node['hostname']}.req") }
+  not_if { File.exist?("/etc/openvpn/pki/reqs/#{node['hostname']}.req") }
 end
 
 execute "Sign the #{node['fqdn']} req" do
   command "EASYRSA_BATCH=true /etc/openvpn/EasyRSA-#{node['openvpn']['easyrsa_version']}/easyrsa sign-req server #{node['hostname']} nopass"
   action :run
   sensitive node['linux']['runtime']['sensitivity']
-  only_if { File.exists?("/etc/openvpn/pki/reqs/#{node['hostname']}.req") }
-  not_if { File.exists?("/etc/openvpn/pki/issued/#{node['hostname']}.crt") }
+  only_if { File.exist?("/etc/openvpn/pki/reqs/#{node['hostname']}.req") }
+  not_if { File.exist?("/etc/openvpn/pki/issued/#{node['hostname']}.crt") }
 end
 
-link "/etc/openvpn/ca.crt" do
-  to "/etc/openvpn/pki/ca.crt"
+link '/etc/openvpn/ca.crt' do
+  to '/etc/openvpn/pki/ca.crt'
 end
 
-link "/etc/openvpn/server.crt" do
+link '/etc/openvpn/server.crt' do
   to "/etc/openvpn/pki/issued/#{node['hostname']}.crt"
 end
 
-link "/etc/openvpn/server.key" do
+link '/etc/openvpn/server.key' do
   to "/etc/openvpn/pki/private/#{node['hostname']}.key"
 end
 
-
 tag('openvpn')
 
-service "openvpn@server" do
-  supports :status => true, :restart => true
+service 'openvpn@server' do
+  supports status: true, restart: true
   action [ :enable, :start ]
 end
 
 template '/etc/monit.d/openvpn' do
   source 'etc/monit.d/openvpn.erb'
-  owner "root"
-  group "root"
+  owner 'root'
+  group 'root'
   mode 0600
   action :create
   sensitive node['linux']['runtime']['sensitivity']

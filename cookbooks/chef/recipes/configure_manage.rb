@@ -43,7 +43,7 @@ file "#{Chef::Config[:file_cache_path]}/.#{passfile}" do
 end
 
 execute 'manage-reconfigure' do
-  command "chef-manage-ctl reconfigure --accept-license"
+  command 'chef-manage-ctl reconfigure --accept-license'
   sensitive node['chef']['runtime']['sensitivity']
   action :nothing
 end
@@ -62,7 +62,7 @@ remote_file "#{Chef::Config['file_cache_path']}/#{install_file}" do
   not_if { manage_version_test == node['chef']['manage_version'] }
 end
 
-rpm_package "chef-manage" do
+rpm_package 'chef-manage' do
   allow_downgrade true
   source "#{Chef::Config['file_cache_path']}/#{install_file}"
   action :install
@@ -88,7 +88,7 @@ end
 ### This will create and manage the Chef Manage configuration directory.
 ###
 
-directory "/etc/chef-manage" do
+directory '/etc/chef-manage' do
   owner 'opscode'
   group 'opscode'
   mode 0700
@@ -96,9 +96,9 @@ directory "/etc/chef-manage" do
 end
 
 if node['chef']['manage_manage'] == true
-  def walk_config(value,prefix)
-    data = String.new
-    value.each do | key, value |
+  def walk_config(value, prefix)
+    data = ''
+    value.each do |key, value|
       if value.is_a?(Hash)
         data << "[\'#{key}\']"
         data << walk_config(value).to_s
@@ -106,24 +106,24 @@ if node['chef']['manage_manage'] == true
         data << prefix + "[\'#{key}\'] = \'#{value}\'\n"
       end
     end
-    return data
+    data
   end
-  config = Array.new
-  output = String.new
-  node['chef']['manage_attributes'].each do | key, value |
-    if value.is_a?(Hash)
-      output << walk_config(value,key).to_s
-    else
-      output << "#{key} = \'#{value}\'"
-    end
-    if (defined?(output)).empty? == false
+  config = []
+  output = ''
+  node['chef']['manage_attributes'].each do |key, value|
+    output << if value.is_a?(Hash)
+                walk_config(value, key).to_s
+              else
+                "#{key} = \'#{value}\'"
+              end
+    if defined?(output).empty? == false
       config.push output
     end
-    output = ""
+    output = ''
   end
 end
 
-template "/etc/chef-manage/manage.rb" do
+template '/etc/chef-manage/manage.rb' do
   source 'etc/chef-manage/manage.rb.erb'
   owner 'root'
   group 'root'
@@ -131,7 +131,7 @@ template "/etc/chef-manage/manage.rb" do
   action :create
   sensitive node['chef']['runtime']['sensitivity']
   variables ({
-    config: config
+    config: config,
   })
   notifies :run, 'execute[manage-reconfigure]', :immediately
   only_if { node['chef']['manage_manage'] == true }

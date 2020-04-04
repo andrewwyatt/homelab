@@ -44,45 +44,46 @@ passwords = data_bag_item('credentials', 'passwords', IO.read(Chef::Config['encr
 execute 'install_agent' do
   command "(curl --tlsv1.2 --silent --show-error --header 'x-connect-key: #{passwords['jumpcloud_connect']}' '#{node['linux']['jumpcloud']['ks_url']}' | bash) && /opt/jc/bin/jcagent start"
   sensitive node['linux']['runtime']['sensitivity']
-  not_if { File.exists? "/opt/jc/jcagent.conf" }
+  not_if { File.exist? '/opt/jc/jcagent.conf' }
 end
 
 execute 'Wait for agent configuration to arrive.' do
   command 'while [ 1 ]; do if [[ "$(cat /opt/jc/jcagent.conf 2>/dev/null)" =~ systemKey ]]; then break; fi; sleep 1; done'
   sensitive node['linux']['runtime']['sensitivity']
-  not_if { File.exists? "/opt/jc/jcagent.conf" }
+  not_if { File.exist? '/opt/jc/jcagent.conf' }
 end
 
 ###
 ### Add the server to the appropriate group if it doesn't already exist.
 ###
 
-sgmembers=`curl -X GET "#{node['linux']['jumpcloud']['api_url']}/v2/systemgroups/#{node['linux']['jumpcloud']['server_groupid']}/membership" \
+sgmembers = `curl -X GET "#{node['linux']['jumpcloud']['api_url']}/v2/systemgroups/#{node['linux']['jumpcloud']['server_groupid']}/membership" \
            -H 'Accept: application/json'       \
            -H 'Content-Type: application/json' \
            -H 'x-api-key: #{passwords['jumpcloud_api']}' 2>/dev/null`
 
-if sgmembers.length < 1
-  sgmembers = "{}"
+if sgmembers.empty?
+  sgmembers = '{}'
 end
 
 ruby_block 'Get the systemKey' do
   block do
     localdata = `cat /opt/jc/jcagent.conf 2>/dev/null`
 
-    if localdata.length < 1
-      localdata = "{}"
+    if localdata.empty?
+      localdata = '{}'
     end
 
     lattrs = JSON.parse(localdata)
-    lattrs = Hash[*lattrs.collect{|h| h.to_a}.flatten]
+    lattrs = Hash[*lattrs.collect(&:to_a).flatten]
     node.run_state['systemKey'] = lattrs['systemKey']
   end
   sensitive node['linux']['runtime']['sensitivity']
 end
 
 execute "Ensuring #{node['fqdn']} is assigned to the appropriate system group." do
-  command lazy { <<-EOF
+  command lazy {
+    <<-EOF
     curl -X POST "#{node['linux']['jumpcloud']['api_url']}/v2/systemgroups/#{node['linux']['jumpcloud']['server_groupid']}/members" \
          -H 'Accept: application/json'                 \
          -H 'Content-Type: application/json'           \
@@ -93,5 +94,5 @@ execute "Ensuring #{node['fqdn']} is assigned to the appropriate system group." 
   action :run
   sensitive node['linux']['runtime']['sensitivity']
   not_if { sgmembers =~ /#{node.run_state['systemKey']}/ }
-  only_if { File.exists? "/opt/jc/jcagent.conf" }
+  only_if { File.exist? '/opt/jc/jcagent.conf' }
 end

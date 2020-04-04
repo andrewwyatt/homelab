@@ -24,7 +24,7 @@ yum_package [ 'ethtool',
   action :install
 end
 
-bash "Ensuring registration with Cobbler server" do
+bash 'Ensuring registration with Cobbler server' do
   code <<-EOF
     koan -l systems --server #{node['linux']['cobbler']['server']} --port #{node['linux']['cobbler']['port']} 2>&1 | grep $(hostname)
     if [ ! $? == 0 ]

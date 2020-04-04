@@ -18,10 +18,10 @@
 ### limitations under the License.
 ###
 
-template "/etc/resolv.conf" do
-  source "etc/resolv.erb"
-  owner "root"
-  group "root"
+template '/etc/resolv.conf' do
+  source 'etc/resolv.erb'
+  owner 'root'
+  group 'root'
   mode 0644
   action :create
   sensitive node['linux']['runtime']['sensitivity']

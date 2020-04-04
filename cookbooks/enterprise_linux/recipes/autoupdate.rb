@@ -22,18 +22,18 @@ yum_package 'autoupdate' do
 end
 
 template '/usr/bin/autoupdate' do
-  source "usr/bin/autoupdate.erb"
-  owner "root"
-  group "root"
+  source 'usr/bin/autoupdate.erb'
+  owner 'root'
+  group 'root'
   mode 0750
   action :create
   sensitive node['linux']['runtime']['sensitivity']
 end
 
 template '/etc/cron.d/autoupdate' do
-  source "etc/cron.d/autoupdate.erb"
-  owner "root"
-  group "root"
+  source 'etc/cron.d/autoupdate.erb'
+  owner 'root'
+  group 'root'
   mode 0644
   action :create
   sensitive node['linux']['runtime']['sensitivity']

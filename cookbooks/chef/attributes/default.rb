@@ -55,7 +55,6 @@ default['chef']['server_version']                = '12.19.31'
 default['chef']['manage_version']                = '2.5.16'
 default['chef']['reporting_version']             = '1.8.0'
 
-
 ###
 ### I want some notifications to go to Slack, so we'll define the attributes here.
 ###
@@ -126,9 +125,9 @@ default['chef']['keys']                           = '/etc/opscode/keys'
 
 default['chef']['sync']                           = true
 default['chef']['mirror_root']                    = '/var/opt/chef/mirror'
-default['chef']['mirror']                         = [ 'data_bags',
-                                                      'environments',
-                                                      'cookbooks' ]
+default['chef']['mirror']                         = %w(data_bags
+                                                       environments
+                                                       cookbooks)
 
 ###
 ### Setting the sync_host attribute to a host will force the cookbook to always replicate
@@ -150,7 +149,7 @@ default['chef']['manage_chef']                    = true
 ### include attributes added to Chef to correct bugs, or provide service optimizations.
 ###
 
-default['chef']['server_attributes']              = { }
+default['chef']['server_attributes']              = {}
 
 ###
 ### Manage the Chef Manage configuration file.  This is default true. When
@@ -159,5 +158,5 @@ default['chef']['server_attributes']              = { }
 
 default['chef']['manage_manage']                  = true
 default['chef']['manage_attributes']              = { 'org_creation_enabled' => 'org_creation_enabled false',
-                                                      'disable_sign_up'      => 'disable_sign_up true'
+                                                      'disable_sign_up' => 'disable_sign_up true',
                                                     }

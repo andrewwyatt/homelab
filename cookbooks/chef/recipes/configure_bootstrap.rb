@@ -68,19 +68,19 @@ template "/var/opt/opscode/nginx/html#{node['chef']['bootstrap_root']}bootstrap"
   action :create
   sensitive node['chef']['runtime']['sensitivity']
   source "var/opt/opscode/nginx/html#{node['chef']['bootstrap_root']}bootstrap.erb"
-  variables({
-    server_name:         node['fqdn'],
-    client_version:      node['chef']['client_version'],
+  variables(
+    server_name: node['fqdn'],
+    client_version: node['chef']['client_version'],
     install_from_source: node['chef']['install_from_source'],
-    url:                 node['chef']['client_url'],
-    org_name:            node['chef']['default_organization'],
-    org_user:            node['chef']['bootstrap_user'],
-    org_cert:            node['chef']['organizations'][node['chef']['default_organization']]['validator'],
-    chef_environment:    node['chef']['organizations'][node['chef']['default_organization']]['environment'],
-    run_list:            node['chef']['organizations'][node['chef']['default_organization']]['run_list'],
-    bootstrap_root:      node['chef']['bootstrap_root'],
-    bootstrap_delay:     node['chef']['bootstrap_delay']
-  })
+    url: node['chef']['client_url'],
+    org_name: node['chef']['default_organization'],
+    org_user: node['chef']['bootstrap_user'],
+    org_cert: node['chef']['organizations'][node['chef']['default_organization']]['validator'],
+    chef_environment: node['chef']['organizations'][node['chef']['default_organization']]['environment'],
+    run_list: node['chef']['organizations'][node['chef']['default_organization']]['run_list'],
+    bootstrap_root: node['chef']['bootstrap_root'],
+    bootstrap_delay: node['chef']['bootstrap_delay']
+  )
 end
 
 execute 'Restart nginx' do
@@ -89,8 +89,8 @@ execute 'Restart nginx' do
   action :nothing
 end
 
-template "/var/opt/opscode/nginx/etc/addon.d/50-bootstrap_external.conf" do
-  source "var/opt/opscode/nginx/etc/addon.d/50-bootstrap_external.conf.erb"
+template '/var/opt/opscode/nginx/etc/addon.d/50-bootstrap_external.conf' do
+  source 'var/opt/opscode/nginx/etc/addon.d/50-bootstrap_external.conf.erb'
   owner 'opscode'
   group 'opscode'
   mode 0640
@@ -99,7 +99,7 @@ template "/var/opt/opscode/nginx/etc/addon.d/50-bootstrap_external.conf" do
   notifies :run, 'execute[Restart nginx]', :immediately
 end
 
-notification = "Encrypting the Chef encrypted data bag secret"
+notification = 'Encrypting the Chef encrypted data bag secret'
 bash notification do
   code <<-EOF
     #{openssl_decrypt} -in /var/opt/opscode/nginx/html#{node['chef']['bootstrap_root']}encrypted_data_bag_secret.enc >/dev/null 2>&1
@@ -111,7 +111,7 @@ bash notification do
   sensitive node['chef']['runtime']['sensitivity']
   notifies :create, "file[#{Chef::Config[:file_cache_path]}/.#{passfile}]", :before
   notifies :delete, "file[#{Chef::Config[:file_cache_path]}/.#{passfile}]", :delayed
-  only_if { File.exists? "/etc/chef/encrypted_data_bag_secret" }
+  only_if { File.exist? '/etc/chef/encrypted_data_bag_secret' }
 end
 
 notification = "Encrypting the Chef administrator certificate for user #{node['chef']['organizations'][node['chef']['default_organization']]['admin_user']['username']}"
@@ -126,10 +126,10 @@ bash notification do
   sensitive node['chef']['runtime']['sensitivity']
   notifies :create, "file[#{Chef::Config[:file_cache_path]}/.#{passfile}]", :before
   notifies :delete, "file[#{Chef::Config[:file_cache_path]}/.#{passfile}]", :delayed
-  only_if { File.exists? "#{node['chef']['keys']}/#{node['chef']['organizations'][node['chef']['default_organization']]['admin_user']['username']}.pem" }
+  only_if { File.exist? "#{node['chef']['keys']}/#{node['chef']['organizations'][node['chef']['default_organization']]['admin_user']['username']}.pem" }
 end
 
-notification = "Encrypting the pivotal private key"
+notification = 'Encrypting the pivotal private key'
 bash notification do
   code <<-EOF
   #{openssl_decrypt} -in /var/opt/opscode/nginx/html#{node['chef']['bootstrap_root']}pivotal.pem.enc >/dev/null 2>&1
@@ -141,17 +141,17 @@ bash notification do
   sensitive node['chef']['runtime']['sensitivity']
   notifies :create, "file[#{Chef::Config[:file_cache_path]}/.#{passfile}]", :before
   notifies :delete, "file[#{Chef::Config[:file_cache_path]}/.#{passfile}]", :delayed
-  only_if { File.exists? "/etc/opscode/pivotal.pem" }
+  only_if { File.exist? '/etc/opscode/pivotal.pem' }
 end
 
 bsfiles = [ "#{node['fqdn']}.crt.enc",
-            "encrypted_data_bag_secret.enc",
+            'encrypted_data_bag_secret.enc',
             "#{node['chef']['organizations'][node['chef']['default_organization']]['admin_user']['username']}.pem.enc",
-            "pivotal.pem.enc" ]
+            'pivotal.pem.enc' ]
 
-node['chef']['organizations'].each do |key,org|
+node['chef']['organizations'].each do |_key, org|
   notification = "Encrypting the #{org['full_name']} validator certificate."
-  bash notification do #~FC022
+  bash notification do # ~FC022
     code <<-EOF
       #{openssl_decrypt} -in /var/opt/opscode/nginx/html#{node['chef']['bootstrap_root']}#{org['short_name']}-validator.pem.enc >/dev/null 2>&1
       if [ ! "$?" = 0 ]
@@ -162,12 +162,12 @@ node['chef']['organizations'].each do |key,org|
     sensitive node['chef']['runtime']['sensitivity']
     notifies :create, "file[#{Chef::Config[:file_cache_path]}/.#{passfile}]", :before
     notifies :delete, "file[#{Chef::Config[:file_cache_path]}/.#{passfile}]", :delayed
-    only_if { File.exists? "#{node['chef']['keys']}/#{org['short_name']}-validator.pem" }
+    only_if { File.exist? "#{node['chef']['keys']}/#{org['short_name']}-validator.pem" }
   end
   bsfiles << "#{org['short_name']}-validator.pem.enc"
 end
 
-bsfiles.each do | bsfile |
+bsfiles.each do |bsfile|
   file "/var/opt/opscode/nginx/html#{node['chef']['bootstrap_root']}#{bsfile}" do
     owner 'opscode'
     group 'opscode'

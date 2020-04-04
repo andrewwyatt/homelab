@@ -18,10 +18,10 @@
 ###
 
 ### Define a command to use for slack notifications
-template "/usr/bin/notify" do
-  source "usr/bin/notify.erb"
-  owner "root"
-  group "root"
+template '/usr/bin/notify' do
+  source 'usr/bin/notify.erb'
+  owner 'root'
+  group 'root'
   mode 0750
   action :create
   sensitive node['linux']['runtime']['sensitivity']

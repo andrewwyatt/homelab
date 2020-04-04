@@ -17,9 +17,9 @@
 ### limitations under the License.
 ###
 
-file "/etc/localtime" do
+file '/etc/localtime' do
   action :delete
-  not_if "test -L /etc/localtime"
+  not_if 'test -L /etc/localtime'
 end
 
 file "/usr/share/zoneinfo/#{node['linux']['timezone']}" do
@@ -29,7 +29,7 @@ file "/usr/share/zoneinfo/#{node['linux']['timezone']}" do
   sensitive node['linux']['runtime']['sensitivity']
 end
 
-link "/etc/localtime" do
+link '/etc/localtime' do
   to "/usr/share/zoneinfo/#{node['linux']['timezone']}"
   owner 'root'
   group 'root'

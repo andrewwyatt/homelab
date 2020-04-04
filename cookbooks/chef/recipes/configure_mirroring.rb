@@ -41,7 +41,12 @@ end
 openssl_decrypt = String.new("openssl aes-256-cbc -a -d -pass file:#{Chef::Config[:file_cache_path]}/.#{passfile}")
 openssl_encrypt = String.new("openssl aes-256-cbc -a -salt -pass file:#{Chef::Config[:file_cache_path]}/.#{passfile}")
 
-unless node['chef']['sync_host'] == node['fqdn']
+if node['chef']['sync_host'] == node['fqdn']
+  if tagged?(node['chef']['worker_tag'])
+    untag(node['chef']['worker_tag'])
+  end
+  tag(node['chef']['master_tag'])
+else
   if tagged?(node['chef']['master_tag'])
     untag(node['chef']['master_tag'])
   end
@@ -54,8 +59,7 @@ unless node['chef']['sync_host'] == node['fqdn']
       recursive true
       action :create
     end
-    node['chef']['organizations'].each do |key,org|
-
+    node['chef']['organizations'].each do |_key, org|
       directory node['chef']['mirror_root'] do
         owner 'root'
         group 'root'
@@ -93,7 +97,7 @@ unless node['chef']['sync_host'] == node['fqdn']
         action :create
       end
 
-      notification = "Decrypt the pivotal key for replication."
+      notification = 'Decrypt the pivotal key for replication.'
       bash notification do
         code <<-EOF
           #{openssl_decrypt} -in #{node['chef']['mirror_root']}/#{node['chef']['sync_host']}/pivotal.pem.enc -out #{node['chef']['mirror_root']}/#{node['chef']['sync_host']}/pivotal.pem
@@ -106,7 +110,7 @@ unless node['chef']['sync_host'] == node['fqdn']
       hosts = [ node['chef']['sync_host'],
                 node['fqdn'] ]
 
-      hosts.each do | host |
+      hosts.each do |host|
         template "#{node['chef']['mirror_root']}/#{node['chef']['sync_host']}/#{org['short_name']}/#{host}.rb" do
           source 'mirror/client.rb.erb'
           owner 'root'
@@ -114,11 +118,11 @@ unless node['chef']['sync_host'] == node['fqdn']
           mode 0700
           sensitive node['chef']['runtime']['sensitivity']
           action :create
-          variables({
-            mirror_root:         node['chef']['mirror_root'],
-            chef_server:         host,
-            chef_org:            org['short_name']
-          })
+          variables(
+            mirror_root: node['chef']['mirror_root'],
+            chef_server: host,
+            chef_org: org['short_name']
+          )
         end
         execute "Fetching certificates from #{host}" do
           command "knife ssl fetch -c #{node['chef']['mirror_root']}/#{node['chef']['sync_host']}/#{org['short_name']}/#{host}.rb 2>/dev/null"
@@ -127,7 +131,7 @@ unless node['chef']['sync_host'] == node['fqdn']
         end
       end
 
-      node['chef']['mirror'].each do | dataset |
+      node['chef']['mirror'].each do |dataset|
         execute "Fetching data from #{node['chef']['sync_host']}" do
           command "knife download /#{dataset} --chef-repo-path #{node['chef']['mirror_root']}/#{node['chef']['sync_host']}/#{org['short_name']}/data -c #{node['chef']['mirror_root']}/#{node['chef']['sync_host']}/#{org['short_name']}/#{node['chef']['sync_host']}.rb"
           sensitive node['chef']['runtime']['sensitivity']
@@ -143,16 +147,11 @@ unless node['chef']['sync_host'] == node['fqdn']
                   "#{node['fqdn']}.rb",
                   "#{node['chef']['sync_host']}.rb" ]
 
-      cleanup.each do | cfile |
+      cleanup.each do |cfile|
         file cfile do
           action :delete
         end
       end
     end
   end
-else
-  if tagged?(node['chef']['worker_tag'])
-    untag(node['chef']['worker_tag'])
-  end
-  tag(node['chef']['master_tag'])
 end
