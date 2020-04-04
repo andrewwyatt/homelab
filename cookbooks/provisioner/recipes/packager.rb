@@ -434,8 +434,8 @@ end
 
 currentdate = `date '+%s'`.chomp
 
-certexpiration = if File.exist?("/etc/opscode/#{node['fqdn']}.crt")
-                   `date -d "$(/usr/bin/openssl x509 -enddate -noout -in #{node['chef']['server_attributes']['nginx']['ssl_certificate']} | sed -e 's#notAfter=##')" '+%s'`.chomp
+certexpiration = if File.exist?("#{node['provisioner']['httpd']['ssl_certificate']}")
+                   `date -d "$(/usr/bin/openssl x509 -enddate -noout -in #{node['provisioner']['httpd']['ssl_certificate']} | sed -e 's#notAfter=##')" '+%s'`.chomp
                  else
                    currentdate
                  end
@@ -443,6 +443,13 @@ certexpiration = if File.exist?("/etc/opscode/#{node['fqdn']}.crt")
 certdaysleft = (certexpiration.to_i - currentdate.to_i) / 86400
 if certdaysleft < node['chef']['ssl']['renewal_day'].to_i
   renew_now = true
+end
+
+notification = "Renewing my SSL certificate @ #{certdaysleft} days left."
+execute 'Renewal notification' do
+  command "notify \"#{node['linux']['slack_channel']}\" \"#{node['provisioner']['replicator_emoji']}\" \"#{node['linux']['api_path']}\"  \"#{notification}\""
+  action :run
+  only_if { renew_now == true }
 end
 
 notification = "Renewing my SSL certificate @ #{certdaysleft} days left."

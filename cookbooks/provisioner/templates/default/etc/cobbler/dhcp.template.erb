@@ -20,14 +20,21 @@ set vendorclass = option vendor-class-identifier;
 
 option pxe-system-type code 93 = unsigned integer 16;
 
+class "nodes" {
+     <%= node['provisioner']['dhcp_match'] %>
+}
+
 subnet <%= node['provisioner']['subnet'] %> netmask <%= node['provisioner']['netmask'] %> {
-     option routers             <%= node['provisioner']['routers'] %>;
-     option domain-name-servers <%= node['provisioner']['domain_name_servers'] %>;
-     option subnet-mask         <%= node['provisioner']['netmask'] %>;
-     range dynamic-bootp        <%= node['provisioner']['dhcp_range'] %>;
-     default-lease-time         <%= node['provisioner']['dhcp_default_lease_time'] %>;
-     max-lease-time             <%= node['provisioner']['dhcp_max_lease_time'] %>;
-     next-server                $next_server;
+     pool {
+          allow members of "nodes";
+          range dynamic-bootp        <%= node['provisioner']['dhcp_range'] %>;
+          option routers             <%= node['provisioner']['routers'] %>;
+          option domain-name-servers <%= node['provisioner']['domain_name_servers'] %>;
+          option subnet-mask         <%= node['provisioner']['netmask'] %>;
+          default-lease-time         <%= node['provisioner']['dhcp_default_lease_time'] %>;
+          max-lease-time             <%= node['provisioner']['dhcp_max_lease_time'] %>;
+          next-server                $next_server;
+     }
      class "pxeclients" {
           match if substring (option vendor-class-identifier, 0, 9) = "PXEClient";
           if option pxe-system-type = 00:02 {

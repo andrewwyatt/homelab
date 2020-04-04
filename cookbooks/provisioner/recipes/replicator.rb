@@ -187,13 +187,22 @@ if node['linux']['dns']['mechanism'] == 'zonomi' && node['provisioner']['ssl']['
 end
 
 ###
+### Configure the http server to use the SSL certificates from Let's Encrypt
+###
+
+if node['linux']['dns']['mechanism'] == 'zonomi' && node['provisioner']['ssl']['use_acme'] == true
+  node.default['provisioner']['httpd']['ssl_certificate'] = '/etc/pki/tls/certs/localhost.crt'
+  node.default['provisioner']['httpd']['ssl_certificate_key'] = '/etc/pki/tls/private/localhost.key'
+end
+
+###
 ### Does my certificate exist, or is it within the renewal window?
 ###
 
 currentdate = `date '+%s'`.chomp
 
-certexpiration = if File.exist?("/etc/opscode/#{node['fqdn']}.crt")
-                   `date -d "$(/usr/bin/openssl x509 -enddate -noout -in #{node['chef']['server_attributes']['nginx']['ssl_certificate']} | sed -e 's#notAfter=##')" '+%s'`.chomp
+certexpiration = if File.exist?("#{node['provisioner']['httpd']['ssl_certificate']}")
+                   `date -d "$(/usr/bin/openssl x509 -enddate -noout -in #{node['provisioner']['httpd']['ssl_certificate']} | sed -e 's#notAfter=##')" '+%s'`.chomp
                  else
                    currentdate
                  end

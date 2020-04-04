@@ -60,6 +60,7 @@ template '/etc/usbguard/usbguard-daemon.conf' do
   action :create
   sensitive node['linux']['runtime']['sensitivity']
   notifies :restart, 'service[usbguard]', :immediately
+  only_if { node['linux']['security']['enable_usbguard'] == true }
 end
 
 service 'usbguard' do

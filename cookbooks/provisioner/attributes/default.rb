@@ -67,6 +67,14 @@ default['provisioner']['dhcp_range']                            = '10.100.100.17
 default['provisioner']['dhcp_default_lease_time']               = '21600'
 default['provisioner']['dhcp_max_lease_time']                   = '43200'
 
+###
+### Match rule so we only answer for VMWare and 
+### VirtualBox instances by default.  Null to
+### disable the match rule.
+###
+
+default['provisioner']['dhcp_match']                            = 'match if ( substring(hardware, 1, 3) = "00:0C:29" ) or ( substring(hardware, 1, 3) = "08:00:27" );'
+
 default['provisioner']['cobbler']['use_https']                  = '1'
 default['provisioner']['cobbler']['port']                       = '443'
 
