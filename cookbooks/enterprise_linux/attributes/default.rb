@@ -258,6 +258,8 @@ default['linux']['logindefs']['create_home']                     = 'yes'
 default['linux']['logindefs']['umask']                           = '027'
 default['linux']['logindefs']['usergroups_enab']                 = 'yes'
 default['linux']['logindefs']['encrypt_method']                  = 'SHA512'
+default['linux']['logindefs']['sha_crypt_min_rounds']            = '10000'
+default['linux']['logindefs']['sha_crypt_max_rounds']            = '99999'
 default['linux']['logindefs']['fail_delay']                      = '4'
 default['linux']['logindefs']['faillog_enab']                    = 'yes'
 
@@ -394,7 +396,7 @@ default['linux']['security']['remove_telnet']                    = true
 default['linux']['security']['harden_as']                        = true
 default['linux']['security']['enable_aide']                      = true
 default['linux']['security']['enable_psacct']                    = true
-default['linux']['security']['enable_usbguard']                  = true
+default['linux']['security']['enable_usbguard']                  = false
 default['linux']['security']['enable_arpwatch']                  = true
 
 default['linux']['rsyslog']['rules']                             = { 'messages' => '*.info;mail.none;authpriv.none;cron.none                /var/log/messages',
@@ -432,7 +434,7 @@ default['linux']['sysctl']                                       = { 'net.ipv4.c
                                                                      'net.ipv6.conf.all.accept_redirects' => '0',
                                                                      'net.ipv6.conf.default.accept_ra' => '0',
                                                                      'net.ipv6.conf.all.accept_ra' => '0',
-                                                                     'vm.swappiness' => '0',
+                                                                     'vm.swappiness' => '1',
                                                                      'kernel.sysrq' => '0',
                                                                      'kernel.exec-shield' => '1',
                                                                      'fs.suid_dumpable' => '0',

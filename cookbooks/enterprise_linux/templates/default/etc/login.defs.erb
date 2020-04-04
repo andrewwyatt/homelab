@@ -63,6 +63,8 @@ USERGROUPS_ENAB <%= node['linux']['logindefs']['usergroups_enab'] %>
 
 # Use SHA512 to encrypt password.
 ENCRYPT_METHOD <%= node['linux']['logindefs']['encrypt_method'] %>
+SHA_CRYPT_MIN_ROUNDS <%= node['linux']['logindefs']['sha_crypt_min_rounds'] %>
+SHA_CRYPT_MAX_ROUNDS <%= node['linux']['logindefs']['sha_crypt_max_rounds'] %>
 
 FAIL_DELAY <%= node['linux']['logindefs']['fail_delay'] %>
 FAILLOG_ENAB <%= node['linux']['logindefs']['faillog_enab'] %>

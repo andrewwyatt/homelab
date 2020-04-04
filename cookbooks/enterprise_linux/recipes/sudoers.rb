@@ -33,7 +33,7 @@ end
 directory '/etc/sudoers.d' do
   owner 'root'
   group 'root'
-  mode 0755
+  mode 0750
   action :create
   sensitive node['linux']['runtime']['sensitivity']
 end
