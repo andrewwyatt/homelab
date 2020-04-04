@@ -147,7 +147,7 @@ default['linux']['banner'] =
 
 **************************************************************************
 
-  '
+'
 
 ###
 ### By default we don't present a message of the day to users post login.
