@@ -28,13 +28,13 @@ subnet <%= node['provisioner']['subnet'] %> netmask <%= node['provisioner']['net
      pool {
           allow members of "nodes";
           range dynamic-bootp        <%= node['provisioner']['dhcp_range'] %>;
-          option routers             <%= node['provisioner']['routers'] %>;
-          option domain-name-servers <%= node['provisioner']['domain_name_servers'] %>;
-          option subnet-mask         <%= node['provisioner']['netmask'] %>;
-          default-lease-time         <%= node['provisioner']['dhcp_default_lease_time'] %>;
-          max-lease-time             <%= node['provisioner']['dhcp_max_lease_time'] %>;
-          next-server                $next_server;
      }
+     option routers             <%= node['provisioner']['routers'] %>;
+     option domain-name-servers <%= node['provisioner']['domain_name_servers'] %>;
+     option subnet-mask         <%= node['provisioner']['netmask'] %>;
+     default-lease-time         <%= node['provisioner']['dhcp_default_lease_time'] %>;
+     max-lease-time             <%= node['provisioner']['dhcp_max_lease_time'] %>;
+     next-server                $next_server;
      class "pxeclients" {
           match if substring (option vendor-class-identifier, 0, 9) = "PXEClient";
           if option pxe-system-type = 00:02 {
