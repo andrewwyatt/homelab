@@ -1,4 +1,19 @@
 ###
+### Lynis recommends arpwatch but then warns on once after adding.  Fixed
+### in an unreleased version.
+skip-test=NETW-3015
+
+###
+### Check ntpq peers output for time source candidates, output checks out.
+###
+skip-test=TIME-3128
+
+###
+### Recommends a tool to automatically install updates, we have that.
+###
+skip-test=PKGS-7420
+
+###
 ### Tables are managed by Chef, no need for this one.
 ###
 skip-test=FIRE-4513
