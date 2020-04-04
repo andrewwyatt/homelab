@@ -125,7 +125,7 @@ default['linux']['chef']['file_header']                          =
 
 default['linux']['banner'] =
   '
-************************************************************************
+**************************************************************************
 
    WARNING: This system is for the use of authorized clients only.
             Individuals using the computer network system without
