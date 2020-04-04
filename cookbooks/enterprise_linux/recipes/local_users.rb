@@ -65,9 +65,16 @@ user 'root' do
   only_if { node['linux']['disable_root'] == false }
 end
 
+###
+### Never lock the root account.
+###
+
 bash 'Ensure local account controls are applied' do
   code <<-EOF
-     for user in $(awk 'BEGIN { FS=":" } /1/ { print $1 }' /etc/shadow)
+     ### Required for cron to function properly.
+     chage -I -1 -m 0 -M 99999 -E -1 root
+     ### All other users
+     for user in $(awk 'BEGIN { FS=":" } /1/ && !/root/ { print $1 }' /etc/shadow)
      do
        chage -m #{node['linux']['logindefs']['pass_min_days']} -M #{node['linux']['logindefs']['pass_max_days']} -W #{node['linux']['logindefs']['pass_warn_age']} ${user}
      done

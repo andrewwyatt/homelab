@@ -219,12 +219,6 @@ default['linux']['login']['lock_inactive_users']                = true
 default['linux']['login']['inactive_user_lock_days']            = '30'
 
 ###
-### Valid for EL6 (deprecated)
-###
-
-default['linux']['runlevel']                                    = '3'
-
-###
 ### EL7 uses multi-user.target
 ###
 

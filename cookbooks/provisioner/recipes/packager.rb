@@ -434,7 +434,7 @@ end
 
 currentdate = `date '+%s'`.chomp
 
-certexpiration = if File.exist?("#{node['provisioner']['httpd']['ssl_certificate']}")
+certexpiration = if File.exist?((node['provisioner']['httpd']['ssl_certificate']).to_s)
                    `date -d "$(/usr/bin/openssl x509 -enddate -noout -in #{node['provisioner']['httpd']['ssl_certificate']} | sed -e 's#notAfter=##')" '+%s'`.chomp
                  else
                    currentdate

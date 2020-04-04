@@ -68,7 +68,7 @@ default['provisioner']['dhcp_default_lease_time']               = '21600'
 default['provisioner']['dhcp_max_lease_time']                   = '43200'
 
 ###
-### Match rule so we only answer for VMWare and 
+### Match rule so we only answer for VMWare and
 ### VirtualBox instances by default.  Null to
 ### disable the match rule.
 ###
