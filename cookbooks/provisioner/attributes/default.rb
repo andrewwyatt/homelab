@@ -73,7 +73,7 @@ default['provisioner']['dhcp_max_lease_time']                   = '43200'
 ### disable the match rule.
 ###
 
-default['provisioner']['dhcp_match']                            = 'match if ( substring(hardware, 1, 3) = "00:0C:29" ) or ( substring(hardware, 1, 3) = "08:00:27" );'
+default['provisioner']['dhcp_match']                            = 'match if ( substring(hardware, 1, 3) = 00:0C:29 ) or ( substring(hardware, 1, 3) = 08:00:27 );'
 
 default['provisioner']['cobbler']['use_https']                  = '1'
 default['provisioner']['cobbler']['port']                       = '443'
