@@ -2,7 +2,7 @@
 
 <% @ping_nodes.each do | node | %>
 <%= "check host #{node} with address #{node}" %>
-<%= "if failed ping count 2 with timeout 4 seconds then" %>
+<%= "if failed ping count 4 with timeout 8 seconds then" %>
 <%= "  exec \"/bin/monit-slack Ping test failed to #{node}\"" %>
 <%= "else if succeeded then" %>
 <%= "  exec \"/bin/monit-slack Ping test succeeded to #{node}\" "%>
