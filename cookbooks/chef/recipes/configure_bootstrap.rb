@@ -144,8 +144,7 @@ bash notification do
   only_if { File.exist? '/etc/opscode/pivotal.pem' }
 end
 
-bsfiles = [ "#{node['fqdn']}.crt.enc",
-            'encrypted_data_bag_secret.enc',
+bsfiles = [ 'encrypted_data_bag_secret.enc',
             "#{node['chef']['organizations'][node['chef']['default_organization']]['admin_user']['username']}.pem.enc",
             'pivotal.pem.enc' ]
 
